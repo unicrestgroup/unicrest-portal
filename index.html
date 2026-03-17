@@ -56,8 +56,6 @@
   --muted:       #666666;
   --border:      #DDDDDD;
   --red:         #CC2200;
-  --teal:        #0f766e;
-  --teal-dark:   #0d5f57;
   --lato:        'Lato', sans-serif;
   --serif:       'Source Serif 4', serif;
 }
@@ -100,7 +98,7 @@ body { background: var(--light); color: var(--black); font-family: var(--lato); 
 #loading {
   position: fixed; inset: 0; background: var(--white);
   display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 1rem; z-index: 200;
+  justify-content: center; gap: 1rem; z-index: 300;
 }
 .loading-bar { width: 200px; height: 4px; background: var(--light); border-radius: 2px; overflow: hidden; }
 .loading-bar-inner {
@@ -110,7 +108,12 @@ body { background: var(--light); color: var(--black); font-family: var(--lato); 
 @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(600%); } }
 .loading-label { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; font-weight: 300; }
 
-#login-screen { min-height: 100vh; display: flex; flex-direction: column; }
+#login-screen {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; flex-direction: column;
+  opacity: 1; transition: opacity 0.35s ease;
+}
+#login-screen.fade-out { opacity: 0; pointer-events: none; }
 .login-hero {
   background: var(--black); flex: 1;
   display: flex; flex-direction: column; align-items: center;
@@ -191,24 +194,11 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .app-card:hover { border-color: var(--purple); box-shadow: 0 2px 12px rgba(124,16,154,0.08); }
-
-/* Pinned card — Field Logger */
-.app-card-pinned {
-  background: var(--white); border: 1.5px solid var(--teal); border-radius: 6px;
-  padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.app-card-pinned:hover { box-shadow: 0 2px 12px rgba(15,118,110,0.12); }
-
 .card-top { display: flex; align-items: center; justify-content: space-between; }
 .card-emoji { font-size: 26px; line-height: 1; }
 .card-cat {
   font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--purple);
   text-transform: uppercase; background: rgba(124,16,154,0.07); border-radius: 3px; padding: 3px 8px;
-}
-.card-cat-teal {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--teal);
-  text-transform: uppercase; background: rgba(15,118,110,0.07); border-radius: 3px; padding: 3px 8px;
 }
 .card-name { font-size: 15px; font-weight: 700; color: var(--black); line-height: 1.3; }
 .card-desc { font-size: 12px; color: var(--muted); line-height: 1.5; font-weight: 300; }
@@ -226,13 +216,6 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
   font-weight: 700; letter-spacing: 0.04em; transition: background 0.15s;
 }
 .btn-launch:hover { background: var(--purple-mid); }
-.btn-launch-ext {
-  background: var(--teal); color: var(--white); border: none; border-radius: 4px;
-  cursor: pointer; font-size: 11px; padding: 5px 12px; font-family: var(--lato);
-  font-weight: 700; letter-spacing: 0.04em; transition: background 0.15s;
-  text-decoration: none; display: inline-block;
-}
-.btn-launch-ext:hover { background: var(--teal-dark); }
 .btn-delete {
   background: none; border: none; color: #CCCCCC; cursor: pointer;
   font-size: 13px; padding: 3px 6px; border-radius: 3px; transition: color 0.15s;
@@ -250,6 +233,8 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
 }
 
 #add-view { padding-bottom: 3rem; }
+#main-app { opacity: 0; transition: opacity 0.35s ease; }
+#main-app.visible { opacity: 1; }
 .form-body { max-width: 700px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .form-field { display: flex; flex-direction: column; gap: 6px; }
@@ -427,7 +412,7 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
       </div>
       <button style="background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);border-radius:4px;padding:7px 14px;font-size:12px;font-family:var(--lato);cursor:pointer;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.5)';this.style.borderColor='rgba(255,255,255,0.2)'" onclick="showView('gallery')">← Back to portal</button>
     </div>
-    <iframe id="app-iframe" sandbox="allow-scripts allow-forms allow-same-origin" title="App"></iframe>
+    <iframe id="app-iframe" sandbox="allow-scripts allow-forms allow-same-origin allow-modals" title="App"></iframe>
   </div>
 </div>
 
@@ -439,20 +424,6 @@ const CONFIG = {
   spSitePath:  "/sites/UnicrestGroup",
   listName:    "UnicrestApps"
 };
-
-// ── Pinned apps — always shown first, not stored in SharePoint ────────────────
-// To add more pinned apps, copy one of the objects below and change the values.
-const PINNED_APPS = [
-  {
-    id:          '__field-logger__',
-    name:        'Field Logger',
-    description: 'Log calls, meetings and contacts directly into HubSpot. Built for the sales team on the road.',
-    category:    'Sales',
-    emoji:       '📞',
-    url:         'https://brave-ocean-058c94b10.6.azurestaticapps.net',
-    pinned:      true
-  }
-];
 
 const EMOJIS = ["⚡","📊","🗂","✏️","🔧","🔬","📝","🧮","📈","🗺","🎯","💡","🔐","📅","🧩","🖥","📋","🔍","⚙️","🗃"];
 
@@ -501,6 +472,15 @@ async function enterApp(account) {
   buildEmojiPicker();
   show('main-app');
   hide('loading');
+  const loginEl  = document.getElementById('login-screen');
+  const mainEl   = document.getElementById('main-app');
+  loginEl.classList.add('fade-out');
+  setTimeout(() => {
+    hide('login-screen');
+    loginEl.classList.remove('fade-out');
+    window.scrollTo(0, 0);
+    mainEl.classList.add('visible');
+  }, 350);
   await loadApps();
   showView('gallery');
 }
@@ -742,18 +722,8 @@ function getFiltered() {
   );
 }
 
-function getPinnedFiltered() {
-  const s = currentSearch.toLowerCase();
-  return PINNED_APPS.filter(a =>
-    (currentCat === 'All' || currentCat === a.category) &&
-    (!s || a.name.toLowerCase().includes(s) || a.description.toLowerCase().includes(s))
-  );
-}
-
 function renderCatPills() {
-  const spCats = allApps.map(a => a.category);
-  const pinnedCats = PINNED_APPS.map(a => a.category);
-  const cats = ['All', ...new Set([...pinnedCats, ...spCats])];
+  const cats = ['All', ...new Set(allApps.map(a => a.category))];
   document.getElementById('cat-pills').innerHTML = cats.map(c =>
     `<button class="cat-pill${c === currentCat ? ' active' : ''}" onclick="setCat('${esc(c)}')">${esc(c)}</button>`
   ).join('');
@@ -761,11 +731,9 @@ function renderCatPills() {
 
 function renderGrid() {
   renderCatPills();
-  const pinned = getPinnedFiltered();
-  const apps   = getFiltered();
-  const grid   = document.getElementById('app-grid');
-
-  if (!pinned.length && !apps.length) {
+  const apps = getFiltered();
+  const grid = document.getElementById('app-grid');
+  if (!apps.length) {
     grid.innerHTML = `<div class="empty">${
       allApps.length === 0
         ? 'No apps yet.<br>Click "+ Add app" to add your first one.'
@@ -773,28 +741,7 @@ function renderGrid() {
     }</div>`;
     return;
   }
-
-  // Pinned cards first
-  const pinnedHtml = pinned.map(a => `
-    <div class="app-card-pinned">
-      <div class="card-top">
-        <span class="card-emoji">${a.emoji}</span>
-        <span class="card-cat-teal">${esc(a.category)}</span>
-      </div>
-      <div class="card-name">${esc(a.name)}</div>
-      ${a.description ? `<div class="card-desc">${esc(a.description)}</div>` : ''}
-      <div class="card-footer">
-        <div class="card-meta">
-          <span class="card-by" style="color:var(--teal);font-weight:700;">Pinned app</span>
-        </div>
-        <div class="card-actions">
-          <a class="btn-launch-ext" href="${a.url}" target="_blank" rel="noopener">Open →</a>
-        </div>
-      </div>
-    </div>`).join('');
-
-  // SharePoint cards
-  const appsHtml = apps.map(a => `
+  grid.innerHTML = apps.map(a => `
     <div class="app-card">
       <div class="card-top">
         <span class="card-emoji">${a.emoji}</span>
@@ -814,8 +761,6 @@ function renderGrid() {
         </div>
       </div>
     </div>`).join('');
-
-  grid.innerHTML = pinnedHtml + appsHtml;
 }
 
 function launchApp(id) {
