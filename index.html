@@ -3,365 +3,402 @@
 <head>
 <!--
 =================================================================
- UNICREST APP PORTAL
- Microsoft SSO + SharePoint storage, no other dependencies.
+ UNICREST APP PORTAL — Shadowspec Edition
+ Microsoft SSO + SharePoint storage
 =================================================================
-
- SETUP GUIDE (about 10 minutes total)
- ─────────────────────────────────────────────────────────────
 
  STEP 1 — Azure App Registration (portal.azure.com)
    a. Azure Active Directory > App registrations > New registration
    b. Name: "Unicrest App Portal"
    c. Supported account types: "Accounts in this organizational directory only"
-   d. Redirect URI: Single-page application (SPA) > the URL where you will host this file
-      (e.g. https://yourcompany.z6.web.core.windows.net/ or https://yoursite.sharepoint.com/apps/unicrest.html)
-   e. Click Register. Copy the Application (client) ID and Directory (tenant) ID.
-   f. API permissions > Add a permission > Microsoft Graph > Delegated permissions
-      > Search "Sites.ReadWrite.All" > Add
-   g. Click "Grant admin consent for [your org]" (requires Global Admin or SharePoint Admin)
+   d. Redirect URI: Single-page application (SPA) > URL where you host this file
+   e. Click Register. Copy Application (client) ID and Directory (tenant) ID.
+   f. API permissions > Add > Microsoft Graph > Delegated > Sites.ReadWrite.All
+   g. Grant admin consent for your org
 
  STEP 2 — SharePoint list
-   a. Go to any SharePoint site your staff can access
+   a. Go to your SharePoint site
    b. New > List, name it exactly: UnicrestApps
-   c. Add the following columns (all "Single line of text" UNLESS noted):
+   c. Add columns:
         AppDescription   (Single line of text)
         Category         (Single line of text)
         Emoji            (Single line of text)
-        HtmlSource       (Multiple lines of text — set to PLAIN TEXT, not enhanced)
+        HtmlSource       (Multiple lines of text — Plain Text, not enhanced)
         AddedBy          (Single line of text)
         DateAdded        (Single line of text)
-      Note: "Title" is the built-in name column, no need to add it.
 
- STEP 3 — Fill in the 4 CONFIG values below
-
- STEP 4 — Host this file
-   Recommended: Azure Blob Storage > Static website (free for small files)
-   Alternatively: Azure Static Web Apps, any IIS/web server, SharePoint Embed web part
-   The redirect URI in Step 1 must match exactly where you host this.
+ STEP 3 — Fill in CONFIG values below
+ STEP 4 — Host this file (GitHub Pages recommended)
 
 =================================================================
 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unicrest App Portal</title>
+<title>Unicrest App Portal — Shadowspec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,700&family=Source+Serif+4:ital,wght@0,900;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.7.1/lib/msal-browser.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:      #0d0f14;
-  --bg2:     #181b22;
-  --bg3:     #1e2128;
-  --border:  #2a2d35;
-  --text:    #e8e4dc;
-  --muted:   #7a6f5c;
-  --dim:     #47453f;
-  --gold:    #c8a96e;
-  --golddark:#a8893e;
-  --red:     #e24b4a;
-  --mono:    'Courier New', monospace;
-  --serif:   Georgia, serif;
+  --purple:      #7C109A;
+  --purple-mid:  #5A0C71;
+  --purple-deep: #3A0848;
+  --purple-navy: #1E0430;
+  --black:       #111111;
+  --light:       #F2F2F2;
+  --white:       #FFFFFF;
+  --sky:         #00A1DE;
+  --sun:         #FF9000;
+  --sun-dark:    #D97800;
+  --muted:       #666666;
+  --border:      #DDDDDD;
+  --red:         #CC2200;
+  --lato:        'Lato', sans-serif;
+  --serif:       'Source Serif 4', serif;
 }
 
-body { background: var(--bg); color: var(--text); font-family: var(--serif); min-height: 100vh; }
+body { background: var(--light); color: var(--black); font-family: var(--lato); font-weight: 400; min-height: 100vh; }
 
-/* ── Shared ── */
 .hidden { display: none !important; }
 
-.btn-gold {
-  background: var(--gold); color: #0d0f14; border: none; border-radius: 6px;
-  padding: 9px 20px; font-size: 13px; font-weight: 700; cursor: pointer;
-  font-family: var(--mono); letter-spacing: 0.04em; transition: background 0.15s;
+.band {
+  height: 6px;
+  background: linear-gradient(90deg,
+    var(--purple) 0%, var(--purple) 25%,
+    var(--purple-mid) 25%, var(--purple-mid) 50%,
+    var(--purple-deep) 50%, var(--purple-deep) 75%,
+    var(--purple-navy) 75%, var(--purple-navy) 100%);
 }
-.btn-gold:hover { background: var(--golddark); }
-.btn-gold:disabled { opacity: 0.45; cursor: not-allowed; }
 
-.btn-outline {
+.btn-primary {
+  background: var(--sun); color: var(--white); border: none; border-radius: 4px;
+  padding: 10px 22px; font-size: 14px; font-weight: 700; font-family: var(--lato);
+  cursor: pointer; letter-spacing: 0.02em; transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--sun-dark); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-secondary {
+  background: var(--white); color: var(--purple); border: 1.5px solid var(--purple);
+  border-radius: 4px; padding: 8px 18px; font-size: 13px; font-weight: 700;
+  font-family: var(--lato); cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.btn-secondary:hover { background: var(--purple); color: var(--white); }
+
+.btn-ghost {
   background: none; border: 1px solid var(--border); color: var(--muted);
-  border-radius: 6px; padding: 7px 14px; font-size: 12px; cursor: pointer;
-  font-family: var(--mono); transition: border-color 0.15s, color 0.15s;
+  border-radius: 4px; padding: 7px 14px; font-size: 12px; font-family: var(--lato);
+  cursor: pointer; transition: border-color 0.15s, color 0.15s;
 }
-.btn-outline:hover { border-color: var(--muted); color: var(--text); }
+.btn-ghost:hover { border-color: var(--purple); color: var(--purple); }
 
-/* ── Loading overlay ── */
 #loading {
-  position: fixed; inset: 0; background: var(--bg); display: flex;
-  align-items: center; justify-content: center; z-index: 200;
-  font-family: var(--mono); color: var(--muted); font-size: 13px; letter-spacing: 0.08em;
-}
-
-/* ── Login screen ── */
-#login-screen {
+  position: fixed; inset: 0; background: var(--white);
   display: flex; flex-direction: column; align-items: center;
-  justify-content: center; height: 100vh; gap: 1.75rem; text-align: center;
+  justify-content: center; gap: 1rem; z-index: 200;
 }
-.login-logo { display: flex; align-items: baseline; gap: 10px; }
-.login-logo h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
-.login-logo span {
-  font-size: 12px; font-family: var(--mono); color: var(--muted);
-  letter-spacing: 0.12em; text-transform: uppercase;
+.loading-bar { width: 200px; height: 4px; background: var(--light); border-radius: 2px; overflow: hidden; }
+.loading-bar-inner {
+  height: 100%; background: var(--purple); width: 40%;
+  animation: slide 1.2s ease-in-out infinite;
 }
-.login-sub {
-  font-size: 13px; color: var(--muted); font-family: var(--mono);
-  max-width: 280px; line-height: 1.7;
+@keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(600%); } }
+.loading-label { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; font-weight: 300; }
+
+#login-screen { min-height: 100vh; display: flex; flex-direction: column; }
+.login-hero {
+  background: var(--black); flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 2rem; padding: 3rem 2rem; text-align: center;
 }
+.login-wordmark { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.login-wordmark-top {
+  font-family: var(--lato); font-weight: 300; font-size: 12px;
+  color: rgba(255,255,255,0.4); letter-spacing: 0.25em; text-transform: uppercase;
+}
+.login-wordmark-main { display: flex; align-items: baseline; gap: 10px; }
+.login-wordmark-name { font-family: var(--lato); font-weight: 900; font-size: 44px; color: var(--white); letter-spacing: -0.02em; }
+.login-wordmark-sub { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 18px; color: rgba(255,255,255,0.45); }
+.login-tagline { font-size: 13px; color: rgba(255,255,255,0.35); font-weight: 300; letter-spacing: 0.1em; }
 .ms-btn {
-  background: #2f2f2f; color: #fff; border: none; border-radius: 4px;
-  padding: 11px 22px; font-size: 14px; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 10px;
-  font-family: 'Segoe UI', Arial, sans-serif; transition: background 0.15s;
+  background: var(--white); color: var(--black); border: none; border-radius: 4px;
+  padding: 12px 24px; font-size: 14px; font-weight: 700; font-family: var(--lato);
+  cursor: pointer; display: inline-flex; align-items: center; gap: 10px; transition: background 0.15s;
 }
-.ms-btn:hover { background: #3a3a3a; }
+.ms-btn:hover { background: var(--light); }
+.login-footer {
+  background: var(--purple); padding: 12px 2rem; text-align: center;
+  font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 300; letter-spacing: 0.08em;
+}
 
-/* ── Header ── */
-header {
-  border-bottom: 1px solid var(--border); padding: 0 2rem;
-  display: flex; align-items: center; justify-content: space-between; height: 60px;
-  position: sticky; top: 0; background: var(--bg); z-index: 10;
+header { background: var(--black); position: sticky; top: 0; z-index: 10; }
+.header-inner {
+  padding: 0 2rem; display: flex; align-items: center;
+  justify-content: space-between; height: 62px;
 }
-.header-logo { display: flex; align-items: baseline; gap: 10px; }
-.header-logo strong { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
-.header-logo em {
-  font-size: 11px; font-family: var(--mono); color: var(--muted);
-  letter-spacing: 0.12em; text-transform: uppercase; font-style: normal;
-}
-.header-right { display: flex; align-items: center; gap: 12px; }
-.user-chip { font-size: 11px; font-family: var(--mono); color: var(--dim); }
+.header-wordmark { display: flex; align-items: baseline; gap: 10px; }
+.header-wordmark strong { font-size: 20px; font-weight: 900; color: var(--white); letter-spacing: -0.01em; }
+.header-wordmark em { font-family: var(--serif); font-style: italic; font-size: 13px; color: rgba(255,255,255,0.4); font-weight: 400; }
+.header-right { display: flex; align-items: center; gap: 14px; }
+.user-chip { font-size: 12px; color: rgba(255,255,255,0.35); font-weight: 300; }
 
-/* ── Error banner ── */
 #error-banner {
-  margin: 0.75rem 2rem 0; padding: 10px 14px;
-  background: #160a0a; border: 1px solid var(--red); border-radius: 6px;
-  font-size: 12px; font-family: var(--mono); color: var(--red);
+  margin: 1rem 2rem 0; padding: 10px 14px;
+  background: #FFF0EE; border-left: 3px solid var(--red);
+  border-radius: 0 4px 4px 0; font-size: 12px; color: var(--red);
 }
 
-/* ── Toolbar ── */
-.toolbar {
-  padding: 1.25rem 2rem 0;
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+.page-title-strip {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 1.25rem 2rem; display: flex; align-items: flex-end;
+  justify-content: space-between; flex-wrap: wrap; gap: 1rem;
 }
+.page-title-strip h1 {
+  font-family: var(--serif); font-weight: 900; font-size: 26px;
+  color: var(--black); letter-spacing: -0.01em; line-height: 1;
+}
+.page-title-strip p { font-size: 13px; color: var(--muted); font-weight: 300; margin-top: 4px; }
+
+.toolbar { padding: 1.25rem 2rem 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .search-input {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-  padding: 7px 12px; color: var(--text); font-size: 13px; font-family: var(--mono);
-  width: 210px; outline: none;
+  background: var(--white); border: 1px solid var(--border); border-radius: 4px;
+  padding: 8px 12px; color: var(--black); font-size: 13px; font-family: var(--lato);
+  width: 220px; outline: none; transition: border-color 0.15s;
 }
-.search-input:focus { border-color: var(--muted); }
-.cat-pill {
-  background: var(--bg2); color: var(--muted); border: 1px solid var(--border);
-  border-radius: 100px; padding: 4px 14px; font-size: 11px; font-family: var(--mono);
-  cursor: pointer; letter-spacing: 0.04em; transition: all 0.15s; white-space: nowrap;
-}
-.cat-pill.active { background: var(--gold); color: #0d0f14; border-color: var(--gold); }
+.search-input:focus { border-color: var(--purple); }
+.search-input::placeholder { color: #AAAAAA; }
 
-/* ── App grid ── */
+.cat-pill {
+  background: var(--white); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 100px; padding: 5px 14px; font-size: 12px; font-family: var(--lato);
+  font-weight: 700; cursor: pointer; letter-spacing: 0.02em; transition: all 0.15s; white-space: nowrap;
+}
+.cat-pill:hover { border-color: var(--purple); color: var(--purple); }
+.cat-pill.active { background: var(--purple); color: var(--white); border-color: var(--purple); }
+
 .app-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 14px; padding: 1.25rem 2rem 2rem;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px; padding: 1.25rem 2rem 2rem;
 }
 .app-card {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  background: var(--white); border: 1px solid var(--border); border-radius: 6px;
   padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.app-card:hover { border-color: #3a3d45; background: #1a1d24; }
+.app-card:hover { border-color: var(--purple); box-shadow: 0 2px 12px rgba(124,16,154,0.08); }
 .card-top { display: flex; align-items: center; justify-content: space-between; }
 .card-emoji { font-size: 26px; line-height: 1; }
 .card-cat {
-  font-size: 10px; font-family: var(--mono); letter-spacing: 0.1em;
-  color: var(--muted); text-transform: uppercase; background: var(--bg);
-  border: 1px solid var(--border); border-radius: 4px; padding: 3px 8px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--purple);
+  text-transform: uppercase; background: rgba(124,16,154,0.07); border-radius: 3px; padding: 3px 8px;
 }
-.card-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.3; }
-.card-desc { font-size: 12px; color: var(--dim); line-height: 1.5; font-family: var(--mono); }
+.card-name { font-size: 15px; font-weight: 700; color: var(--black); line-height: 1.3; }
+.card-desc { font-size: 12px; color: var(--muted); line-height: 1.5; font-weight: 300; }
 .card-footer {
   display: flex; align-items: flex-end; justify-content: space-between;
-  margin-top: auto; padding-top: 10px; border-top: 1px solid var(--bg3);
+  margin-top: auto; padding-top: 10px; border-top: 1px solid var(--light);
 }
 .card-meta { display: flex; flex-direction: column; gap: 2px; }
-.card-date { font-size: 10px; font-family: var(--mono); color: var(--dim); }
-.card-by   { font-size: 10px; font-family: var(--mono); color: var(--dim); }
+.card-date { font-size: 10px; color: #AAAAAA; font-weight: 300; }
+.card-by   { font-size: 10px; color: #AAAAAA; font-weight: 300; }
 .card-actions { display: flex; gap: 6px; align-items: center; }
 .btn-launch {
-  background: none; border: 1px solid var(--border); color: var(--gold);
-  cursor: pointer; font-size: 11px; padding: 4px 10px; border-radius: 4px;
-  font-family: var(--mono); letter-spacing: 0.06em; transition: all 0.15s;
+  background: var(--purple); color: var(--white); border: none; border-radius: 4px;
+  cursor: pointer; font-size: 11px; padding: 5px 12px; font-family: var(--lato);
+  font-weight: 700; letter-spacing: 0.04em; transition: background 0.15s;
 }
-.btn-launch:hover { background: var(--bg3); border-color: var(--gold); }
+.btn-launch:hover { background: var(--purple-mid); }
 .btn-delete {
-  background: none; border: none; color: var(--dim); cursor: pointer;
-  font-size: 13px; padding: 3px 6px; border-radius: 4px; font-family: var(--mono);
-  transition: color 0.15s;
+  background: none; border: none; color: #CCCCCC; cursor: pointer;
+  font-size: 13px; padding: 3px 6px; border-radius: 3px; transition: color 0.15s;
 }
 .btn-delete:hover { color: var(--red); }
-
 .empty {
   grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;
-  color: var(--dim); font-family: var(--mono); font-size: 13px; line-height: 2;
+  color: #AAAAAA; font-size: 14px; font-weight: 300; line-height: 2;
 }
 
-/* ── Add form ── */
-#add-view {
-  max-width: 700px; margin: 0 auto; padding: 2rem;
-  display: flex; flex-direction: column; gap: 1.25rem;
-}
-.form-hdr {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;
-}
-.form-hdr h2 {
-  font-size: 13px; font-family: var(--mono); letter-spacing: 0.1em;
-  color: var(--muted); text-transform: uppercase; font-weight: 400;
-}
+#add-view { padding-bottom: 3rem; }
+.form-body { max-width: 700px; margin: 0 auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.25rem; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .form-field { display: flex; flex-direction: column; gap: 6px; }
-.form-label {
-  font-size: 11px; font-family: var(--mono); letter-spacing: 0.1em;
-  color: var(--muted); text-transform: uppercase;
-}
+.form-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
 .form-input, .form-select {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-  padding: 9px 12px; color: var(--text); font-size: 13px; font-family: var(--mono);
-  outline: none; width: 100%;
+  background: var(--white); border: 1px solid var(--border); border-radius: 4px;
+  padding: 9px 12px; color: var(--black); font-size: 13px; font-family: var(--lato);
+  outline: none; width: 100%; transition: border-color 0.15s;
 }
-.form-input:focus, .form-select:focus { border-color: var(--muted); }
-.form-select option { background: var(--bg2); }
+.form-input:focus, .form-select:focus { border-color: var(--purple); }
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px;
+}
 .form-textarea {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-  padding: 10px 12px; color: var(--text); font-size: 12px; font-family: var(--mono);
-  outline: none; width: 100%; resize: vertical; min-height: 200px; line-height: 1.5;
+  background: var(--white); border: 1px solid var(--border); border-radius: 4px;
+  padding: 10px 12px; color: var(--black); font-size: 12px;
+  font-family: 'Courier New', monospace; outline: none; width: 100%;
+  resize: vertical; min-height: 200px; line-height: 1.5; transition: border-color 0.15s;
 }
-.form-textarea:focus { border-color: var(--muted); }
-.form-hint { font-size: 11px; font-family: var(--mono); color: var(--dim); line-height: 1.5; }
+.form-textarea:focus { border-color: var(--purple); }
+.form-hint { font-size: 11px; color: #AAAAAA; line-height: 1.5; font-weight: 300; }
 .emoji-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .emoji-btn {
-  font-size: 20px; padding: 5px 9px; background: none;
-  border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: border-color 0.1s;
+  font-size: 20px; padding: 5px 9px; background: var(--white);
+  border: 1px solid var(--border); border-radius: 4px; cursor: pointer; transition: border-color 0.1s;
 }
-.emoji-btn.active { background: var(--bg3); border-color: var(--gold); }
+.emoji-btn:hover { border-color: var(--purple); }
+.emoji-btn.active { border-color: var(--purple); background: rgba(124,16,154,0.06); }
 
-/* ── Launch view ── */
 #launch-view { display: flex; flex-direction: column; height: 100vh; }
 .launch-bar {
-  border-bottom: 1px solid var(--border); padding: 0 1.5rem;
-  display: flex; align-items: center; justify-content: space-between; height: 50px;
-  background: var(--bg); flex-shrink: 0;
+  background: var(--black); padding: 0 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 50px; flex-shrink: 0;
 }
-.launch-title {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 14px; font-family: var(--mono); color: var(--muted);
-}
+.launch-title { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.55); }
 #app-iframe { flex: 1; border: none; background: #fff; }
+
+.portal-footer {
+  background: var(--black); padding: 14px 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-tagline { font-size: 11px; color: rgba(255,255,255,0.25); font-weight: 300; letter-spacing: 0.06em; }
+.footer-logo { font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; }
 </style>
 </head>
 <body>
 
-<!-- Loading -->
-<div id="loading">Initialising...</div>
-
-<!-- Login -->
-<div id="login-screen" class="hidden">
-  <div class="login-logo">
-    <h1>Unicrest</h1>
-    <span>App Portal</span>
-  </div>
-  <p class="login-sub">Internal tools hub. Sign in with your Microsoft account to continue.</p>
-  <button class="ms-btn" id="signin-btn" onclick="signIn()">
-    <svg width="18" height="18" viewBox="0 0 21 21">
-      <rect x="1"  y="1"  width="9" height="9" fill="#f25022"/>
-      <rect x="11" y="1"  width="9" height="9" fill="#7fba00"/>
-      <rect x="1"  y="11" width="9" height="9" fill="#00a4ef"/>
-      <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
-    </svg>
-    Sign in with Microsoft
-  </button>
+<div id="loading">
+  <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+  <span class="loading-label">Signing you in</span>
 </div>
 
-<!-- Main app -->
+<div id="login-screen" class="hidden">
+  <div class="band"></div>
+  <div class="login-hero">
+    <div class="login-wordmark">
+      <span class="login-wordmark-top">Shadowspec Internal</span>
+      <div class="login-wordmark-main">
+        <span class="login-wordmark-name">Unicrest</span>
+        <span class="login-wordmark-sub">App Portal</span>
+      </div>
+    </div>
+    <p class="login-tagline">Bringing People Together</p>
+    <button class="ms-btn" id="signin-btn" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 21 21">
+        <rect x="1"  y="1"  width="9" height="9" fill="#f25022"/>
+        <rect x="11" y="1"  width="9" height="9" fill="#7fba00"/>
+        <rect x="1"  y="11" width="9" height="9" fill="#00a4ef"/>
+        <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+      </svg>
+      Sign in with Microsoft
+    </button>
+  </div>
+  <div class="login-footer">Caring, Sheltering, Protecting since 1992</div>
+</div>
+
 <div id="main-app" class="hidden">
   <header>
-    <div class="header-logo">
-      <strong>Unicrest</strong>
-      <em>App Portal</em>
-    </div>
-    <div class="header-right">
-      <span class="user-chip" id="user-name"></span>
-      <button class="btn-gold" onclick="showView('add')">+ Add app</button>
-      <button class="btn-outline" onclick="signOut()">Sign out</button>
+    <div class="band"></div>
+    <div class="header-inner">
+      <div class="header-wordmark">
+        <strong>Unicrest</strong>
+        <em>App Portal</em>
+      </div>
+      <div class="header-right">
+        <span class="user-chip" id="user-name"></span>
+        <button class="btn-primary" onclick="showView('add')">+ Add app</button>
+        <button style="background:none;border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.45);border-radius:4px;padding:7px 14px;font-size:12px;font-family:var(--lato);cursor:pointer;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.5)';this.style.color='#fff'" onmouseout="this.style.borderColor='rgba(255,255,255,0.18)';this.style.color='rgba(255,255,255,0.45)'" onclick="signOut()">Sign out</button>
+      </div>
     </div>
   </header>
 
   <div id="error-banner" class="hidden"></div>
 
-  <!-- Gallery -->
   <div id="gallery-view">
+    <div class="page-title-strip">
+      <div>
+        <h1>Your tools</h1>
+        <p>Internal apps built for the Shadowspec team</p>
+      </div>
+      <div id="cat-pills" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+    </div>
     <div class="toolbar">
       <input class="search-input" type="text" id="search-input"
              placeholder="Search apps..." oninput="filterApps(this.value)">
-      <div id="cat-pills" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
     </div>
     <div class="app-grid" id="app-grid"></div>
+    <div class="portal-footer">
+      <span class="footer-tagline">Shadowspec Internal — Unicrest App Portal</span>
+      <span class="footer-logo">SHADOWSPEC</span>
+    </div>
   </div>
 
-  <!-- Add form -->
   <div id="add-view" class="hidden">
-    <div class="form-hdr">
-      <h2>Add new app</h2>
-      <button class="btn-outline" onclick="showView('gallery')">Cancel</button>
+    <div class="page-title-strip">
+      <div>
+        <h1>Add a new app</h1>
+        <p>Paste a Claude-generated HTML app to share it with the team</p>
+      </div>
+      <button class="btn-ghost" onclick="showView('gallery')">Cancel</button>
     </div>
-    <div class="form-row">
-      <div class="form-field">
-        <label class="form-label">App name</label>
-        <input class="form-input" id="f-name" placeholder="e.g. Invoice Calculator">
+    <div class="form-body">
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">App name</label>
+          <input class="form-input" id="f-name" placeholder="e.g. Invoice Calculator">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="f-cat">
+            <option>Productivity</option>
+            <option>Finance</option>
+            <option>Data</option>
+            <option>Writing</option>
+            <option>Utilities</option>
+            <option>Research</option>
+            <option>HR</option>
+            <option>Other</option>
+          </select>
+        </div>
       </div>
       <div class="form-field">
-        <label class="form-label">Category</label>
-        <select class="form-select" id="f-cat">
-          <option>Productivity</option>
-          <option>Finance</option>
-          <option>Data</option>
-          <option>Writing</option>
-          <option>Utilities</option>
-          <option>Research</option>
-          <option>HR</option>
-          <option>Other</option>
-        </select>
+        <label class="form-label">Description (optional)</label>
+        <input class="form-input" id="f-desc" placeholder="One-line description">
       </div>
+      <div class="form-field">
+        <label class="form-label">Icon</label>
+        <div class="emoji-row" id="emoji-row"></div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">HTML source</label>
+        <textarea class="form-textarea" id="f-html"
+          placeholder="Paste the full HTML for your Claude-generated app here..."
+          spellcheck="false"></textarea>
+        <p class="form-hint">Maximum approximately 60,000 characters. Very large apps may need to be split.</p>
+      </div>
+      <button class="btn-primary" id="submit-btn" onclick="submitApp()">Save to portal</button>
     </div>
-    <div class="form-field">
-      <label class="form-label">Description (optional)</label>
-      <input class="form-input" id="f-desc" placeholder="One-line description">
-    </div>
-    <div class="form-field">
-      <label class="form-label">Icon</label>
-      <div class="emoji-row" id="emoji-row"></div>
-    </div>
-    <div class="form-field">
-      <label class="form-label">HTML source</label>
-      <textarea class="form-textarea" id="f-html"
-        placeholder="Paste the full HTML for your Claude-generated app here..."
-        spellcheck="false"></textarea>
-      <p class="form-hint">Max approximately 60,000 characters. Very large apps may need to be split.</p>
-    </div>
-    <button class="btn-gold" id="submit-btn" onclick="submitApp()">Save to portal</button>
   </div>
 
-  <!-- Launch -->
   <div id="launch-view" class="hidden">
+    <div class="band"></div>
     <div class="launch-bar">
       <div class="launch-title">
         <span id="launch-emoji"></span>
         <span id="launch-name"></span>
       </div>
-      <button class="btn-outline" onclick="showView('gallery')">← Back to portal</button>
+      <button style="background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);border-radius:4px;padding:7px 14px;font-size:12px;font-family:var(--lato);cursor:pointer;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.5)';this.style.borderColor='rgba(255,255,255,0.2)'" onclick="showView('gallery')">← Back to portal</button>
     </div>
     <iframe id="app-iframe" sandbox="allow-scripts allow-forms allow-same-origin" title="App"></iframe>
   </div>
 </div>
 
 <script>
-// ================================================================
-//  CONFIGURATION — fill in these 4 values after setup
-// ================================================================
 const CONFIG = {
   clientId:    "c6595fee-5861-474a-b604-4487ac361580",
   tenantId:    "8c8bc073-973e-4ddf-9384-38498e8aa324",
@@ -369,17 +406,14 @@ const CONFIG = {
   spSitePath:  "/sites/UnicrestGroup",
   listName:    "UnicrestApps"
 };
-// ================================================================
 
 const EMOJIS = ["⚡","📊","🗂","✏️","🔧","🔬","📝","🧮","📈","🗺","🎯","💡","🔐","📅","🧩","🖥","📋","🔍","⚙️","🗃"];
-const CATS   = ["Productivity","Finance","Data","Writing","Utilities","Research","HR","Other"];
 
 let msalApp, siteId = null, listId = null;
 let allApps = [], currentSearch = '', currentCat = 'All';
 let selectedEmoji = EMOJIS[0];
 let saving = false;
 
-// ── MSAL config ──────────────────────────────────────────────
 const msalConfig = {
   auth: {
     clientId: CONFIG.clientId,
@@ -391,15 +425,12 @@ const msalConfig = {
 
 const TOKEN_REQUEST = { scopes: ["https://graph.microsoft.com/Sites.ReadWrite.All"] };
 
-// ── Init ─────────────────────────────────────────────────────
 async function init() {
   try {
     msalApp = new msal.PublicClientApplication(msalConfig);
     await msalApp.initialize();
-
     const redirect = await msalApp.handleRedirectPromise();
-    const accounts  = msalApp.getAllAccounts();
-
+    const accounts = msalApp.getAllAccounts();
     if (accounts.length > 0) {
       msalApp.setActiveAccount(accounts[0]);
       await enterApp(accounts[0]);
@@ -424,7 +455,6 @@ async function enterApp(account) {
   showView('gallery');
 }
 
-// ── Auth ─────────────────────────────────────────────────────
 async function signIn() {
   try {
     document.getElementById('signin-btn').textContent = 'Signing in...';
@@ -443,9 +473,7 @@ async function signIn() {
   }
 }
 
-function signOut() {
-  msalApp.logoutPopup().finally(() => location.reload());
-}
+function signOut() { msalApp.logoutPopup().finally(() => location.reload()); }
 
 async function getToken() {
   const account = msalApp.getActiveAccount();
@@ -454,7 +482,6 @@ async function getToken() {
   return r.accessToken;
 }
 
-// ── Graph helpers ─────────────────────────────────────────────
 async function gGet(path) {
   const token = await getToken();
   const r = await fetch('https://graph.microsoft.com/v1.0' + path, {
@@ -481,26 +508,21 @@ async function gPost(path, body) {
 async function gDelete(path) {
   const token = await getToken();
   const r = await fetch('https://graph.microsoft.com/v1.0' + path, {
-    method: 'DELETE',
-    headers: { Authorization: 'Bearer ' + token }
+    method: 'DELETE', headers: { Authorization: 'Bearer ' + token }
   });
   if (!r.ok) throw new Error(`Graph DELETE ${path} → ${r.status}`);
 }
 
-// ── SharePoint ────────────────────────────────────────────────
 async function resolveSiteList() {
   if (siteId && listId) return;
   const site = await gGet(`/sites/${CONFIG.spHostname}:${CONFIG.spSitePath}`);
   siteId = site.id;
   const lists = await gGet(`/sites/${siteId}/lists?$select=id,displayName`);
   const match = (lists.value || []).find(l => l.displayName === CONFIG.listName);
-  if (!match) {
-    throw new Error(`SharePoint list "${CONFIG.listName}" not found. Check STEP 2 of setup.`);
-  }
+  if (!match) throw new Error(`SharePoint list "${CONFIG.listName}" not found. Check setup step 2.`);
   listId = match.id;
 }
 
-// ── Safe base64 for full Unicode HTML ────────────────────────
 function encodeHTML(str) {
   return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,
     (_, hex) => String.fromCharCode(parseInt(hex, 16))));
@@ -513,28 +535,24 @@ function decodeHTML(b64) {
   } catch { return ''; }
 }
 
-// ── App CRUD ──────────────────────────────────────────────────
 async function loadApps() {
-  document.getElementById('app-grid').innerHTML =
-    '<div class="empty">Loading apps...</div>';
+  document.getElementById('app-grid').innerHTML = '<div class="empty">Loading apps...</div>';
   try {
     await resolveSiteList();
     const data = await gGet(`/sites/${siteId}/lists/${listId}/items?expand=fields&$top=500`);
     allApps = (data.value || []).map(item => ({
       id:          item.id,
-      name:        item.fields.Title         || '',
+      name:        item.fields.Title          || '',
       description: item.fields.AppDescription || '',
-      category:    item.fields.Category       || 'Other',
-      emoji:       item.fields.Emoji          || '⚡',
+      category:    item.fields.Category        || 'Other',
+      emoji:       item.fields.Emoji           || '⚡',
       html:        decodeHTML(item.fields.HtmlSource),
-      addedBy:     item.fields.AddedBy        || '',
-      dateAdded:   item.fields.DateAdded      || item.createdDateTime || ''
+      addedBy:     item.fields.AddedBy         || '',
+      dateAdded:   item.fields.DateAdded       || item.createdDateTime || ''
     }));
     renderGrid();
   } catch (e) {
-    showError(e.message);
-    allApps = [];
-    renderGrid();
+    showError(e.message); allApps = []; renderGrid();
   }
 }
 
@@ -557,8 +575,7 @@ async function submitApp() {
 
   saving = true;
   const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Saving...';
+  btn.disabled = true; btn.textContent = 'Saving...';
 
   try {
     await resolveSiteList();
@@ -573,9 +590,7 @@ async function submitApp() {
   } catch (e) {
     showError(e.message);
   } finally {
-    saving = false;
-    btn.disabled = false;
-    btn.textContent = 'Save to portal';
+    saving = false; btn.disabled = false; btn.textContent = 'Save to portal';
   }
 }
 
@@ -586,12 +601,9 @@ async function deleteApp(id) {
     await gDelete(`/sites/${siteId}/lists/${listId}/items/${id}`);
     allApps = allApps.filter(a => a.id !== id);
     renderGrid();
-  } catch (e) {
-    showError(e.message);
-  }
+  } catch (e) { showError(e.message); }
 }
 
-// ── UI ────────────────────────────────────────────────────────
 function showView(v) {
   ['gallery','add','launch'].forEach(n =>
     document.getElementById(n + '-view').classList.add('hidden'));
@@ -600,7 +612,6 @@ function showView(v) {
 }
 
 function filterApps(val) { currentSearch = val; renderGrid(); }
-
 function setCat(cat) { currentCat = cat; renderCatPills(); renderGrid(); }
 
 function getFiltered() {
@@ -662,8 +673,7 @@ function launchApp(id) {
 
 function buildEmojiPicker() {
   document.getElementById('emoji-row').innerHTML = EMOJIS.map(e =>
-    `<button class="emoji-btn${e === selectedEmoji ? ' active' : ''}"
-      onclick="setEmoji('${e}')">${e}</button>`
+    `<button class="emoji-btn${e === selectedEmoji ? ' active' : ''}" onclick="setEmoji('${e}')">${e}</button>`
   ).join('');
 }
 
@@ -676,15 +686,14 @@ function setEmoji(e) {
 
 function showError(msg) {
   const el = document.getElementById('error-banner');
-  el.textContent = msg;
-  el.classList.remove('hidden');
+  el.textContent = msg; el.classList.remove('hidden');
   clearTimeout(el._t);
   el._t = setTimeout(() => el.classList.add('hidden'), 10000);
 }
 
 function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
-function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtDate(iso) {
   if (!iso) return '';
   try { return new Date(iso).toLocaleDateString('en-NZ', { day:'2-digit', month:'short', year:'numeric' }); }
