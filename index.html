@@ -412,7 +412,7 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
       </div>
       <button style="background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);border-radius:4px;padding:7px 14px;font-size:12px;font-family:var(--lato);cursor:pointer;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.5)'" onmouseout="this.style.color='rgba(255,255,255,0.5)';this.style.borderColor='rgba(255,255,255,0.2)'" onclick="showView('gallery')">← Back to portal</button>
     </div>
-    <iframe id="app-iframe" sandbox="allow-scripts allow-forms allow-same-origin allow-modals" title="App"></iframe>
+    <iframe id="app-iframe" sandbox="allow-scripts allow-forms allow-same-origin allow-modals allow-popups" title="App"></iframe>
   </div>
 </div>
 
@@ -696,7 +696,12 @@ function showView(v) {
   ['gallery','add','launch'].forEach(n =>
     document.getElementById(n + '-view').classList.add('hidden'));
   document.getElementById(v + '-view').classList.remove('hidden');
-  if (v === 'gallery') renderGrid();
+  if (v === 'gallery') {
+    if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
+    const iframe = document.getElementById('app-iframe');
+    iframe.removeAttribute('src');
+    renderGrid();
+  }
   if (v === 'add' && !editingId) {
     document.getElementById('form-title').textContent    = 'Add a new app';
     document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
@@ -763,12 +768,17 @@ function renderGrid() {
     </div>`).join('');
 }
 
+let currentBlobUrl = null;
+
 function launchApp(id) {
   const a = allApps.find(x => x.id === id);
   if (!a) return;
   document.getElementById('launch-emoji').textContent = a.emoji;
   document.getElementById('launch-name').textContent  = a.name;
-  document.getElementById('app-iframe').srcdoc = a.html;
+  if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); }
+  currentBlobUrl = URL.createObjectURL(new Blob([a.html], { type: 'text/html' }));
+  document.getElementById('app-iframe').src = currentBlobUrl;
+  document.getElementById('app-iframe').removeAttribute('srcdoc');
   showView('launch');
 }
 
