@@ -216,6 +216,12 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
   font-size: 13px; padding: 3px 6px; border-radius: 3px; transition: color 0.15s;
 }
 .btn-delete:hover { color: var(--red); }
+.btn-edit {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  border-radius: 4px; cursor: pointer; font-size: 11px; padding: 4px 10px;
+  font-family: var(--lato); font-weight: 700; letter-spacing: 0.04em; transition: all 0.15s;
+}
+.btn-edit:hover { border-color: var(--purple); color: var(--purple); }
 .empty {
   grid-column: 1 / -1; text-align: center; padding: 4rem 2rem;
   color: #AAAAAA; font-size: 14px; font-weight: 300; line-height: 2;
@@ -341,10 +347,10 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
   <div id="add-view" class="hidden">
     <div class="page-title-strip">
       <div>
-        <h1>Add a new app</h1>
-        <p>Paste a Claude-generated HTML app to share it with the team</p>
+        <h1 id="form-title">Add a new app</h1>
+        <p id="form-subtitle">Paste a Claude-generated HTML app to share it with the team</p>
       </div>
-      <button class="btn-ghost" onclick="showView('gallery')">Cancel</button>
+      <button class="btn-ghost" onclick="cancelForm()">Cancel</button>
     </div>
     <div class="form-body">
       <div class="form-row">
@@ -556,6 +562,50 @@ async function loadApps() {
   }
 }
 
+let editingId = null;
+
+function editApp(id) {
+  const a = allApps.find(x => x.id === id);
+  if (!a) return;
+  editingId = id;
+  document.getElementById('f-name').value = a.name;
+  document.getElementById('f-desc').value = a.description;
+  document.getElementById('f-cat').value  = a.category;
+  document.getElementById('f-html').value = a.html;
+  setEmoji(a.emoji);
+  document.getElementById('form-title').textContent    = 'Edit app';
+  document.getElementById('form-subtitle').textContent = 'Update the details for this app';
+  document.getElementById('submit-btn').textContent    = 'Save changes';
+  showView('add');
+}
+
+function cancelForm() {
+  editingId = null;
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-html').value = '';
+  document.getElementById('f-cat').value  = 'Productivity';
+  setEmoji(EMOJIS[0]);
+  document.getElementById('form-title').textContent    = 'Add a new app';
+  document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
+  document.getElementById('submit-btn').textContent    = 'Save to portal';
+  showView('gallery');
+}
+
+async function gPatch(path, body) {
+  const token = await getToken();
+  const r = await fetch('https://graph.microsoft.com/v1.0' + path, {
+    method: 'PATCH',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const t = await r.text().catch(() => '');
+    throw new Error(`Graph PATCH ${path} → ${r.status}: ${t}`);
+  }
+  return r.json();
+}
+
 async function submitApp() {
   if (saving) return;
   const name = document.getElementById('f-name').value.trim();
@@ -579,18 +629,27 @@ async function submitApp() {
 
   try {
     await resolveSiteList();
-    await gPost(`/sites/${siteId}/lists/${listId}/items`, { fields });
+    if (editingId) {
+      await gPatch(`/sites/${siteId}/lists/${listId}/items/${editingId}/fields`, fields);
+    } else {
+      await gPost(`/sites/${siteId}/lists/${listId}/items`, { fields });
+    }
+    editingId = null;
     document.getElementById('f-name').value = '';
     document.getElementById('f-desc').value = '';
     document.getElementById('f-html').value = '';
     document.getElementById('f-cat').value = 'Productivity';
     setEmoji(EMOJIS[0]);
+    document.getElementById('form-title').textContent    = 'Add a new app';
+    document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
+    document.getElementById('submit-btn').textContent    = 'Save to portal';
     await loadApps();
     showView('gallery');
   } catch (e) {
     showError(e.message);
   } finally {
-    saving = false; btn.disabled = false; btn.textContent = 'Save to portal';
+    saving = false; btn.disabled = false;
+    btn.textContent = editingId ? 'Save changes' : 'Save to portal';
   }
 }
 
@@ -609,6 +668,11 @@ function showView(v) {
     document.getElementById(n + '-view').classList.add('hidden'));
   document.getElementById(v + '-view').classList.remove('hidden');
   if (v === 'gallery') renderGrid();
+  if (v === 'add' && !editingId) {
+    document.getElementById('form-title').textContent    = 'Add a new app';
+    document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
+    document.getElementById('submit-btn').textContent    = 'Save to portal';
+  }
 }
 
 function filterApps(val) { currentSearch = val; renderGrid(); }
@@ -656,6 +720,7 @@ function renderGrid() {
         </div>
         <div class="card-actions">
           <button class="btn-delete" onclick="deleteApp('${a.id}')" title="Remove">✕</button>
+          <button class="btn-edit" onclick="editApp('${a.id}')">Edit</button>
           <button class="btn-launch" onclick="launchApp('${a.id}')">Launch →</button>
         </div>
       </div>
