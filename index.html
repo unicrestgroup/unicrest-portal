@@ -492,11 +492,12 @@ async function resolveSiteList() {
   if (siteId && listId) return;
   const site = await gGet(`/sites/${CONFIG.spHostname}:${CONFIG.spSitePath}`);
   siteId = site.id;
-  const lists = await gGet(`/sites/${siteId}/lists?$filter=name eq '${CONFIG.listName}'&$select=id,name`);
-  if (!lists.value?.length) {
+  const lists = await gGet(`/sites/${siteId}/lists?$select=id,displayName`);
+  const match = (lists.value || []).find(l => l.displayName === CONFIG.listName);
+  if (!match) {
     throw new Error(`SharePoint list "${CONFIG.listName}" not found. Check STEP 2 of setup.`);
   }
-  listId = lists.value[0].id;
+  listId = match.id;
 }
 
 // ── Safe base64 for full Unicode HTML ────────────────────────
