@@ -377,6 +377,11 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
         <input class="form-input" id="f-desc" placeholder="One-line description">
       </div>
       <div class="form-field">
+        <label class="form-label">Visible to</label>
+        <input class="form-input" id="f-visible" placeholder="Leave blank for everyone, or enter emails: jane@company.com, john@company.com">
+        <p class="form-hint">Separate multiple emails with commas. Leave blank and all signed-in staff will see this app.</p>
+      </div>
+      <div class="form-field">
         <label class="form-label">Icon</label>
         <div class="emoji-row" id="emoji-row"></div>
       </div>
@@ -452,7 +457,10 @@ async function init() {
   }
 }
 
+let currentUserEmail = '';
+
 async function enterApp(account) {
+  currentUserEmail = (account.username || '').toLowerCase().trim();
   document.getElementById('user-name').textContent = account.name || account.username;
   buildEmojiPicker();
   show('main-app');
@@ -554,7 +562,8 @@ async function loadApps() {
       emoji:       item.fields.Emoji           || '⚡',
       html:        decodeHTML(item.fields.HtmlSource),
       addedBy:     item.fields.AddedBy         || '',
-      dateAdded:   item.fields.DateAdded       || item.createdDateTime || ''
+      dateAdded:   item.fields.DateAdded       || item.createdDateTime || '',
+      visibleTo:   item.fields.VisibleTo        || ''
     }));
     renderGrid();
   } catch (e) {
@@ -568,10 +577,11 @@ function editApp(id) {
   const a = allApps.find(x => x.id === id);
   if (!a) return;
   editingId = id;
-  document.getElementById('f-name').value = a.name;
-  document.getElementById('f-desc').value = a.description;
-  document.getElementById('f-cat').value  = a.category;
-  document.getElementById('f-html').value = a.html;
+  document.getElementById('f-name').value    = a.name;
+  document.getElementById('f-desc').value    = a.description;
+  document.getElementById('f-cat').value     = a.category;
+  document.getElementById('f-html').value    = a.html;
+  document.getElementById('f-visible').value = a.visibleTo || '';
   setEmoji(a.emoji);
   document.getElementById('form-title').textContent    = 'Edit app';
   document.getElementById('form-subtitle').textContent = 'Update the details for this app';
@@ -581,10 +591,11 @@ function editApp(id) {
 
 function cancelForm() {
   editingId = null;
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-desc').value = '';
-  document.getElementById('f-html').value = '';
-  document.getElementById('f-cat').value  = 'Productivity';
+  document.getElementById('f-name').value    = '';
+  document.getElementById('f-desc').value    = '';
+  document.getElementById('f-html').value    = '';
+  document.getElementById('f-cat').value     = 'Productivity';
+  document.getElementById('f-visible').value = '';
   setEmoji(EMOJIS[0]);
   document.getElementById('form-title').textContent    = 'Add a new app';
   document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
@@ -620,7 +631,8 @@ async function submitApp() {
     Emoji:          selectedEmoji,
     HtmlSource:     encodeHTML(html),
     AddedBy:        account?.name || account?.username || '',
-    DateAdded:      new Date().toISOString()
+    DateAdded:      new Date().toISOString(),
+    VisibleTo:      document.getElementById('f-visible').value.trim()
   };
 
   saving = true;
@@ -635,10 +647,11 @@ async function submitApp() {
       await gPost(`/sites/${siteId}/lists/${listId}/items`, { fields });
     }
     editingId = null;
-    document.getElementById('f-name').value = '';
-    document.getElementById('f-desc').value = '';
-    document.getElementById('f-html').value = '';
-    document.getElementById('f-cat').value = 'Productivity';
+    document.getElementById('f-name').value    = '';
+    document.getElementById('f-desc').value    = '';
+    document.getElementById('f-html').value    = '';
+    document.getElementById('f-cat').value     = 'Productivity';
+    document.getElementById('f-visible').value = '';
     setEmoji(EMOJIS[0]);
     document.getElementById('form-title').textContent    = 'Add a new app';
     document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
@@ -678,9 +691,16 @@ function showView(v) {
 function filterApps(val) { currentSearch = val; renderGrid(); }
 function setCat(cat) { currentCat = cat; renderCatPills(); renderGrid(); }
 
+function isVisible(a) {
+  if (!a.visibleTo || !a.visibleTo.trim()) return true;
+  const allowed = a.visibleTo.split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+  return allowed.includes(currentUserEmail);
+}
+
 function getFiltered() {
   const s = currentSearch.toLowerCase();
   return allApps.filter(a =>
+    isVisible(a) &&
     (currentCat === 'All' || a.category === currentCat) &&
     (!s || a.name.toLowerCase().includes(s) || a.description.toLowerCase().includes(s))
   );
@@ -711,7 +731,7 @@ function renderGrid() {
         <span class="card-emoji">${a.emoji}</span>
         <span class="card-cat">${esc(a.category)}</span>
       </div>
-      <div class="card-name">${esc(a.name)}</div>
+      <div class="card-name">${esc(a.name)}${a.visibleTo ? ' <span style="font-size:10px;font-weight:400;color:var(--muted);background:var(--light);border-radius:3px;padding:2px 6px;vertical-align:middle;">Restricted</span>' : ''}</div>
       ${a.description ? `<div class="card-desc">${esc(a.description)}</div>` : ''}
       <div class="card-footer">
         <div class="card-meta">
