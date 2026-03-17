@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Unicrest IEA Builder</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0f0f0}
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* TOP BAR */
+#topbar{background:#fff;border-bottom:2px solid #c0392b;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+#topbar .brand{font-size:15px;font-weight:700;color:#333}
+#topbar .brand em{color:#c0392b;font-style:normal}
+.tabs{display:flex;gap:6px}
+.tab{padding:7px 18px;border:1px solid #bbb;border-radius:4px;background:#f5f5f5;font-size:13px;cursor:pointer;font-family:Arial}
+.tab.on{background:#c0392b;color:#fff;border-color:#c0392b}
+#printbtn{padding:8px 18px;background:#c0392b;color:#fff;border:none;border-radius:4px;font-size:13px;font-weight:700;cursor:pointer;font-family:Arial}
+#printbtn:hover{background:#a93226}
+
+/* FORM */
+#formpanel{padding:20px;max-width:880px;margin:0 auto;width:100%}
+.card{background:#fff;border:1px solid #ddd;border-radius:6px;padding:15px 18px;margin-bottom:14px}
+.cardtitle{font-size:10px;font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+.f{margin-bottom:10px}
+.f label{display:block;font-size:11px;color:#555;font-weight:700;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;padding:7px 9px;border:1px solid #ccc;border-radius:4px;font-size:13px;font-family:Arial}
+.f textarea{resize:vertical}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.typebtn{display:flex;gap:8px;margin-bottom:14px}
+.tb{flex:1;padding:9px;border:1px solid #ccc;border-radius:4px;background:#fff;color:#666;font-size:13px;cursor:pointer;font-family:Arial;font-weight:600}
+.tb.on{border-color:#c0392b;color:#c0392b;background:#fff8f7}
+.tbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.tbar label{font-size:11px;font-weight:700;color:#555;white-space:nowrap}
+.tbar select{flex:1;padding:6px 8px;border:1px solid #ccc;border-radius:4px;font-size:12px}
+.tbar button{padding:6px 14px;border:1px solid #bbb;border-radius:4px;background:#f0f0f0;font-size:12px;cursor:pointer}
+.gobtn{width:100%;padding:12px;background:#c0392b;color:#fff;border:none;border-radius:5px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px}
+
+/* PREVIEW */
+#prevpanel{display:none;padding:20px;background:#ccc;min-height:calc(100vh - 58px)}
+.pg{background:#fff;width:100%;max-width:760px;margin:0 auto 2px;padding:26px 34px;font-family:Georgia,serif;font-size:10pt;line-height:1.55;color:#000}
+.pg+.pg{border-top:3px dashed #aaa}
+.phdr{display:flex;justify-content:flex-end;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:16px}
+.phdr img{height:54px;width:auto}
+.ph1{font-size:12pt;font-weight:bold;text-align:center;margin:10px 0 4px}
+.ph2{font-size:11pt;font-weight:bold;margin:12px 0 5px}
+.ph3{font-size:10pt;font-weight:bold;margin:8px 0 3px;text-decoration:underline}
+.pp{margin:3px 0 5px}
+.pftr{display:flex;justify-content:space-between;border-top:1px solid #999;margin-top:14px;padding-top:3px;font-size:8pt;color:#666}
+.ptbl{width:100%;border-collapse:collapse;font-size:9.5pt;margin:6px 0}
+.ptbl td{border:1px solid #000;padding:4px 7px;vertical-align:top}
+.ptbl .k{font-weight:700;width:38%}
+.sigs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}
+.sigbox{border:1px solid #000;padding:10px}
+.signm{font-size:9pt;font-weight:bold;margin-bottom:26px}
+.sigl{border-top:1px solid #000;margin-bottom:4px}
+.sigd{font-size:8pt}
+ul.dl{padding-left:18px;margin:3px 0 6px}
+ul.dl li{margin-bottom:2px}
+ol.dl{padding-left:18px;margin:3px 0 6px}
+ol.dl li{margin-bottom:2px}
+
+/* PRINT - this is the only thing that matters */
+#printarea{display:none}
+@media print{
+  #app,body,html{display:block!important}
+  #topbar,#formpanel,#prevpanel{display:none!important}
+  #printarea{display:block!important}
+  .pg{padding:16mm 14mm!important;page-break-after:always!important;break-after:page!important;max-width:100%!important;border:none!important}
+  .pg+.pg{border-top:none!important}
+  @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="topbar">
+  <div class="brand"><em>UNICREST</em> GROUP &nbsp;|&nbsp; IEA Builder</div>
+  <div class="tabs">
+    <button class="tab on" id="t-form" onclick="showForm()">Form</button>
+    <button class="tab" id="t-prev" onclick="showPreview()">Preview</button>
+  </div>
+  <button id="printbtn" onclick="alert('JS works! Now calling doPrint...'); doPrint();">Print / Save PDF</button>
+</div>
+
+<div id="formpanel">
+  <div style="max-width:880px;margin:0 auto;padding-top:20px">
+    <div class="typebtn">
+      <button class="tb on" id="bt-perm" onclick="setType('perm')">Permanent Employment</button>
+      <button class="tb" id="bt-cas" onclick="setType('cas')">Casual Employment</button>
+    </div>
+
+    <div class="card">
+      <div class="cardtitle">Offer Letter</div>
+      <div class="g2">
+        <div class="f"><label>Letter date</label><input type="date" id="f-date"></div>
+        <div class="f"><label>Sign-back deadline</label><input type="date" id="f-deadline"></div>
+        <div class="f"><label>Contact phone</label><input id="f-phone" value="09 438 6862"></div>
+        <div class="f"><label>Contact email</label><input id="f-email" value="hamish@unicrest.com"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardtitle">Employee</div>
+      <div class="g2">
+        <div class="f"><label>Full name</label><input id="f-name" placeholder="First Last"></div>
+        <div class="f"><label>Address</label><input id="f-address" placeholder="e.g. 1/261 Kamo Road, Whangarei"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardtitle">Role</div>
+      <div class="f"><label>Position title</label><input id="f-pos" placeholder="e.g. Production Assistant"></div>
+      <div class="g2">
+        <div class="f"><label>Commencement date</label><input type="date" id="f-start"></div>
+        <div class="f"><label>Place of work</label><input id="f-place" value="13 Nell Place, Whangarei 0110"></div>
+        <div class="f" id="rn-wrap"><label>Reports to (name)</label><input id="f-rname" placeholder="e.g. Paulo De Almeida"></div>
+        <div class="f" id="rt-wrap"><label>Reports to (title)</label><input id="f-rtitle" placeholder="e.g. Production Supervisor"></div>
+        <div class="f" id="dept-wrap" style="display:none"><label>Department</label><input id="f-dept" placeholder="e.g. Supply Chain"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardtitle">Compensation</div>
+      <div class="typebtn" id="paytoggle">
+        <button class="tb on" id="bt-sal" onclick="setPayType('salary')">Annual Salary</button>
+        <button class="tb" id="bt-hr" onclick="setPayType('hourly')">Hourly Rate</button>
+      </div>
+      <div class="g2">
+        <div class="f" id="sal-wrap"><label>Annual salary ($)</label><input type="number" id="f-sal" placeholder="55000"></div>
+        <div class="f" id="hr-wrap" style="display:none"><label>Hourly rate ($)</label><input type="number" id="f-hr" placeholder="29.00" step="0.01"></div>
+        <div class="f" id="ot-wrap" style="display:none"><label>Overtime rate ($)</label><input type="number" id="f-ot" placeholder="29.00" step="0.01"></div>
+      </div>
+      <div class="f"><label>Additional benefits</label><textarea id="f-benefits" rows="2">Introduction to the Growth By Sharing incentive scheme following the 90 day trial period</textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="cardtitle">Hours</div>
+      <div class="g2">
+        <div class="f"><label>Hours per week</label><input id="f-hrs" value="40"></div>
+        <div class="f"><label>Working days</label><input id="f-days" value="Monday to Friday"></div>
+        <div class="f"><label>Start time</label><input id="f-stime" value="8am"></div>
+        <div class="f"><label>End time</label><input id="f-etime" value="5pm"></div>
+      </div>
+    </div>
+
+    <div class="card" id="notice-card">
+      <div class="cardtitle">Notice Periods</div>
+      <div class="g3">
+        <div class="f"><label>During trial period</label><input id="f-nt" value="1 week"></div>
+        <div class="f"><label>Redundancy / resignation</label><input id="f-nr" value="2 weeks"></div>
+        <div class="f"><label>Other reasons</label><input id="f-no" value="1 week"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="cardtitle">Position Description</div>
+      <div class="tbar">
+        <label>Load template:</label>
+        <select id="f-tmpl">
+          <option value="">— select —</option>
+          <option value="marketing">Marketing Specialist</option>
+          <option value="accounts">Accounts &amp; Finance Assistant</option>
+          <option value="assembly">Assembly Technician</option>
+          <option value="production">Production Assistant</option>
+        </select>
+        <button onclick="loadTmpl()">Load</button>
+      </div>
+      <div class="f"><label>Role duties</label><textarea id="f-desc" rows="10" placeholder="Type or paste duties, or load a template above..."></textarea></div>
+    </div>
+
+    <button class="gobtn" onclick="showPreview()">Preview document &rarr;</button>
+  </div>
+</div>
+
+<div id="prevpanel">
+  <div id="doc-out"></div>
+</div>
+
+</div><!-- #app -->
+
+<!-- print area lives outside #app so body > * hiding doesn't affect it strangely -->
+<div id="printarea"></div>
+
+<script>
+var LOGO = "data:image/jpeg;base64,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";
+var ctype = "perm";
+var ptype = "salary";
+var MO = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function ord(n){if(!n)return"___";n=parseInt(n);var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+function fdate(s){if(!s)return"___________";var p=s.split("-").map(Number);return ord(p[2])+" "+MO[p[1]-1]+" "+p[0];}
+function fmoney(n){if(!n)return"[Amount]";return"$"+parseFloat(n).toLocaleString("en-NZ",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function g(id){var e=document.getElementById(id);return e?e.value.trim():"";}
+function show(id,v){document.getElementById(id).style.display=v?"block":"none";}
+function tb(id,v){document.getElementById(id).classList.toggle("on",v);}
+
+function setType(t){
+  ctype=t;
+  tb("bt-perm",t==="perm"); tb("bt-cas",t==="cas");
+  show("rn-wrap",t==="perm"); show("rt-wrap",t==="perm"); show("dept-wrap",t==="cas");
+  show("notice-card",t==="perm");
+  show("paytoggle",t==="perm");
+  if(t==="cas"){ ptype="hourly"; show("sal-wrap",false); show("hr-wrap",true); show("ot-wrap",true); tb("bt-sal",false); tb("bt-hr",true); }
+  else { setPayType(ptype); }
+}
+
+function setPayType(p){
+  ptype=p;
+  tb("bt-sal",p==="salary"); tb("bt-hr",p==="hourly");
+  show("sal-wrap",p==="salary"); show("hr-wrap",p==="hourly"); show("ot-wrap",p==="hourly");
+}
+
+function showForm(){
+  show("formpanel",true); show("prevpanel",false);
+  tb("t-form",true); tb("t-prev",false);
+}
+
+function showPreview(){
+  buildDoc();
+  show("formpanel",false); show("prevpanel",true);
+  tb("t-form",false); tb("t-prev",true);
+}
+
+function doPrint(){
+  buildDoc();
+
+  var css = [
+    "*{box-sizing:border-box;margin:0;padding:0}",
+    "body{background:#fff;font-family:Arial,sans-serif}",
+    ".pg{background:#fff;color:#000;width:100%;padding:20mm 18mm;font-family:Georgia,'Times New Roman',serif;font-size:10pt;line-height:1.55;page-break-after:always;break-after:page}",
+    ".phdr{display:flex;justify-content:flex-end;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:16px}",
+    ".phdr img{height:54px;width:auto}",
+    ".ph1{font-size:12pt;font-weight:bold;text-align:center;margin:10px 0 4px}",
+    ".ph2{font-size:11pt;font-weight:bold;margin:12px 0 5px}",
+    ".ph3{font-size:10pt;font-weight:bold;margin:8px 0 3px;text-decoration:underline}",
+    ".pp{margin:3px 0 5px}",
+    ".pftr{display:flex;justify-content:space-between;border-top:1px solid #999;margin-top:14px;padding-top:3px;font-size:8pt;color:#666}",
+    ".ptbl{width:100%;border-collapse:collapse;font-size:9.5pt;margin:6px 0}",
+    ".ptbl td{border:1px solid #000;padding:4px 7px;vertical-align:top}",
+    ".ptbl .k{font-weight:700;width:38%}",
+    ".sigs{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}",
+    ".sigbox{border:1px solid #000;padding:10px}",
+    ".signm{font-size:9pt;font-weight:bold;margin-bottom:26px}",
+    ".sigl{border-top:1px solid #000;margin-bottom:4px}",
+    ".sigd{font-size:8pt}",
+    "ul.dl{padding-left:18px;margin:3px 0 6px}",
+    "ul.dl li{margin-bottom:2px}",
+    "ol.dl{padding-left:18px;margin:3px 0 6px}",
+    "ol.dl li{margin-bottom:2px}",
+    "table{width:100%;border-collapse:collapse}",
+    "@media print{.pg{padding:16mm 14mm!important;page-break-after:always!important}@page{size:A4;margin:0}}"
+  ].join("");
+
+  var content = document.getElementById("doc-out").innerHTML;
+  var fullHtml = "<!DOCTYPE html><html><head><meta charset='UTF-8'><style>" + css + "</style></head><body>" + content + "</body></html>";
+
+  // Remove any existing print iframe
+  var old = document.getElementById("__pf");
+  if(old) old.parentNode.removeChild(old);
+
+  var iframe = document.createElement("iframe");
+  iframe.id = "__pf";
+  // Position off-screen but NOT display:none — hidden iframes can print blank in some browsers
+  iframe.style.cssText = "position:fixed;right:0;bottom:0;width:1px;height:1px;border:0;opacity:0;";
+  document.body.appendChild(iframe);
+
+  var doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(fullHtml);
+  doc.close();
+
+  iframe.onload = function(){
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch(e) {
+      alert("Print error: " + e.message + "\n\nTry: File menu > Print in your browser.");
+    }
+    // Clean up after printing
+    setTimeout(function(){ 
+      var f = document.getElementById("__pf");
+      if(f) f.parentNode.removeChild(f);
+    }, 5000);
+  };
+}
+
+var TMPLS = {
+marketing:"Role Purpose\nThis role supports the Marketing Department through high-quality design execution, digital content management, social media operations, and end-to-end Shopify administration.\n\n1. Design & Visual Output\n- Create high-quality visual assets including brochures, flyers, trade display materials, and digital graphics.\n- Maintain brand consistency across all visual and written content.\n- Edit and prepare images for product, website, and social media use.\n\n2. Digital & Social Media Execution\n- Plan, schedule, and publish content across social platforms.\n- Manage blogs, email content, and downloadable assets.\n- Support leadership communication on LinkedIn.\n- Monitor activity and ensure social channels remain active and on-brand.\n\n3. Shopify Administration (3 Sites)\n- Manage product data, imagery, specifications, and merchandising.\n- Update homepages, landing pages, and collections.\n- Ensure accuracy and consistency across all three sites.\n- Routine QA, housekeeping, and performance checks.\n\n4. Marketing Operations & Coordination\n- Support the Marketing Manager in project execution and workflow management.\n- Coordinate dealer and internal communications.\n- Own and deliver assigned tasks and projects from start to finish.",
+accounts:"Accounts Payable (AP)\n- Process supplier invoices, ensuring correct coding and authorisation.\n- Schedule and execute payments to vendors (EFT, cheque, etc.).\n- Reconcile supplier statements and resolve discrepancies.\n- Maintain vendor details and respond to payment-related queries.\n\nAccounts Receivable (AR)\n- Generate and issue customer invoices and credit notes.\n- Allocate incoming payments and follow up on overdue accounts.\n- Reconcile customer accounts and manage debtor communications.\n\nBank & Account Reconciliations\n- Perform daily, weekly, and month-end bank reconciliations.\n- Reconcile corporate credit card and petty cash accounts.\n- Investigate and resolve unmatched transactions.\n\nGST & Tax Compliance\n- Prepare and file GST returns accurately and on time.\n- Maintain supporting documentation for tax filings and audits.\n\nMonth-End and General Ledger Support\n- Assist with journal entries, accruals, and prepayments.\n- Help with monthly financial close procedures.\n- Support preparation of trial balances and financial reports.",
+assembly:"Position: Assembly Technician - Supply Chain Department\n\n- Assemble products in accordance with supplied build specifications and schedules.\n- Maintain quality standards throughout the assembly process.\n- Report defects or production issues to the supervisor promptly.\n- Keep the work area clean, organised, and compliant with health and safety requirements.\n- Assist with loading and unloading of import/export container shipments.\n- Support stock control and inventory accuracy within the supply chain department.\n- Follow all company operational rules and guidelines with respect to health and safety.\n\nReports to: Paulo De Almeida or any other representative designated by the Employer.",
+production:"General\n- Responsible for the general tidiness and correct placement of all plant, tools, equipment, and materials in the production factory areas.\n- Maintain satisfactory levels of all resources/materials needed in the factory/warehouse areas.\n- Abide by all operational rules and guidelines with respect to health and safety.\n\nRepairs/Maintenance\n- Responsible for the maintenance of all plant and equipment in the warehouse/factory area.\n\nProduction\n- Responsible for the build of all product according to the supplied production schedule (report to the PS).\n- Responsible for the loading/unloading of import/export container shipments.\n- Responsible for the coordination of all product storage (shelf and containers).\n- Responsible for notifying admin of any production consumables that need ordering on a kan-ban basis.\n\nReports to: Paulo De Almeida, or Production Supervisor"
+};
+
+function loadTmpl(){
+  var sel=document.getElementById("f-tmpl").value; if(!sel)return;
+  document.getElementById("f-desc").value=TMPLS[sel]||"";
+  var pos=document.getElementById("f-pos"); if(!pos.value){var t={marketing:"Marketing Specialist",accounts:"Accounts & Finance Assistant",assembly:"Assembly Technician",production:"Production Assistant"};pos.value=t[sel]||"";}
+}
+
+function hdr(){ return '<div class="phdr"><img src="'+LOGO+'" alt="Unicrest Group"></div>'; }
+function ftr(n,tot){ return '<div class="pftr"><span>Page '+n+' of '+tot+'</span><span>Version 1.3</span><span>&#8230;&#8230;&#8230;&#8230;<br>Initial here</span></div>'; }
+
+function buildDoc(){
+  var isPerm=ctype==="perm", isHr=(ctype==="cas")||(ctype==="perm"&&ptype==="hourly");
+  var nm=g("f-name")||"[Employee Name]", fn=nm.split(" ")[0]||"[First Name]";
+  var addr=g("f-address")||"Whangarei";
+  var pos=g("f-pos")||"[Position]";
+  var place=g("f-place")||"13 Nell Place, Whangarei 0110";
+  var sal=g("f-sal"), hr=g("f-hr"), ot=g("f-ot");
+  var benefits=g("f-benefits")||"—";
+  var hrs=g("f-hrs")||"40", days=g("f-days")||"Monday to Friday", st=g("f-stime")||"8am", et=g("f-etime")||"5pm";
+  var nt=g("f-nt")||"1 week", nr=g("f-nr")||"2 weeks", no=g("f-no")||"1 week";
+  var desc=g("f-desc");
+  var phone=g("f-phone")||"[Phone]", email=g("f-email")||"[Email]";
+  var tot=9;
+
+  // PAGE 1 - Offer Letter
+  var p1='<div class="pg">'+hdr()+
+    '<p class="pp"><strong>Private and Confidential</strong></p>'+
+    '<p class="pp">'+fdate(g("f-date"))+'</p>'+
+    '<p class="pp">'+nm+'<br>'+addr+'</p><br>'+
+    '<p class="pp">Dear '+fn+',</p>'+
+    '<div class="ph2">OFFER OF EMPLOYMENT</div>'+
+    '<p class="pp">I am pleased to offer you the position of <strong>'+pos+'</strong> at Unicrest Group Limited on the terms and conditions outlined in the attached proposed individual employment agreement, position description and policies and procedures manual.</p>'+
+    '<p class="pp">Please note, this offer is conditional on satisfactory results of the following:</p>'+
+    '<ul class="dl"><li>Telephone reference checks</li><li>Pre-employment credit and database checks</li><li>Drug and alcohol testing</li></ul>'+
+    '<p class="pp">If the results of these checks are not of a standard that is satisfactory to us, we may withdraw this conditional offer, or terminate your employment.</p>'+
+    '<p class="pp">Please note that you are entitled to discuss this offer and the proposed terms and conditions of employment with your family, a lawyer, or someone else you trust. If you want to seek further information on your employment rights you can contact Employment New Zealand\'s free information service on 0800 20 90 20 or via their website www.employment.govt.nz.</p>'+
+    '<p class="pp">If you disagree with, do not understand, or wish to clarify anything in this offer, please phone me on '+phone+' or '+email+'. To accept the offer of employment and proposed terms and conditions, please sign both copies of the employment agreement, position description and policies and procedures manual and return one copy of each to me by <strong>'+fdate(g("f-deadline"))+'</strong>. Please note, if you do not return the signed documents to us by this date, our offer will lapse.</p>'+
+    '<div class="ph3">Trial Period</div>'+
+    '<p class="pp">The proposed employment agreement includes a trial period to assess and confirm suitability for the position. Further information outlining this is in your individual employment agreement.</p>'+
+    '<div class="ph3">Kiwisaver</div>'+
+    '<p class="pp">If you are eligible to participate in KiwiSaver (the government superannuation scheme) then you will receive an information pack about it when you return your signed agreement (or when you start work).</p>'+
+    '<p class="pp">If you have any questions regarding this offer then please let me know. Otherwise, I look forward to hearing from you.</p>'+
+    '<p class="pp">Yours sincerely</p><br><br>'+
+    '<p class="pp">Hamish Blampied<br><em><strong>Director</strong></em></p>'+
+    ftr(1,tot)+'</div>';
+
+  // PAGE 2 - Part 1 Terms
+  var payRow = isHr
+    ? '<tr><td class="ptbl k">Salary / Wage:<br>(See Part 5 clause 1)</td><td>'+(hr?fmoney(hr):"[Amount]")+' per hour, which excludes the employer\'s required KiwiSaver contribution.</td></tr>'+
+      (ot?'<tr><td class="ptbl k">Overtime Payments:</td><td>Overtime will be paid at the rate of '+fmoney(ot)+' per hour</td></tr>':'')
+    : '<tr><td class="ptbl k">Salary / Wage:<br>(See Part 5 clause 1)</td><td>'+(sal?fmoney(sal):"[Amount]")+' per annum which excludes the employer\'s required KiwiSaver contribution.</td></tr>';
+
+  var noticeRows = isPerm
+    ? '<tr><td colspan="2" style="padding:4px 7px;font-weight:700;border:1px solid #000">Notice Periods:</td></tr>'+
+      '<tr><td class="ptbl k">(a) During the trial period</td><td>'+nt+'</td></tr>'+
+      '<tr><td class="ptbl k">(b) Redundancy or resignation</td><td>'+nr+'</td></tr>'+
+      '<tr><td class="ptbl k">(c) Other reasons</td><td>'+no+'</td></tr>' : "";
+
+  var directRow = isPerm
+    ? '<tr><td class="ptbl k">Direct report:</td><td>'+(g("f-rname")||"[Name]")+', '+(g("f-rtitle")||"[Title]")+'</td></tr>'
+    : '<tr><td class="ptbl k">Department:</td><td>'+(g("f-dept")||"[Department]")+'</td></tr>';
+
+  var p2='<div class="pg">'+hdr()+
+    '<div class="ph1">'+(isPerm?"PERMANENT EMPLOYMENT AGREEMENT":"CASUAL INDIVIDUAL EMPLOYMENT AGREEMENT")+'</div>'+
+    '<p class="pp" style="text-align:center;font-size:9pt">(under Part 6 Employment Relations Act 2000)</p>'+
+    '<div class="ph2">PART 1: THE MAIN TERMS OF OUR AGREEMENT</div>'+
+    '<table class="ptbl"><tbody>'+
+    '<tr><td class="ptbl k">Our name and address:</td><td>Unicrest Group Limited<br>13 Nell Place, Whangarei 0110</td></tr>'+
+    '<tr><td class="ptbl k">Your name and address:</td><td>'+nm+', '+addr+'</td></tr>'+
+    '<tr><td class="ptbl k">Job Title:</td><td>'+pos+'</td></tr>'+
+    '<tr><td class="ptbl k">Commencement Date:<br>(See Part 3 clause 2)</td><td>'+fdate(g("f-start"))+'</td></tr>'+
+    payRow+
+    '<tr><td class="ptbl k">Payment frequency:</td><td>Fortnightly</td></tr>'+
+    '<tr><td class="ptbl k">Additional benefits:</td><td>'+benefits+'</td></tr>'+
+    '<tr><td class="ptbl k">Holiday entitlement:</td><td>4 weeks</td></tr>'+
+    directRow+
+    '<tr><td class="ptbl k">Normal place of work:</td><td>'+place+'</td></tr>'+
+    '<tr><td class="ptbl k">Hours and days of work:</td><td>'+hrs+' hours per week from '+days+' between the hours of '+st+' and '+et+'</td></tr>'+
+    '<tr><td class="ptbl k">Trial Period:</td><td>90 Days</td></tr>'+
+    noticeRows+
+    '</tbody></table>'+ftr(2,tot)+'</div>';
+
+  // PAGE 3 - Part 2 Job Description
+  var descHtml = desc ? '<div style="white-space:pre-wrap;font-size:9.5pt;line-height:1.5">'+desc+'</div>' : '<p class="pp" style="color:#999;font-style:italic">[Position description to be added]</p>';
+  var p3='<div class="pg">'+hdr()+
+    '<div class="ph2">PART 2: YOUR JOB DESCRIPTION</div>'+
+    '<div class="ph3">1. General Duties</div>'+
+    '<p class="pp">Your general duties are as follows:</p>'+
+    '<ol class="dl" type="a"><li>Diligently work within the team and use your best endeavours to promote and protect our interests;</li>'+
+    '<li>Promptly carry out and comply with all of your obligations as an employee and all reasonable and lawful policies, instructions and directions;</li>'+
+    '<li>While undertaking work for us, devote your efforts exclusively to the discharge of your duties as an employee;</li>'+
+    '<li>Ensure customer satisfaction at all times;</li><li>Undergo any training course stipulated by us;</li>'+
+    '<li>Undertake those duties normally associated with your position and job description;</li>'+
+    '<li>Carry out such other duties as directed, provided you are capable of performing such duties in a safe manner and with reasonable training; and</li>'+
+    '<li>Carry out all other duties agreed between us from time to time.</li></ol>'+
+    '<div class="ph3">2. Specific Duties</div>'+
+    '<p class="pp">The duties specific to your job title are those set out in your job description which forms part of this agreement.</p>'+
+    '<div class="ph2" style="margin-top:12px">Position Description: '+pos+'</div>'+descHtml+ftr(3,tot)+'</div>';
+
+  // PAGE 4 - Part 3
+  var p4='<div class="pg">'+hdr()+
+    '<div class="ph2">PART 3: HOW THIS AGREEMENT WORKS</div>'+
+    '<div class="ph3">1. Agreement Content and Application</div>'+
+    '<p class="pp">This agreement is an individual employment agreement made under Part 6 of the Employment Relations Act 2000. Any prior contract, agreement or arrangement is superseded and replaced by this agreement. The terms and conditions contained in this agreement cannot be varied unless such variation is in writing and signed by both parties.</p>'+
+    '<div class="ph3">2. Commencement</div>'+
+    '<p class="pp">Your employment will commence on the date stated in Part 1 and will terminate only in accordance with the terms of this agreement.</p>'+
+    '<div class="ph3">3. Trial Period</div>'+
+    '<p class="pp">You will be employed subject to a trial period of 90 days pursuant to s67A Employment Relations Act 2000. We will review your performance, conduct, compatibility and any other issues throughout the trial period. Any unsatisfactory issues may result in your termination. If your employment is terminated during this trial period, you are not entitled to pursue a personal grievance on the grounds of unjustified dismissal.</p>'+
+    '<div class="ph3">4. How this agreement may be terminated</div>'+
+    '<p class="pp"><strong>a) On notice:</strong> Either party may terminate this agreement by giving the period of notice stated in Part 1.</p>'+
+    '<p class="pp"><strong>b) Instant dismissal:</strong> In the event that you are found guilty of serious or wilful misconduct (including but not limited to dishonesty, wilful disobedience or breach of loyalty or confidentiality) you may be summarily dismissed.</p>'+
+    '<p class="pp"><strong>e) Abandonment:</strong> Where you are absent for a continuous period of three days without notification and consent, you shall be deemed to have terminated your employment without notice.</p>'+
+    '<p class="pp"><strong>g) Lengthy illness or incapacity:</strong> We may terminate your employment if, as a result of mental or physical illness you are rendered incapable of performing your duties for a continuous period of 20 working days or for periods totalling two months in any 12-month period.</p>'+
+    '<p class="pp"><strong>j) Redundancy:</strong> Redundancy means a situation where the termination is attributable, wholly or mainly, to the fact that the position filled by the employee is, or will become, superfluous to the needs of the employer. No compensation is payable in the event of redundancy.</p>'+
+    '<p class="pp"><strong>o) Force Majeure:</strong> The Employee understands and agrees that their job may end without notice if a natural disaster, workplace fire, flood or other similar major event beyond the Employer\'s control makes it impossible for employment to continue.</p>'+
+    '<div class="ph3">5. Emergency Management</div>'+
+    '<p class="pp">If the Employer closes premises for reasons associated with a \'crisis or emergency\', the Employer may require Employees to work from home, work from another location, reduce hours of work, change duties or not work at all.</p>'+
+    '<div class="ph3">6. Obligations upon termination</div>'+
+    '<p class="pp"><strong>Return of property:</strong> All Company property must be returned within 24 hours of termination. <strong>Deductions from final pay:</strong> Upon termination we will be entitled to deduct from any moneys owing to you any amount you may then owe us.</p>'+
+    '<div class="ph3">8. Employment Relationship Problems</div>'+
+    '<p class="pp">If you wish to raise a personal grievance we encourage discussion in the first instance. If unresolved, mediation services are available via MBIE, or the matter may be referred to the Employment Relations Authority. Any personal grievance must be raised within 90 days.</p>'+
+    ftr(4,tot)+'</div>';
+
+  // PAGE 5 - Part 4
+  var p5='<div class="pg">'+hdr()+
+    '<div class="ph2">PART 4: YOUR OBLIGATIONS</div>'+
+    '<div class="ph3">2. Hours of work</div>'+
+    '<p class="pp">Your ordinary hours and days of work are set out in Part 1. You may be requested at times to work additional hours as necessary to meet our operational requirements.</p>'+
+    '<div class="ph3">3. Place of work</div>'+
+    '<p class="pp">Your initial location of work is stated in Part 1. We may require you to travel periodically to perform your duties or relocate to another location within a reasonable distance of your normal place of work.</p>'+
+    '<div class="ph3">4. Standards you must keep</div>'+
+    '<p class="pp"><strong>a) General work standard:</strong> We seek excellence in standards of work and in customer liaison. You agree to strive to achieve the highest levels of efficiency and service.</p>'+
+    '<p class="pp"><strong>b) Devotion of time:</strong> During your work hours you are required to devote the whole of your time and attention to requirements of our business.</p>'+
+    '<p class="pp"><strong>c) Punctuality:</strong> You shall ensure that you attend work punctually on every day that you are required to work. If you believe you are going to be late or unable to attend you must telephone us.</p>'+
+    '<p class="pp"><strong>d) Customer service:</strong> You will conduct yourself at all times in a manner which will enhance and support our work and reputation.</p>'+
+    '<p class="pp"><strong>e) Compatibility:</strong> Our success relies upon all our staff working as a team. You are obliged at all times to be courteous and well-mannered towards your work colleagues.</p>'+
+    '<p class="pp"><strong>f) Instructions:</strong> You must comply with lawful and reasonable requests and instructions from management and senior staff.</p>'+
+    '<div class="ph3">5. Uniform, Clothing and Appearance</div>'+
+    '<p class="pp">You shall dress and present yourself neatly and tidily at all times in accordance with our current dress policy.</p>'+
+    '<div class="ph3">7. Health and Safety at Work</div>'+
+    '<p class="pp">We both agree that we will each take all steps reasonably practicable to ensure a safe working environment is maintained. You shall: (a) familiarise yourself with hazard warnings; (b) use safety equipment provided; (c) report any accident, near miss or hazard; (d) tell us if you are experiencing symptoms of occupational stress or work-related injury. You must notify us within 1 day of any work-related claims lodged with ACC.</p>'+
+    '<div class="ph3">9. Discrimination</div>'+
+    '<p class="pp">We do not tolerate any form of discrimination recognised by the Human Rights Act and will take appropriate disciplinary action against any member of staff found guilty of such discrimination, up to and including dismissal.</p>'+
+    '<div class="ph3">10. Acceptable Internet and Email Use</div>'+
+    '<p class="pp">Your use of the internet during work hours should be primarily for work related purposes. Social networking websites shall not be used to make any comment about your work, our business, our clients, our products or colleagues without our express permission. Upon termination you are required to delete all clients of ours from your LinkedIn connections.</p>'+
+    ftr(5,tot)+'</div>';
+
+  // PAGE 6 - Part 5 Benefits
+  var salRef = isHr ? (hr?fmoney(hr):"[Amount]")+" per hour" : (sal?fmoney(sal):"[Amount]")+" per annum";
+  var kiwiNote = isPerm
+    ? '<p class="pp"><strong>b)</strong> Your remuneration does not include the minimum KiwiSaver employer contribution as required by law. If you elect to contribute to a KiwiSaver scheme we shall pay the Employer Contribution into your scheme.</p>'
+    : '<p class="pp"><strong>b)</strong> 8% holiday pay will be paid on top of the hourly rate.</p>';
+  var leaveSection = isPerm ? (
+    '<div class="ph3">2. Annual Leave</div><p class="pp">At the end of each 12 months of employment, you will be entitled to paid annual leave of 4 weeks, calculated in accordance with the Holidays Act 2003.</p>'+
+    '<div class="ph3">3. Public Holidays</div><p class="pp">You are entitled to a day\'s paid holiday when any of the following public holidays falls on one of your normal working days: New Years\' Day and the following day, Waitangi Day, Good Friday, Easter Monday, Anzac Day, local anniversary day, Queen\'s birthday, Labour Day, Christmas Day and Boxing Day. You may be required to work on any of the above days if requested, in which case you will be paid one and a half times your relevant daily pay.</p>'+
+    '<div class="ph3">5. Sick Leave</div><p class="pp">After 6 months\' continuous service you will be entitled to take up to a maximum of ten days paid sick leave in the following 12 months and up to 10 days in each subsequent year. Sick leave may be taken when you, your spouse or a person who depends on you for care is sick or injured.</p>'+
+    '<div class="ph3">6. Bereavement Leave</div><p class="pp">After 6 months\' continuous service you will be entitled to take up to a maximum of three days paid bereavement leave for each bereavement you suffer on the death of your spouse, partner, parent, child, brother or sister, grandparent, grandchild, or spouse\'s parent.</p>'+
+    '<div class="ph3">7. Domestic Violence Leave</div><p class="pp">After 6 months of continuous employment, Employees who are affected by domestic or family violence may request a change to their working arrangements and up to 10 days additional paid leave. Refer to the Domestic Violence Policy or speak with Hamish or Jonathan for more information.</p>'+
+    '<div class="ph3">8. Parental Leave</div><p class="pp">You are entitled to parental leave in accordance with the Parental Leave and Employment Protection Act and its amendments.</p>'
+  ) : "";
+  var p6='<div class="pg">'+hdr()+
+    '<div class="ph2">PART 5: THE BENEFITS YOU WILL RECEIVE</div>'+
+    '<div class="ph3">1. Remuneration</div>'+
+    '<p class="pp"><strong>a)</strong> You shall receive remuneration of '+salRef+' as stated in Part 1.</p>'+
+    kiwiNote+
+    '<p class="pp"><strong>c) Deductions:</strong> You authorise us under the Wages Protection Act 1983 to make a rateable deduction from your wage for any money that you owe to us. We will consult with you prior to making the deduction.</p>'+
+    '<p class="pp"><strong>e) Confidentiality of remuneration:</strong> You agree to keep the amounts and components of remuneration confidential between us, except that you may disclose this information to any independent person outside our company for the purposes of obtaining advice.</p>'+
+    '<p class="pp"><strong>f) Reimbursement of expenditure:</strong> The Employer shall reimburse the Employee for all reasonable travel, accommodation and other expenses properly incurred in accordance with Company policy and using current IRD motor vehicle rates. You are required to obtain and produce GST invoices and receipts for payments claimed. Reimbursement is not available for traffic and parking violations.</p>'+
+    '<p class="pp"><strong>g) Remuneration Reviews:</strong> Your remuneration shall be reviewed on a yearly basis in conjunction with a performance review.</p>'+
+    (isHr && !isPerm?'':leaveSection)+
+    ftr(6,tot)+'</div>';
+
+  // PAGE 7 - Part 6 Restrictions
+  var p7='<div class="pg">'+hdr()+
+    '<div class="ph2">PART 6: RESTRICTIONS IMPOSED BY THIS EMPLOYMENT</div>'+
+    '<div class="ph3">2. Confidentiality</div>'+
+    '<p class="pp">During the period of your employment, we will provide you with access to Confidential Information to enable and assist you to carry out your duties. You agree: (a) to treat as confidential all Confidential Information unless required to disclose it by law; (b) to use the Confidential Information only in performance of your duties; (c) not to divulge or disclose any Confidential Information to any third party except with our prior written consent; (d) not to remove, copy or distribute any Confidential Information from our premises without our consent; (e) not to use the Confidential Information to harm the Company; (f) not to make any statement to the media related to us; (g) to return to us on termination all Confidential Information which is capable of being returned.</p>'+
+    '<p class="pp">These restrictions shall continue to apply after the termination of your employment without limit in point of time.</p>'+
+    '<div class="ph3">3. Intellectual Property Ownership</div>'+
+    '<p class="pp">All Know-How or Company Information developed or created in whole or in part by you arising from or in connection with your employment by us shall be our absolute property unless we formally declare otherwise in writing.</p>'+
+    '<div class="ph3">4. Non-Solicitation</div>'+
+    '<p class="pp">During employment and for 24 months after you cease to be employed by us you will not either directly or indirectly approach our customers, other staff or contractors with the intention of enticing them away from us or assisting anyone else to do so.</p>'+
+    '<div class="ph3">5. Other Employment</div>'+
+    '<p class="pp">Except with our written consent, while employed by us you must not set yourself up, own, operate or otherwise engage in any private business or undertake other employment: (a) with any business that may compete in any material respect with our business; or (b) with any of our customers or suppliers.</p>'+
+    '<div class="ph3">6. Restraint of Trade</div>'+
+    '<p class="pp">You will not during employment or for 12 months after termination: (a) provide or arrange Similar Services to any Client with whom you had dealings in the preceding three months; or (b) within New Zealand become personally engaged in an enterprise which provides Similar Services except with our written consent.</p>'+
+    '<div class="ph3">7. Garden Leave</div>'+
+    '<p class="pp">In the event this Agreement is terminated by either party, we may at any time during the notice period: (a) direct you to undertake such duties as we may think fit; (b) direct you not to report for work; (c) terminate your employment earlier than the expiry of notice by making a payment in lieu of your remuneration for the unexpired period.</p>'+
+    ftr(7,tot)+'</div>';
+
+  // PAGE 8 - Part 7 Signatures
+  var p8='<div class="pg">'+hdr()+
+    '<div class="ph2">PART 7: YOUR AGREEMENT TO THESE TERMS</div>'+
+    '<div class="ph3">1. Representations Prior to Offer of Employment</div>'+
+    '<p class="pp">In making an offer of employment to you we have relied on your representations about your qualifications and experience. You confirm that these representations are true and correct. Specifically, you warrant that: (a) you have produced evidence of your qualifications, New Zealand residency or citizenship or work visa; (b) everything you have told us as to your qualifications and experience when applying for your position is true and complete; (c) you have not deliberately failed to disclose anything which may have materially influenced our decision to employ you; (d) you know of no issues that might in any way affect your ability to work for us or our trust and confidence in you; (e) you have disclosed to us any injuries and illnesses you have previously suffered that may affect your ability to perform your duties and all previous ACC claims.</p>'+
+    '<div class="ph3">2. Certificate of Exemption</div>'+
+    '<p class="pp">The employer has strongly held religious and moral objections to membership of trade unions or employee associations. For this reason, the employer has sought and been issued by MBIE with a Certificate of Exemption under Section 24 of the Employment Relations Act 2000 which allows the employer to deny union access to the workplace. The employee acknowledges that this Certificate is in place and agrees to abide by the employer\'s wishes to deny access.</p>'+
+    '<div class="ph3">3. Your Right to Legal Advice</div>'+
+    '<p class="pp">You acknowledge that you have read and understood the provisions of this agreement and that prior to signing this agreement we have told you of your right to obtain independent advice in relation to this agreement before accepting the terms of employment set out in it and you have been given a reasonable opportunity to obtain such advice.</p>'+
+    '<br><div class="sigs">'+
+    '<div class="sigbox"><div class="signm">SIGNED BY: Hamish Blampied<br>On behalf of Unicrest Group Ltd</div><br><br><div class="sigl"></div><div class="sigd">Date: ___________________________</div></div>'+
+    '<div class="sigbox"><div class="signm">SIGNED BY: '+nm+'</div><br><br><div class="sigl"></div><div class="sigd">Date: ___________________________</div></div>'+
+    '</div>'+ftr(8,tot)+'</div>';
+
+  // PAGE 9 - Policies
+  var pols=[
+    ["Health & Safety Policy","I have read, understood, and agree to comply with Unicrest Group's Health & Safety Policy including hazard identification, incident reporting, use of PPE, and safe work practices."],
+    ["Drug & Alcohol Policy","I acknowledge that Unicrest Group operates a drug and alcohol free workplace. I understand that pre-employment, random, and for-cause testing may occur."],
+    ["Acceptable Use of IT, Internet & Email","I have read and understood the policy regarding use of company IT systems, internet, and email. I agree to use these resources primarily for work purposes."],
+    ["Social Media Policy","I understand that I must not make any comment about my work, the business, its clients, products, services, or colleagues on social media without express written permission."],
+    ["Confidentiality & Privacy","I acknowledge my obligations to maintain confidentiality of all Company Information and understand these obligations continue after my employment ends."],
+    ["Workplace Harassment & Discrimination","I have read and understood the company's policy on harassment, bullying, and discrimination. I agree to treat all colleagues, customers, and stakeholders with respect and dignity."],
+    ["Code of Conduct","I understand the standards of conduct, professional presentation, punctuality, and customer service expected of me and agree to uphold these standards."],
+    ["Leave & Absence Policy","I acknowledge the processes for requesting and notifying leave and understand the requirement to notify the company at least one hour before my scheduled start time if I am unable to attend."],
+    ["Vehicle & Expense Policy","I understand the process for claiming business expenses and vehicle mileage, including the requirement to hold valid receipts and comply with current IRD mileage rates."],
+    ["Domestic Violence Policy","I am aware that the company offers support, including up to 10 days additional paid leave, to employees affected by domestic or family violence."]
+  ];
+  var prows=pols.map(function(p,i){var bg=i%2===0?"#f9f9f9":"#fff";
+    return '<tr><td style="border:1px solid #999;padding:5px 8px;font-weight:700;font-size:9pt;vertical-align:top;width:26%;background:'+bg+'">'+p[0]+'</td>'+
+      '<td style="border:1px solid #999;padding:5px 8px;font-size:8.5pt;vertical-align:top;background:'+bg+'">'+p[1]+'</td>'+
+      '<td style="border:1px solid #999;padding:5px 8px;text-align:center;vertical-align:middle;width:66px;background:'+bg+'"><div style="font-size:7pt;color:#888;margin-bottom:14px">Initial</div><div style="border-top:1px solid #000;width:42px;margin:0 auto"></div></td></tr>';
+  }).join("");
+  var p9='<div class="pg">'+hdr()+
+    '<div class="ph1">POLICIES &amp; PROCEDURES ACKNOWLEDGMENT</div>'+
+    '<p class="pp" style="text-align:center;font-size:9pt;color:#555">Unicrest Group Limited &mdash; To be completed and returned with your signed employment agreement</p><br>'+
+    '<p class="pp">I, <strong>'+nm+'</strong>, acknowledge that I have been provided with, and have read and understood, the following Unicrest Group policies and procedures. I agree to comply with these policies as a condition of my employment.</p>'+
+    '<p class="pp" style="font-size:9pt;color:#555;margin-bottom:8px">Please initial each row to confirm you have read and understood each policy.</p>'+
+    '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
+    '<th style="background:#222;color:#fff;padding:6px 8px;text-align:left;font-size:8.5pt;border:1px solid #000">Policy</th>'+
+    '<th style="background:#222;color:#fff;padding:6px 8px;text-align:left;font-size:8.5pt;border:1px solid #000">Acknowledgment</th>'+
+    '<th style="background:#222;color:#fff;padding:6px 8px;text-align:center;font-size:8.5pt;border:1px solid #000;width:66px">Initial</th>'+
+    '</tr></thead><tbody>'+prows+'</tbody></table><br>'+
+    '<p class="pp" style="font-size:9pt">By signing below I confirm that I have read, understood, and agree to comply with all of the above policies and procedures as a condition of my employment with Unicrest Group Limited.</p>'+
+    '<div class="sigs" style="margin-top:12px">'+
+    '<div class="sigbox"><div class="signm">Employee: '+nm+'<br>Position: '+pos+'</div><br><div class="sigl"></div><div class="sigd">Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Date: _______________</div></div>'+
+    '<div class="sigbox"><div class="signm">Witnessed by:<br>&nbsp;</div><br><div class="sigl"></div><div class="sigd">Name / Signature &nbsp;&nbsp; Date: _______________</div></div>'+
+    '</div>'+ftr(9,tot)+'</div>';
+
+  document.getElementById("doc-out").innerHTML = p1+p2+p3+p4+p5+p6+p7+p8+p9;
+}
+
+// Init
+buildDoc();
+</script>
+</body>
+</html>
