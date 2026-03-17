@@ -265,6 +265,10 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
 }
 .emoji-btn:hover { border-color: var(--purple); }
 .emoji-btn.active { border-color: var(--purple); background: rgba(124,16,154,0.06); }
+.type-toggle { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; width: fit-content; }
+.type-btn { background: var(--white); color: var(--muted); border: none; padding: 8px 18px; font-size: 12px; font-weight: 700; font-family: var(--lato); cursor: pointer; transition: background 0.15s, color 0.15s; letter-spacing: 0.02em; }
+.type-btn:first-child { border-right: 1px solid var(--border); }
+.type-btn.active { background: var(--purple); color: var(--white); }
 
 #launch-view { display: flex; flex-direction: column; height: 100vh; }
 .launch-bar {
@@ -393,11 +397,23 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
         <div class="emoji-row" id="emoji-row"></div>
       </div>
       <div class="form-field">
+        <label class="form-label">App type</label>
+        <div class="type-toggle">
+          <button class="type-btn active" id="type-btn-html" onclick="setAppType('html')">HTML app</button>
+          <button class="type-btn" id="type-btn-url" onclick="setAppType('url')">External URL</button>
+        </div>
+      </div>
+      <div class="form-field" id="field-html">
         <label class="form-label">HTML source</label>
         <textarea class="form-textarea" id="f-html"
           placeholder="Paste the full HTML for your Claude-generated app here..."
           spellcheck="false"></textarea>
         <p class="form-hint">Maximum approximately 60,000 characters. Very large apps may need to be split.</p>
+      </div>
+      <div class="form-field hidden" id="field-url">
+        <label class="form-label">URL</label>
+        <input class="form-input" id="f-url" placeholder="https://example.com">
+        <p class="form-hint">Opens in a new browser tab when launched.</p>
       </div>
       <button class="btn-primary" id="submit-btn" onclick="submitApp()">Save to portal</button>
     </div>
@@ -579,7 +595,9 @@ async function loadApps() {
       html:        decodeHTML(item.fields.HtmlSource),
       addedBy:     item.fields.AddedBy         || '',
       dateAdded:   item.fields.DateAdded       || item.createdDateTime || '',
-      visibleTo:   item.fields.VisibleTo        || ''
+      visibleTo:   item.fields.VisibleTo        || '',
+      appType:     item.fields.AppType          || 'html',
+      appUrl:      item.fields.AppUrl           || ''
     }));
     renderGrid();
   } catch (e) {
@@ -588,6 +606,15 @@ async function loadApps() {
 }
 
 let editingId = null;
+let currentAppType = 'html';
+
+function setAppType(type) {
+  currentAppType = type;
+  document.getElementById('type-btn-html').classList.toggle('active', type === 'html');
+  document.getElementById('type-btn-url').classList.toggle('active', type === 'url');
+  document.getElementById('field-html').classList.toggle('hidden', type === 'url');
+  document.getElementById('field-url').classList.toggle('hidden', type === 'html');
+}
 
 function editApp(id) {
   const a = allApps.find(x => x.id === id);
@@ -597,8 +624,10 @@ function editApp(id) {
   document.getElementById('f-desc').value    = a.description;
   document.getElementById('f-cat').value     = a.category;
   document.getElementById('f-html').value    = a.html;
+  document.getElementById('f-url').value     = a.appUrl || '';
   document.getElementById('f-visible').value = a.visibleTo || '';
   setEmoji(a.emoji);
+  setAppType(a.appType || 'html');
   document.getElementById('form-title').textContent    = 'Edit app';
   document.getElementById('form-subtitle').textContent = 'Update the details for this app';
   document.getElementById('submit-btn').textContent    = 'Save changes';
@@ -610,9 +639,11 @@ function cancelForm() {
   document.getElementById('f-name').value    = '';
   document.getElementById('f-desc').value    = '';
   document.getElementById('f-html').value    = '';
+  document.getElementById('f-url').value     = '';
   document.getElementById('f-cat').value     = 'Productivity';
   document.getElementById('f-visible').value = '';
   setEmoji(EMOJIS[0]);
+  setAppType('html');
   document.getElementById('form-title').textContent    = 'Add a new app';
   document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
   document.getElementById('submit-btn').textContent    = 'Save to portal';
@@ -637,7 +668,10 @@ async function submitApp() {
   if (saving) return;
   const name = document.getElementById('f-name').value.trim();
   const html = document.getElementById('f-html').value.trim();
-  if (!name || !html) { showError('App name and HTML source are required.'); return; }
+  const url = document.getElementById('f-url').value.trim();
+  if (!name) { showError('App name is required.'); return; }
+  if (currentAppType === 'html' && !html) { showError('HTML source is required.'); return; }
+  if (currentAppType === 'url' && !url) { showError('URL is required.'); return; }
 
   const account = msalApp.getActiveAccount();
   const fields = {
@@ -648,7 +682,9 @@ async function submitApp() {
     HtmlSource:     encodeHTML(html),
     AddedBy:        account?.name || account?.username || '',
     DateAdded:      new Date().toISOString(),
-    VisibleTo:      document.getElementById('f-visible').value.trim()
+    VisibleTo:      document.getElementById('f-visible').value.trim(),
+    AppType:        currentAppType,
+    AppUrl:         currentAppType === 'url' ? document.getElementById('f-url').value.trim() : ''
   };
 
   saving = true;
@@ -666,9 +702,11 @@ async function submitApp() {
     document.getElementById('f-name').value    = '';
     document.getElementById('f-desc').value    = '';
     document.getElementById('f-html').value    = '';
+    document.getElementById('f-url').value     = '';
     document.getElementById('f-cat').value     = 'Productivity';
     document.getElementById('f-visible').value = '';
     setEmoji(EMOJIS[0]);
+    setAppType('html');
     document.getElementById('form-title').textContent    = 'Add a new app';
     document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
     document.getElementById('submit-btn').textContent    = 'Save to portal';
@@ -752,7 +790,7 @@ function renderGrid() {
         <span class="card-emoji">${a.emoji}</span>
         <span class="card-cat">${esc(a.category)}</span>
       </div>
-      <div class="card-name">${esc(a.name)}${a.visibleTo ? ' <span style="font-size:10px;font-weight:400;color:var(--muted);background:var(--light);border-radius:3px;padding:2px 6px;vertical-align:middle;">Restricted</span>' : ''}</div>
+      <div class="card-name">${esc(a.name)}${a.visibleTo ? ' <span style="font-size:10px;font-weight:400;color:var(--muted);background:var(--light);border-radius:3px;padding:2px 6px;vertical-align:middle;">Restricted</span>' : ''}${a.appType==='url' ? ' <span style="font-size:10px;font-weight:400;color:var(--sky);background:rgba(0,161,222,0.08);border-radius:3px;padding:2px 6px;vertical-align:middle;">URL</span>' : ''}</div>
       ${a.description ? `<div class="card-desc">${esc(a.description)}</div>` : ''}
       <div class="card-footer">
         <div class="card-meta">
@@ -762,7 +800,7 @@ function renderGrid() {
         <div class="card-actions">
           <button class="btn-delete" onclick="deleteApp('${a.id}')" title="Remove">✕</button>
           <button class="btn-edit" onclick="editApp('${a.id}')">Edit</button>
-          <button class="btn-launch" onclick="launchApp('${a.id}')">Launch →</button>
+          <button class="btn-launch" onclick="launchApp('${a.id}')">${a.appType==='url' ? 'Open ↗' : 'Launch →'}</button>
         </div>
       </div>
     </div>`).join('');
@@ -773,6 +811,10 @@ let currentBlobUrl = null;
 function launchApp(id) {
   const a = allApps.find(x => x.id === id);
   if (!a) return;
+  if (a.appType === 'url' && a.appUrl) {
+    window.open(a.appUrl, '_blank', 'noopener');
+    return;
+  }
   document.getElementById('launch-emoji').textContent = a.emoji;
   document.getElementById('launch-name').textContent  = a.name;
   if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); }
