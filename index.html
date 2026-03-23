@@ -637,7 +637,11 @@ function editApp(id) {
   document.getElementById('form-title').textContent    = 'Edit app';
   document.getElementById('form-subtitle').textContent = 'Update the details for this app';
   document.getElementById('submit-btn').textContent    = 'Save changes';
-  document.getElementById('delete-from-edit').classList.remove('hidden');
+  if (canDelete(a)) {
+    document.getElementById('delete-from-edit').classList.remove('hidden');
+  } else {
+    document.getElementById('delete-from-edit').classList.add('hidden');
+  }
   showView('add');
 }
 
@@ -729,7 +733,14 @@ async function submitApp() {
   }
 }
 
+function canDelete(a) {
+  if (ADMINS.includes(currentUserEmail)) return true;
+  return (a.addedBy || '').toLowerCase() === currentUserEmail;
+}
+
 async function deleteApp(id) {
+  const a = allApps.find(x => x.id === id);
+  if (!a || !canDelete(a)) { showError('You can only delete apps you added.'); return; }
   if (!confirm('Remove this app from the portal?')) return;
   try {
     await resolveSiteList();
@@ -741,6 +752,8 @@ async function deleteApp(id) {
 
 async function deleteFromEdit() {
   if (!editingId) return;
+  const a = allApps.find(x => x.id === editingId);
+  if (!a || !canDelete(a)) { showError('You can only delete apps you added.'); return; }
   if (!confirm('Remove this app from the portal?')) return;
   try {
     await resolveSiteList();
@@ -833,7 +846,7 @@ function renderGrid() {
           ${a.addedBy ? `<span class="card-by">${esc(a.addedBy)}</span>` : ''}
         </div>
         <div class="card-actions">
-          <button class="btn-delete" onclick="deleteApp('${a.id}')" title="Remove">✕</button>
+          ${canDelete(a) ? `<button class="btn-delete" onclick="deleteApp('${a.id}')" title="Remove">✕</button>` : ''}
           <button class="btn-edit" onclick="editApp('${a.id}')">Edit</button>
           <button class="btn-launch" onclick="launchApp('${a.id}')">${a.appType==='url' ? 'Open ↗' : 'Launch →'}</button>
         </div>
