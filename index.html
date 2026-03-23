@@ -380,6 +380,7 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
             <option>Research</option>
             <option>HR</option>
             <option>Sales</option>
+            <option>Operations</option>
             <option>Other</option>
           </select>
         </div>
@@ -417,6 +418,9 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
         <p class="form-hint">Opens in a new browser tab when launched.</p>
       </div>
       <button class="btn-primary" id="submit-btn" onclick="submitApp()">Save to portal</button>
+      <div id="delete-from-edit" class="hidden" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);">
+        <button onclick="deleteFromEdit()" style="background:none;border:1px solid #DDAAAA;color:var(--red);border-radius:4px;padding:8px 16px;font-size:12px;font-weight:700;font-family:var(--lato);cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#FFF0EE'" onmouseout="this.style.background='none'">Delete this app</button>
+      </div>
     </div>
   </div>
 
@@ -459,6 +463,7 @@ const msalConfig = {
 };
 
 const TOKEN_REQUEST = { scopes: ["https://graph.microsoft.com/Sites.ReadWrite.All"] };
+const ADMINS = ["regan@unicrest.com"];
 
 async function init() {
   try {
@@ -632,6 +637,7 @@ function editApp(id) {
   document.getElementById('form-title').textContent    = 'Edit app';
   document.getElementById('form-subtitle').textContent = 'Update the details for this app';
   document.getElementById('submit-btn').textContent    = 'Save changes';
+  document.getElementById('delete-from-edit').classList.remove('hidden');
   showView('add');
 }
 
@@ -645,6 +651,7 @@ function cancelForm() {
   document.getElementById('f-visible').value = '';
   setEmoji(EMOJIS[0]);
   setAppType('html');
+  document.getElementById('delete-from-edit').classList.add('hidden');
   document.getElementById('form-title').textContent    = 'Add a new app';
   document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
   document.getElementById('submit-btn').textContent    = 'Save to portal';
@@ -708,6 +715,7 @@ async function submitApp() {
     document.getElementById('f-visible').value = '';
     setEmoji(EMOJIS[0]);
     setAppType('html');
+    document.getElementById('delete-from-edit').classList.add('hidden');
     document.getElementById('form-title').textContent    = 'Add a new app';
     document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
     document.getElementById('submit-btn').textContent    = 'Save to portal';
@@ -731,6 +739,30 @@ async function deleteApp(id) {
   } catch (e) { showError(e.message); }
 }
 
+async function deleteFromEdit() {
+  if (!editingId) return;
+  if (!confirm('Remove this app from the portal?')) return;
+  try {
+    await resolveSiteList();
+    await gDelete(`/sites/${siteId}/lists/${listId}/items/${editingId}`);
+    allApps = allApps.filter(a => a.id !== editingId);
+    editingId = null;
+    document.getElementById('delete-from-edit').classList.add('hidden');
+    setAppType('html');
+    document.getElementById('f-name').value    = '';
+    document.getElementById('f-desc').value    = '';
+    document.getElementById('f-html').value    = '';
+    document.getElementById('f-url').value     = '';
+    document.getElementById('f-cat').value     = 'Productivity';
+    document.getElementById('f-visible').value = '';
+    setEmoji(EMOJIS[0]);
+    document.getElementById('form-title').textContent    = 'Add a new app';
+    document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
+    document.getElementById('submit-btn').textContent    = 'Save to portal';
+    showView('gallery');
+  } catch (e) { showError(e.message); }
+}
+
 function showView(v) {
   ['gallery','add','launch'].forEach(n =>
     document.getElementById(n + '-view').classList.add('hidden'));
@@ -745,6 +777,7 @@ function showView(v) {
     document.getElementById('form-title').textContent    = 'Add a new app';
     document.getElementById('form-subtitle').textContent = 'Paste a Claude-generated HTML app to share it with the team';
     document.getElementById('submit-btn').textContent    = 'Save to portal';
+    document.getElementById('delete-from-edit').classList.add('hidden');
   }
 }
 
@@ -752,6 +785,7 @@ function filterApps(val) { currentSearch = val; renderGrid(); }
 function setCat(cat) { currentCat = cat; renderCatPills(); renderGrid(); }
 
 function isVisible(a) {
+  if (ADMINS.includes(currentUserEmail)) return true;
   if (!a.visibleTo || !a.visibleTo.trim()) return true;
   const allowed = a.visibleTo.split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
   return allowed.includes(currentUserEmail);
