@@ -124,6 +124,118 @@
       "managerFailedBy": "Lysander",
       "managerFailedTime": "16:35",
       "isManager": false
+    },
+    {
+      "id": 1774902390769,
+      "name": "Unicrest\nApp Portal\nPaulo De Almeida",
+      "role": "production",
+      "date": "2026-03-31",
+      "time": "09:26",
+      "items": [
+        {
+          "id": "1.1",
+          "label": "Unnecessary items removed from work areas",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "1.2",
+          "label": "Only today's materials and tools are present",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.1",
+          "label": "All tools returned to correct storage location",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.2",
+          "label": "Walkways and exits are clear and unobstructed",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.3",
+          "label": "Labels and signage are visible and correct",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.4",
+          "label": "No products left on work benches",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.1",
+          "label": "Work surfaces wiped down and free of debris",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.2",
+          "label": "Floor swept and free of waste",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.3",
+          "label": "Rubbish bins emptied (not overflowing)",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.8",
+          "label": "Tape and shrink wrap in stock",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "4.1",
+          "label": "Any issues from yesterday's checklist resolved",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "4.2",
+          "label": "Accident or near miss register completed (if relevant)",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "4.3",
+          "label": "Forklift and order picker pre-use checks completed",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "5.1",
+          "label": "Team briefed on any changes or issues",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "5.2",
+          "label": "Corrective actions from prior checks are on track",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.4",
+          "label": "Skip bin and Cardbaord bin emptied (not overflowing)",
+          "pass": true,
+          "notes": ""
+        }
+      ],
+      "signedOff": false,
+      "signedBy": null,
+      "signOffTime": null,
+      "managerFailed": false,
+      "managerFailedBy": "",
+      "managerFailedTime": "",
+      "isManager": false
     }
   ],
   "checklist": [
