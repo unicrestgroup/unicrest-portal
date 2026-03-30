@@ -195,5 +195,20 @@
     "secondary": "C",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndssrbkqx6s",
+    "name": "Paulo De Almeida",
+    "date": "2026-03-30T23:07:15.152Z",
+    "scores": {
+      "D": 34,
+      "I": 32,
+      "S": 48,
+      "C": 87
+    },
+    "primary": "C",
+    "secondary": "S",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
