@@ -135,5 +135,20 @@
     "secondary": "I",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndr9po2oq2r",
+    "name": "Peter Dreyer",
+    "date": "2026-03-30T22:24:26.930Z",
+    "scores": {
+      "D": 35,
+      "I": 22,
+      "S": 76,
+      "C": 67
+    },
+    "primary": "S",
+    "secondary": "C",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
