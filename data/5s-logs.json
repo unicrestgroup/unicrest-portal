@@ -21,8 +21,9 @@
       {
         "id": "2.1",
         "label": "All tools returned to correct storage location",
-        "pass": true,
-        "notes": ""
+        "pass": false,
+        "notes": "test",
+        "managerOverride": true
       },
       {
         "id": "2.2",
@@ -118,9 +119,9 @@
     "signedOff": false,
     "signedBy": null,
     "signOffTime": null,
-    "managerFailed": false,
-    "managerFailedBy": "",
-    "managerFailedTime": "",
+    "managerFailed": true,
+    "managerFailedBy": "Lysander",
+    "managerFailedTime": "16:35",
     "isManager": false
   }
 ]
