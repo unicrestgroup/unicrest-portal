@@ -75,5 +75,20 @@
     "secondary": "C",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndot218wc7y",
+    "name": "Regan Boon",
+    "date": "2026-03-30T21:15:30.572Z",
+    "scores": {
+      "D": 75,
+      "I": 66,
+      "S": 40,
+      "C": 19
+    },
+    "primary": "D",
+    "secondary": "I",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
