@@ -177,8 +177,9 @@
         {
           "id": "3.2",
           "label": "Floor swept and free of waste",
-          "pass": true,
-          "notes": ""
+          "pass": false,
+          "notes": "floor wasnt swept",
+          "managerOverride": true
         },
         {
           "id": "3.3",
@@ -232,9 +233,9 @@
       "signedOff": false,
       "signedBy": null,
       "signOffTime": null,
-      "managerFailed": false,
-      "managerFailedBy": "",
-      "managerFailedTime": "",
+      "managerFailed": true,
+      "managerFailedBy": "Unicrest\nApp Portal\nPaulo De Almeida",
+      "managerFailedTime": "09:26",
       "isManager": false
     }
   ],
