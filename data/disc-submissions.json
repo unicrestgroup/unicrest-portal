@@ -150,5 +150,20 @@
     "secondary": "C",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndrckiffjka",
+    "name": "Gareth Mauchline",
+    "date": "2026-03-30T22:26:40.215Z",
+    "scores": {
+      "D": 74,
+      "I": 20,
+      "S": 68,
+      "C": 38
+    },
+    "primary": "D",
+    "secondary": "S",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
