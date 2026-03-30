@@ -60,5 +60,20 @@
     "secondary": "I",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndoeomkt6ek",
+    "name": "Oregon Blampied",
+    "date": "2026-03-30T21:04:20.012Z",
+    "scores": {
+      "D": 85,
+      "I": 27,
+      "S": 38,
+      "C": 50
+    },
+    "primary": "D",
+    "secondary": "C",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
