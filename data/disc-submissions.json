@@ -105,5 +105,20 @@
     "secondary": "D",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndqogb48gl8",
+    "name": "Lissa McGillan",
+    "date": "2026-03-30T22:07:55.024Z",
+    "scores": {
+      "D": 26,
+      "I": 43,
+      "S": 86,
+      "C": 44
+    },
+    "primary": "S",
+    "secondary": "C",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
