@@ -182,8 +182,9 @@
         {
           "id": "3.2",
           "label": "Floor swept and free of waste",
-          "pass": true,
-          "notes": ""
+          "pass": false,
+          "notes": "floor needs sweeping",
+          "managerOverride": true
         },
         {
           "id": "3.3",
@@ -243,9 +244,9 @@
       "signedOff": false,
       "signedBy": null,
       "signOffTime": null,
-      "managerFailed": false,
-      "managerFailedBy": "",
-      "managerFailedTime": "",
+      "managerFailed": true,
+      "managerFailedBy": "Unicrest\nApp Portal\nRegan Boon",
+      "managerFailedTime": "10:57",
       "isManager": false
     }
   ],
