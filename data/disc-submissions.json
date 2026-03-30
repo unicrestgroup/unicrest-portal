@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": "mndjj1wqmoh6",
+    "name": "Leilani Kaiki",
+    "date": "2026-03-30T18:47:45.770Z",
+    "scores": {
+      "D": 71,
+      "I": 71,
+      "S": 58,
+      "C": 69
+    },
+    "primary": "D",
+    "secondary": "I",
+    "lieFlagged": false,
+    "inconsistencies": [
+      "Steadiness"
+    ]
+  }
+]
