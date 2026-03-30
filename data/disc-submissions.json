@@ -180,5 +180,20 @@
     "secondary": "C",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndrvxmargvr",
+    "name": "Gerardo R. Domingo",
+    "date": "2026-03-30T22:41:43.666Z",
+    "scores": {
+      "D": 24,
+      "I": 39,
+      "S": 84,
+      "C": 52
+    },
+    "primary": "S",
+    "secondary": "C",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
