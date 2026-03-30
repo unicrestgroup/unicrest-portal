@@ -330,8 +330,8 @@
       {
         "id": "3.7",
         "label": "FedEx bags in stock",
-        "pass": true,
-        "notes": ""
+        "pass": false,
+        "notes": "Need to order more"
       },
       {
         "id": "4.1",
