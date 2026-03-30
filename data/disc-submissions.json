@@ -45,5 +45,20 @@
     "secondary": "I",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndmaidf9l00",
+    "name": "Lysander Blampied",
+    "date": "2026-03-30T20:05:06.052Z",
+    "scores": {
+      "D": 82,
+      "I": 59,
+      "S": 27,
+      "C": 32
+    },
+    "primary": "D",
+    "secondary": "I",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
