@@ -13,5 +13,20 @@
     "secondary": "D",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mncnoje31sly",
+    "name": "Bob Test 94",
+    "date": "2026-03-30T03:56:13.995Z",
+    "scores": {
+      "D": 46,
+      "I": 48,
+      "S": 42,
+      "C": 60
+    },
+    "primary": "C",
+    "secondary": "I",
+    "lieFlagged": true,
+    "inconsistencies": []
   }
 ]
