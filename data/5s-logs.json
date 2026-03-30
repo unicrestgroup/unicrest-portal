@@ -246,17 +246,17 @@
     },
     {
       "s": 3,
-      "id": "3.4",
-      "label": "Skip bin and Cardbaord bin emptied (not overflowing)",
-      "roles": null
-    },
-    {
-      "s": 3,
       "id": "3.5",
       "label": "Clear Cardbaord Boxes",
       "roles": [
         "production"
       ]
+    },
+    {
+      "s": 3,
+      "id": "3.9",
+      "label": "Empty skip bin and cardbaord bin (not overflowing)",
+      "roles": null
     }
   ]
 }
