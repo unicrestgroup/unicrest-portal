@@ -120,5 +120,20 @@
     "secondary": "C",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndr933blpdu",
+    "name": "Craig Maden",
+    "date": "2026-03-30T22:23:57.671Z",
+    "scores": {
+      "D": 24,
+      "I": 57,
+      "S": 82,
+      "C": 37
+    },
+    "primary": "S",
+    "secondary": "I",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
