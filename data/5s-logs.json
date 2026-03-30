@@ -229,9 +229,9 @@
           "notes": ""
         }
       ],
-      "signedOff": false,
-      "signedBy": null,
-      "signOffTime": null,
+      "signedOff": true,
+      "signedBy": "Unicrest\nApp Portal\nPaulo De Almeida",
+      "signOffTime": "09:23",
       "managerFailed": false,
       "managerFailedBy": "",
       "managerFailedTime": "",
