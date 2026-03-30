@@ -15,5 +15,20 @@
     "inconsistencies": [
       "Steadiness"
     ]
+  },
+  {
+    "id": "mndk9z17rl00",
+    "name": "Lysander Blampied",
+    "date": "2026-03-30T19:08:41.755Z",
+    "scores": {
+      "D": 71,
+      "I": 85,
+      "S": 35,
+      "C": 38
+    },
+    "primary": "I",
+    "secondary": "D",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
