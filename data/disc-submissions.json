@@ -90,5 +90,20 @@
     "secondary": "I",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndpiuln2mjh",
+    "name": "Leilani Kaiki",
+    "date": "2026-03-30T21:35:33.995Z",
+    "scores": {
+      "D": 63,
+      "I": 50,
+      "S": 72,
+      "C": 14
+    },
+    "primary": "S",
+    "secondary": "D",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
