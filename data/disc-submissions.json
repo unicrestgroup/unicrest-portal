@@ -240,5 +240,20 @@
     "secondary": "C",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mne8qp2u43rv",
+    "name": "Kayla Stewart",
+    "date": "2026-03-31T06:33:32.790Z",
+    "scores": {
+      "D": 26,
+      "I": 43,
+      "S": 86,
+      "C": 46
+    },
+    "primary": "S",
+    "secondary": "C",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
