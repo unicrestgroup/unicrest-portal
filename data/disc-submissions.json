@@ -210,5 +210,20 @@
     "secondary": "S",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mndw7qe9soci",
+    "name": "Jen Corbett",
+    "date": "2026-03-31T00:42:52.641Z",
+    "scores": {
+      "D": 66,
+      "I": 13,
+      "S": 52,
+      "C": 68
+    },
+    "primary": "C",
+    "secondary": "D",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
