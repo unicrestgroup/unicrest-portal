@@ -225,5 +225,20 @@
     "secondary": "D",
     "lieFlagged": false,
     "inconsistencies": []
+  },
+  {
+    "id": "mne8ngejz7u8",
+    "name": "Josie Clayton",
+    "date": "2026-03-31T06:31:01.579Z",
+    "scores": {
+      "D": 18,
+      "I": 79,
+      "S": 47,
+      "C": 56
+    },
+    "primary": "I",
+    "secondary": "C",
+    "lieFlagged": false,
+    "inconsistencies": []
   }
 ]
