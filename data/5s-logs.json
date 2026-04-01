@@ -271,5 +271,145 @@
       "roles": null
     }
   ],
-  "equipmentLogs": []
+  "equipmentLogs": [
+    {
+      "id": 1775070958748,
+      "machineId": "forklift_wh",
+      "machineName": "Forklift",
+      "area": "Warehouse",
+      "role": "warehouse",
+      "submittedBy": "Unicrest\nApp Portal\nRegan Boon",
+      "date": "2026-04-02",
+      "time": "08:15",
+      "hasWeeklyChecks": true,
+      "items": [
+        {
+          "id": "f1",
+          "label": "No fluid leaks visible under the truck",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f2",
+          "label": "Tyres in good condition — no cuts, damage or excessive wear",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f3",
+          "label": "Forks not bent, cracked or worn; backrest in place and secure",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f4",
+          "label": "Mast and lift chains undamaged — no kinks or broken links",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f5",
+          "label": "Overhead guard in place, not bent, cracked or loose",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f6",
+          "label": "Battery connector secure; cable not frayed or damaged",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f7",
+          "label": "Battery charge adequate for the shift",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f8",
+          "label": "Hydraulic fluid level in normal range",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f9",
+          "label": "No damage to truck body, panels or controls",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f10",
+          "label": "Horn working",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f11",
+          "label": "Lights working (if fitted)",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f12",
+          "label": "Brakes effective — service and parking brake",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f13",
+          "label": "Steering responsive, no excessive play",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f14",
+          "label": "Mast raises, lowers and tilts smoothly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f15",
+          "label": "Reach and tilt functions operating correctly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "fw1",
+          "label": "Battery water (electrolyte) level checked and topped up if needed — wear PPE",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        },
+        {
+          "id": "fw2",
+          "label": "Battery case clean and free from acid residue or corrosion",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        },
+        {
+          "id": "fw3",
+          "label": "Mast chains checked for lubrication — lubricate if dry",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        }
+      ]
+    }
+  ]
 }
