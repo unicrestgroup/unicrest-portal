@@ -540,6 +540,221 @@
         },
         {
           "id": "f2",
+          "label": "Tyres in good condition ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ no cuts, damage or excessive wear",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f3",
+          "label": "Forks not bent, cracked or worn; backrest in place and secure",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f4",
+          "label": "Mast and lift chains undamaged ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ no kinks or broken links",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f5",
+          "label": "Overhead guard in place, not bent, cracked or loose",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f6",
+          "label": "Battery connector secure; cable not frayed or damaged",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f7",
+          "label": "Battery charge adequate for the shift",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f8",
+          "label": "Hydraulic fluid level in normal range",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f9",
+          "label": "No damage to truck body, panels or controls",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f10",
+          "label": "Horn working",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f11",
+          "label": "Lights working (if fitted)",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f12",
+          "label": "Brakes effective ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ service and parking brake",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f13",
+          "label": "Steering responsive, no excessive play",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f14",
+          "label": "Mast raises, lowers and tilts smoothly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f15",
+          "label": "Reach and tilt functions operating correctly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "fw1",
+          "label": "Battery water (electrolyte) level checked and topped up if needed ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ wear PPE",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        },
+        {
+          "id": "fw2",
+          "label": "Battery case clean and free from acid residue or corrosion",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        },
+        {
+          "id": "fw3",
+          "label": "Mast chains checked for lubrication ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ lubricate if dry",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        }
+      ]
+    },
+    {
+      "id": 1774915964221,
+      "machineId": "strapping",
+      "machineName": "Strapping Machine",
+      "area": "Production",
+      "role": "production",
+      "submittedBy": "Unicrest\nApp Portal\nRegan Boon",
+      "date": "2026-03-31",
+      "time": "13:12",
+      "hasWeeklyChecks": true,
+      "items": [
+        {
+          "id": "s1",
+          "label": "Machine clean and free of strap debris and obstructions",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s2",
+          "label": "Power cable in good condition ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ no damage, fraying or exposed wiring",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s3",
+          "label": "Safety guards in place and secured",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s4",
+          "label": "Feed track clear of obstructions",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s5",
+          "label": "Blades and sealing element visually inspected ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ no visible cracks or damage",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s6",
+          "label": "Strapping loaded and feeding correctly through track",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s7",
+          "label": "Test strap completed ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ tension, seal and cut quality acceptable",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s8",
+          "label": "Machine completes full cycle without errors or unusual noise",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "sw1",
+          "label": "Feed track and internal strap path cleaned of debris and dust",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        }
+      ]
+    },
+    {
+      "id": 1774917039520,
+      "machineId": "forklift_wh",
+      "machineName": "Forklift",
+      "area": "Warehouse",
+      "role": "warehouse",
+      "submittedBy": "Unicrest\nApp Portal\nMark Reynolds",
+      "date": "2026-03-31",
+      "time": "13:30",
+      "hasWeeklyChecks": true,
+      "items": [
+        {
+          "id": "f1",
+          "label": "No fluid leaks visible under the truck",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f2",
           "label": "Tyres in good condition ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ no cuts, damage or excessive wear",
           "pass": true,
           "notes": "",
@@ -660,221 +875,6 @@
       ]
     },
     {
-      "id": 1774915964221,
-      "machineId": "strapping",
-      "machineName": "Strapping Machine",
-      "area": "Production",
-      "role": "production",
-      "submittedBy": "Unicrest\nApp Portal\nRegan Boon",
-      "date": "2026-03-31",
-      "time": "13:12",
-      "hasWeeklyChecks": true,
-      "items": [
-        {
-          "id": "s1",
-          "label": "Machine clean and free of strap debris and obstructions",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "s2",
-          "label": "Power cable in good condition ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ no damage, fraying or exposed wiring",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "s3",
-          "label": "Safety guards in place and secured",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "s4",
-          "label": "Feed track clear of obstructions",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "s5",
-          "label": "Blades and sealing element visually inspected ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ no visible cracks or damage",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "s6",
-          "label": "Strapping loaded and feeding correctly through track",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "s7",
-          "label": "Test strap completed ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ tension, seal and cut quality acceptable",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "s8",
-          "label": "Machine completes full cycle without errors or unusual noise",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "sw1",
-          "label": "Feed track and internal strap path cleaned of debris and dust",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        }
-      ]
-    },
-    {
-      "id": 1774917039520,
-      "machineId": "forklift_wh",
-      "machineName": "Forklift",
-      "area": "Warehouse",
-      "role": "warehouse",
-      "submittedBy": "Unicrest\nApp Portal\nMark Reynolds",
-      "date": "2026-03-31",
-      "time": "13:30",
-      "hasWeeklyChecks": true,
-      "items": [
-        {
-          "id": "f1",
-          "label": "No fluid leaks visible under the truck",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f2",
-          "label": "Tyres in good condition ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ no cuts, damage or excessive wear",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f3",
-          "label": "Forks not bent, cracked or worn; backrest in place and secure",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f4",
-          "label": "Mast and lift chains undamaged ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ no kinks or broken links",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f5",
-          "label": "Overhead guard in place, not bent, cracked or loose",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f6",
-          "label": "Battery connector secure; cable not frayed or damaged",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f7",
-          "label": "Battery charge adequate for the shift",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f8",
-          "label": "Hydraulic fluid level in normal range",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f9",
-          "label": "No damage to truck body, panels or controls",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f10",
-          "label": "Horn working",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f11",
-          "label": "Lights working (if fitted)",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f12",
-          "label": "Brakes effective ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ service and parking brake",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f13",
-          "label": "Steering responsive, no excessive play",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f14",
-          "label": "Mast raises, lowers and tilts smoothly",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f15",
-          "label": "Reach and tilt functions operating correctly",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "fw1",
-          "label": "Battery water (electrolyte) level checked and topped up if needed ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ wear PPE",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        },
-        {
-          "id": "fw2",
-          "label": "Battery case clean and free from acid residue or corrosion",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        },
-        {
-          "id": "fw3",
-          "label": "Mast chains checked for lubrication ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ lubricate if dry",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        }
-      ]
-    },
-    {
       "id": 1774917130872,
       "machineId": "order_picker",
       "machineName": "Order Picker",
@@ -971,7 +971,7 @@
         },
         {
           "id": "ow1",
-          "label": "Battery water (electrolyte) level checked and topped up if needed ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ wear PPE",
+          "label": "Battery water (electrolyte) level checked and topped up if needed ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ wear PPE",
           "pass": true,
           "notes": "",
           "weekly": true
@@ -982,6 +982,124 @@
           "pass": true,
           "notes": "",
           "weekly": true
+        }
+      ]
+    },
+    {
+      "id": 1775067516013,
+      "machineId": "forklift_wh",
+      "machineName": "Forklift",
+      "area": "Warehouse",
+      "role": "warehouse",
+      "submittedBy": "Unicrest\nApp Portal\nRegan Boon",
+      "date": "2026-04-02",
+      "time": "07:18",
+      "hasWeeklyChecks": false,
+      "items": [
+        {
+          "id": "f1",
+          "label": "No fluid leaks visible under the truck",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f2",
+          "label": "Tyres in good condition — no cuts, damage or excessive wear",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f3",
+          "label": "Forks not bent, cracked or worn; backrest in place and secure",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f4",
+          "label": "Mast and lift chains undamaged — no kinks or broken links",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f5",
+          "label": "Overhead guard in place, not bent, cracked or loose",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f6",
+          "label": "Battery connector secure; cable not frayed or damaged",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f7",
+          "label": "Battery charge adequate for the shift",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f8",
+          "label": "Hydraulic fluid level in normal range",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f9",
+          "label": "No damage to truck body, panels or controls",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f10",
+          "label": "Horn working",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f11",
+          "label": "Lights working (if fitted)",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f12",
+          "label": "Brakes effective — service and parking brake",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f13",
+          "label": "Steering responsive, no excessive play",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f14",
+          "label": "Mast raises, lowers and tilts smoothly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "f15",
+          "label": "Reach and tilt functions operating correctly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
         }
       ]
     }
