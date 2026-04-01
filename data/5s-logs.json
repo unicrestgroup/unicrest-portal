@@ -399,15 +399,105 @@
       "id": "3.9",
       "label": "Empty skip bin and cardbaord bin (not overflowing)",
       "roles": null
-    },
-    {
-      "s": 2,
-      "id": "2.5",
-      "label": "All products in the correct locations",
-      "roles": [
-        "warehouse"
-      ]
     }
   ],
-  "equipmentLogs": []
+  "equipmentLogs": [
+    {
+      "id": 1775068195650,
+      "machineId": "order_picker",
+      "machineName": "Order Picker",
+      "area": "Warehouse",
+      "role": "warehouse",
+      "submittedBy": "Unicrest\nApp Portal\nMark Reynolds",
+      "date": "2026-04-02",
+      "time": "07:29",
+      "hasWeeklyChecks": false,
+      "items": [
+        {
+          "id": "o1",
+          "label": "No fluid leaks visible under machine",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o2",
+          "label": "Wheels and casters in good condition, no damage",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o3",
+          "label": "Platform undamaged; floor and edges intact",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o4",
+          "label": "Harness anchor point secure and undamaged",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o5",
+          "label": "Safety gate or restraining chain in place and functioning",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o6",
+          "label": "Battery connector secure; cable not frayed or damaged",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o7",
+          "label": "Battery charge adequate for the shift",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o8",
+          "label": "Horn working",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o9",
+          "label": "Travel and lift controls responding correctly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o10",
+          "label": "Emergency lowering function working",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o11",
+          "label": "Brakes effective",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o12",
+          "label": "OPS (operator presence system) indicator functioning",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        }
+      ]
+    }
+  ]
 }
