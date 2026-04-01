@@ -292,7 +292,7 @@
         },
         {
           "id": "f2",
-          "label": "Tyres in good condition — no cuts, damage or excessive wear",
+          "label": "Tyres in good condition â no cuts, damage or excessive wear",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -306,7 +306,7 @@
         },
         {
           "id": "f4",
-          "label": "Mast and lift chains undamaged — no kinks or broken links",
+          "label": "Mast and lift chains undamaged â no kinks or broken links",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -362,7 +362,7 @@
         },
         {
           "id": "f12",
-          "label": "Brakes effective — service and parking brake",
+          "label": "Brakes effective â service and parking brake",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -390,7 +390,7 @@
         },
         {
           "id": "fw1",
-          "label": "Battery water (electrolyte) level checked and topped up if needed — wear PPE",
+          "label": "Battery water (electrolyte) level checked and topped up if needed â wear PPE",
           "pass": true,
           "notes": "",
           "weekly": true
@@ -404,7 +404,118 @@
         },
         {
           "id": "fw3",
-          "label": "Mast chains checked for lubrication — lubricate if dry",
+          "label": "Mast chains checked for lubrication â lubricate if dry",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        }
+      ]
+    },
+    {
+      "id": 1775070991952,
+      "machineId": "order_picker",
+      "machineName": "Order Picker",
+      "area": "Warehouse",
+      "role": "warehouse",
+      "submittedBy": "Unicrest\nApp Portal\nRegan Boon",
+      "date": "2026-04-02",
+      "time": "08:16",
+      "hasWeeklyChecks": true,
+      "items": [
+        {
+          "id": "o1",
+          "label": "No fluid leaks visible under machine",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o2",
+          "label": "Wheels and casters in good condition, no damage",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o3",
+          "label": "Platform undamaged; floor and edges intact",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o4",
+          "label": "Harness anchor point secure and undamaged",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o5",
+          "label": "Safety gate or restraining chain in place and functioning",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o6",
+          "label": "Battery connector secure; cable not frayed or damaged",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o7",
+          "label": "Battery charge adequate for the shift",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o8",
+          "label": "Horn working",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o9",
+          "label": "Travel and lift controls responding correctly",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o10",
+          "label": "Emergency lowering function working",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o11",
+          "label": "Brakes effective",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "o12",
+          "label": "OPS (operator presence system) indicator functioning",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "ow1",
+          "label": "Battery water (electrolyte) level checked and topped up if needed — wear PPE",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        },
+        {
+          "id": "ow2",
+          "label": "Battery case clean and free from acid residue or corrosion",
           "pass": true,
           "notes": "",
           "weekly": true
