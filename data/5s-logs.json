@@ -541,7 +541,7 @@
         },
         {
           "id": "f2",
-          "label": "Tyres in good condition — no cuts, damage or excessive wear",
+          "label": "Tyres in good condition â no cuts, damage or excessive wear",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -555,7 +555,7 @@
         },
         {
           "id": "f4",
-          "label": "Mast and lift chains undamaged — no kinks or broken links",
+          "label": "Mast and lift chains undamaged â no kinks or broken links",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -611,7 +611,7 @@
         },
         {
           "id": "f12",
-          "label": "Brakes effective — service and parking brake",
+          "label": "Brakes effective â service and parking brake",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -639,7 +639,7 @@
         },
         {
           "id": "fw1",
-          "label": "Battery water (electrolyte) level checked and topped up if needed — wear PPE",
+          "label": "Battery water (electrolyte) level checked and topped up if needed â wear PPE",
           "pass": true,
           "notes": "",
           "weekly": true
@@ -653,7 +653,83 @@
         },
         {
           "id": "fw3",
-          "label": "Mast chains checked for lubrication — lubricate if dry",
+          "label": "Mast chains checked for lubrication â lubricate if dry",
+          "pass": true,
+          "notes": "",
+          "weekly": true
+        }
+      ]
+    },
+    {
+      "id": 1775073120054,
+      "machineId": "strapping",
+      "machineName": "Strapping Machine",
+      "area": "Production",
+      "role": "production",
+      "submittedBy": "Unicrest\nApp Portal\nPaulo De Almeida",
+      "date": "2026-04-02",
+      "time": "08:52",
+      "hasWeeklyChecks": true,
+      "items": [
+        {
+          "id": "s1",
+          "label": "Machine clean and free of strap debris and obstructions",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s2",
+          "label": "Power cable in good condition — no damage, fraying or exposed wiring",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s3",
+          "label": "Safety guards in place and secured",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s4",
+          "label": "Feed track clear of obstructions",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s5",
+          "label": "Blades and sealing element visually inspected — no visible cracks or damage",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s6",
+          "label": "Strapping loaded and feeding correctly through track",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s7",
+          "label": "Test strap completed — tension, seal and cut quality acceptable",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "s8",
+          "label": "Machine completes full cycle without errors or unusual noise",
+          "pass": true,
+          "notes": "",
+          "weekly": false
+        },
+        {
+          "id": "sw1",
+          "label": "Feed track and internal strap path cleaned of debris and dust",
           "pass": true,
           "notes": "",
           "weekly": true
