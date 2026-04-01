@@ -371,9 +371,9 @@
           "notes": ""
         }
       ],
-      "signedOff": false,
-      "signedBy": null,
-      "signOffTime": null,
+      "signedOff": true,
+      "signedBy": "Unicrest\nApp Portal\nRegan Boon",
+      "signOffTime": "11:36",
       "managerFailed": false,
       "managerFailedBy": "",
       "managerFailedTime": "",
@@ -541,7 +541,7 @@
         },
         {
           "id": "f2",
-          "label": "Tyres in good condition â no cuts, damage or excessive wear",
+          "label": "Tyres in good condition Ã¢ÂÂ no cuts, damage or excessive wear",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -555,7 +555,7 @@
         },
         {
           "id": "f4",
-          "label": "Mast and lift chains undamaged â no kinks or broken links",
+          "label": "Mast and lift chains undamaged Ã¢ÂÂ no kinks or broken links",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -611,7 +611,7 @@
         },
         {
           "id": "f12",
-          "label": "Brakes effective â service and parking brake",
+          "label": "Brakes effective Ã¢ÂÂ service and parking brake",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -639,7 +639,7 @@
         },
         {
           "id": "fw1",
-          "label": "Battery water (electrolyte) level checked and topped up if needed â wear PPE",
+          "label": "Battery water (electrolyte) level checked and topped up if needed Ã¢ÂÂ wear PPE",
           "pass": true,
           "notes": "",
           "weekly": true
@@ -653,7 +653,7 @@
         },
         {
           "id": "fw3",
-          "label": "Mast chains checked for lubrication â lubricate if dry",
+          "label": "Mast chains checked for lubrication Ã¢ÂÂ lubricate if dry",
           "pass": true,
           "notes": "",
           "weekly": true
@@ -680,7 +680,7 @@
         },
         {
           "id": "s2",
-          "label": "Power cable in good condition — no damage, fraying or exposed wiring",
+          "label": "Power cable in good condition â no damage, fraying or exposed wiring",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -701,7 +701,7 @@
         },
         {
           "id": "s5",
-          "label": "Blades and sealing element visually inspected — no visible cracks or damage",
+          "label": "Blades and sealing element visually inspected â no visible cracks or damage",
           "pass": true,
           "notes": "",
           "weekly": false
@@ -715,7 +715,7 @@
         },
         {
           "id": "s7",
-          "label": "Test strap completed — tension, seal and cut quality acceptable",
+          "label": "Test strap completed â tension, seal and cut quality acceptable",
           "pass": true,
           "notes": "",
           "weekly": false
