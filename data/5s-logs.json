@@ -260,6 +260,124 @@
       "managerFailedBy": "Unicrest\nApp Portal\nRegan Boon",
       "managerFailedTime": "08:17",
       "isManager": false
+    },
+    {
+      "id": 1775072929424,
+      "name": "Unicrest\nApp Portal\nPaulo De Almeida",
+      "role": "production",
+      "date": "2026-04-02",
+      "time": "08:48",
+      "items": [
+        {
+          "id": "1.1",
+          "label": "Unnecessary items removed from work areas",
+          "pass": false,
+          "notes": "Still some container components to be put away"
+        },
+        {
+          "id": "1.2",
+          "label": "Only today's materials and tools are present",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.1",
+          "label": "All tools returned to correct storage location",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.2",
+          "label": "Walkways and exits are clear and unobstructed",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.3",
+          "label": "Labels and signage are visible and correct",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "2.4",
+          "label": "No products left on work benches",
+          "pass": false,
+          "notes": "No, needs a tidy up"
+        },
+        {
+          "id": "3.1",
+          "label": "Work surfaces wiped down and free of debris",
+          "pass": false,
+          "notes": "Need a good clean up"
+        },
+        {
+          "id": "3.2",
+          "label": "Floor swept and free of waste",
+          "pass": false,
+          "notes": "Need a good clean up"
+        },
+        {
+          "id": "3.3",
+          "label": "Rubbish bins emptied (not overflowing)",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.8",
+          "label": "Tape and shrink wrap in stock",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "4.1",
+          "label": "Any issues from yesterday's checklist resolved",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "4.2",
+          "label": "Accident or near miss register completed (if relevant)",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "4.3",
+          "label": "Forklift and order picker pre-use checks completed",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "5.1",
+          "label": "Team briefed on any changes or issues",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "5.2",
+          "label": "Corrective actions from prior checks are on track",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.5",
+          "label": "Clear Cardbaord Boxes",
+          "pass": true,
+          "notes": ""
+        },
+        {
+          "id": "3.9",
+          "label": "Empty skip bin and cardbaord bin (not overflowing)",
+          "pass": true,
+          "notes": ""
+        }
+      ],
+      "signedOff": false,
+      "signedBy": null,
+      "signOffTime": null,
+      "managerFailed": false,
+      "managerFailedBy": "",
+      "managerFailedTime": "",
+      "isManager": false
     }
   ],
   "checklist": [
@@ -400,258 +518,6 @@
       "id": "3.9",
       "label": "Empty skip bin and cardbaord bin (not overflowing)",
       "roles": null
-    }
-  ],
-  "equipmentLogs": [
-    {
-      "id": 1775071613784,
-      "machineId": "forklift_wh",
-      "machineName": "Forklift",
-      "area": "Warehouse",
-      "role": "warehouse",
-      "submittedBy": "Unicrest\nApp Portal\nRegan Boon",
-      "date": "2026-04-02",
-      "time": "08:26",
-      "hasWeeklyChecks": true,
-      "items": [
-        {
-          "id": "f1",
-          "label": "No fluid leaks visible under the truck",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f2",
-          "label": "Tyres in good condition â no cuts, damage or excessive wear",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f3",
-          "label": "Forks not bent, cracked or worn; backrest in place and secure",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f4",
-          "label": "Mast and lift chains undamaged â no kinks or broken links",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f5",
-          "label": "Overhead guard in place, not bent, cracked or loose",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f6",
-          "label": "Battery connector secure; cable not frayed or damaged",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f7",
-          "label": "Battery charge adequate for the shift",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f8",
-          "label": "Hydraulic fluid level in normal range",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f9",
-          "label": "No damage to truck body, panels or controls",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f10",
-          "label": "Horn working",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f11",
-          "label": "Lights working (if fitted)",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f12",
-          "label": "Brakes effective â service and parking brake",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f13",
-          "label": "Steering responsive, no excessive play",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f14",
-          "label": "Mast raises, lowers and tilts smoothly",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "f15",
-          "label": "Reach and tilt functions operating correctly",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "fw1",
-          "label": "Battery water (electrolyte) level checked and topped up if needed â wear PPE",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        },
-        {
-          "id": "fw2",
-          "label": "Battery case clean and free from acid residue or corrosion",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        },
-        {
-          "id": "fw3",
-          "label": "Mast chains checked for lubrication â lubricate if dry",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        }
-      ]
-    },
-    {
-      "id": 1775071627395,
-      "machineId": "order_picker",
-      "machineName": "Order Picker",
-      "area": "Warehouse",
-      "role": "warehouse",
-      "submittedBy": "Unicrest\nApp Portal\nRegan Boon",
-      "date": "2026-04-02",
-      "time": "08:27",
-      "hasWeeklyChecks": true,
-      "items": [
-        {
-          "id": "o1",
-          "label": "No fluid leaks visible under machine",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o2",
-          "label": "Wheels and casters in good condition, no damage",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o3",
-          "label": "Platform undamaged; floor and edges intact",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o4",
-          "label": "Harness anchor point secure and undamaged",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o5",
-          "label": "Safety gate or restraining chain in place and functioning",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o6",
-          "label": "Battery connector secure; cable not frayed or damaged",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o7",
-          "label": "Battery charge adequate for the shift",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o8",
-          "label": "Horn working",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o9",
-          "label": "Travel and lift controls responding correctly",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o10",
-          "label": "Emergency lowering function working",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o11",
-          "label": "Brakes effective",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "o12",
-          "label": "OPS (operator presence system) indicator functioning",
-          "pass": true,
-          "notes": "",
-          "weekly": false
-        },
-        {
-          "id": "ow1",
-          "label": "Battery water (electrolyte) level checked and topped up if needed — wear PPE",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        },
-        {
-          "id": "ow2",
-          "label": "Battery case clean and free from acid residue or corrosion",
-          "pass": true,
-          "notes": "",
-          "weekly": true
-        }
-      ]
     }
   ]
 }
