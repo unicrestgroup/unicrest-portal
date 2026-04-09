@@ -671,9 +671,24 @@
     </div>
     <div class="header-right">
       <span class="user-chip" id="user-name">Loading...</span>
+      <button class="btn-ghost" onclick="toggleSettings()">⚙ Settings</button>
       <button class="btn-ghost" onclick="signOut()">Sign out</button>
     </div>
   </header>
+
+  <!-- Settings panel -->
+  <div id="settings-panel" style="display:none; background:var(--surface); border-bottom:1px solid var(--border); padding:16px 28px;">
+    <div style="max-width:480px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Anthropic API Key</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Your key is stored in your browser only and never saved to GitHub.</p>
+      <div style="display:flex;gap:8px;">
+        <input class="input-sm" type="password" id="api-key-input" placeholder="sk-ant-api03-..." style="flex:1;" />
+        <button class="btn-sm btn-red" onclick="saveApiKey()">Save</button>
+        <button class="btn-sm" onclick="clearApiKey()">Clear</button>
+      </div>
+      <div id="api-key-status" style="font-size:11px;margin-top:8px;color:var(--muted);font-style:italic;"></div>
+    </div>
+  </div>
 
   <div class="date-banner">
     <div class="date-today" id="date-today"></div>
@@ -785,8 +800,7 @@
 const CONFIG = {
   clientId:       'c6595fee-5861-474a-b604-4487ac361580',
   tenantId:       '8c8bc073-973e-4ddf-9384-38498e8aa324',
-  redirectUri:    'https://unicrestgroup.github.io/unicrest-portal/gm-command-centre.html',
-  anthropicKey:   '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'   // sk-ant-...
+  redirectUri:    'https://unicrestgroup.github.io/unicrest-portal/gm-command-centre.html'
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -806,7 +820,41 @@ var SCOPES = ['User.Read','Mail.Read','Calendars.Read'];
 
 var currentAccount = null;
 
-// ── AUTH ──────────────────────────────────────────────────────────────────────
+// ── SETTINGS ─────────────────────────────────────────────────────────────────
+
+function getApiKey() {
+  return localStorage.getItem('gm_anthropic_key') || '';
+}
+
+function toggleSettings() {
+  const panel = document.getElementById('settings-panel');
+  const visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  if (!visible) {
+    const key = getApiKey();
+    document.getElementById('api-key-input').value = key ? '••••••••••••••••' : '';
+    document.getElementById('api-key-status').textContent = key ? 'API key is set.' : 'No API key saved yet.';
+  }
+}
+
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (!val || val.startsWith('•')) {
+    document.getElementById('api-key-status').textContent = 'No changes made.';
+    return;
+  }
+  localStorage.setItem('gm_anthropic_key', val);
+  document.getElementById('api-key-status').textContent = 'Saved.';
+  document.getElementById('api-key-input').value = '••••••••••••••••';
+}
+
+function clearApiKey() {
+  localStorage.removeItem('gm_anthropic_key');
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-key-status').textContent = 'API key cleared.';
+}
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
 
 async function init() {
   msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -1049,8 +1097,9 @@ function renderEmailList(emails, folderLabel) {
 async function summariseEmails() {
   if (!rawEmails.length) return;
 
-  if (!CONFIG.anthropicKey || CONFIG.anthropicKey.startsWith('REPLACE')) {
-    alert('Anthropic API key not set. Add your key to the CONFIG block in the HTML file.');
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    alert('No Anthropic API key set. Click ⚙ Settings to add your key.');
     return;
   }
 
@@ -1062,12 +1111,11 @@ async function summariseEmails() {
   ).join('\n\n');
 
   try {
-    console.log('Using API key starting with:', CONFIG.anthropicKey.trim().slice(0, 16) + '...');
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': CONFIG.anthropicKey.trim(),
+        'x-api-key': apiKey.trim(),
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
