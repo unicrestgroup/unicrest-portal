@@ -1072,7 +1072,7 @@ async function summariseEmails() {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5',
         max_tokens: 1000,
         system: `You are a GM's assistant. Analyse these emails and return a JSON array of objects with:
 - from (string)
@@ -1086,6 +1086,7 @@ Return ONLY valid JSON, no markdown, no preamble.`,
     });
 
     const result = await resp.json();
+    console.log('API response:', JSON.stringify(result).slice(0, 300));
 
     if (result.error) {
       throw new Error(result.error.message);
