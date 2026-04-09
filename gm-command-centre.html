@@ -473,8 +473,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <span class="sched-time-lbl">Start</span>
         <span id="sched-time-display" class="sched-time-val"></span>
         <div class="sched-arrows">
-          <button class="sched-arrow" onclick="schedAdjustTime(schedIncrement)">▲</button>
-          <button class="sched-arrow" onclick="schedAdjustTime(-schedIncrement)">▼</button>
+          <button class="sched-arrow" onclick="schedAdjustTime(-schedIncrement)">▲</button>
+          <button class="sched-arrow" onclick="schedAdjustTime(schedIncrement)">▼</button>
         </div>
         <div class="sched-inc-row">
           <span class="sched-inc-lbl">Step:</span>
@@ -752,14 +752,27 @@ function schedRenderTimeline(){
   const nowFrac=now.getHours()+now.getMinutes()/60;
   const showNow=schedSelDate===todStr&&nowFrac>=TL_START&&nowFrac<=TL_END;
   let rows='';
-  for(let h=TL_START;h<TL_END;h++){const ap=h<12?'am':'pm',disp=(h%12||12)+ap;rows+=`<div onclick="schedClickHour(${h})" style="display:flex;min-height:${TL_HOUR_H}px;cursor:pointer;transition:background 0.1s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'"><div style="width:52px;flex-shrink:0;font-size:10px;color:rgba(255,255,255,0.2);text-align:right;padding:4px 10px 0 0;line-height:1;">${disp}</div><div style="flex:1;border-top:1px solid rgba(255,255,255,0.05);position:relative;height:${TL_HOUR_H}px;padding-right:12px;"></div></div>`;}
+  const slotsPerHour=60/schedIncrement;
+  const slotH=TL_HOUR_H/slotsPerHour;
+  for(let h=TL_START;h<TL_END;h++){
+    for(let s=0;s<slotsPerHour;s++){
+      const totalMins=h*60+s*schedIncrement;
+      const fracH=totalMins/60;
+      const isHourStart=s===0;
+      const ap=h<12?'am':'pm',disp=(h%12||12)+(schedIncrement<60&&s>0?':'+String(s*schedIncrement).padStart(2,'0'):'')+(isHourStart?ap:'');
+      const timeLabel=isHourStart?`<div style="width:52px;flex-shrink:0;font-size:10px;color:rgba(255,255,255,0.2);text-align:right;padding:4px 10px 0 0;line-height:1;">${(h%12||12)+ap}</div>`:`<div style="width:52px;flex-shrink:0;font-size:9px;color:rgba(255,255,255,0.08);text-align:right;padding:2px 10px 0 0;line-height:1;">${s*schedIncrement===30?'30':'·'}</div>`;
+      rows+=`<div onclick="schedClickSlot(${h},${s*schedIncrement})" style="display:flex;min-height:${slotH}px;cursor:pointer;transition:background 0.08s;border-top:${isHourStart?'1px solid rgba(255,255,255,0.06)':'1px solid rgba(255,255,255,0.02)'};" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">${timeLabel}<div style="flex:1;position:relative;height:${slotH}px;padding-right:12px;"></div></div>`;
+    }
+  }
   body.innerHTML=`<div style="position:relative;">${rows}</div>`;
   const container=body.querySelector('div');
-  schedDayEvs.forEach(ev=>{const top=(ev.start-TL_START)*TL_HOUR_H,h=Math.max(ev.dur*TL_HOUR_H-2,20);const el=document.createElement('div');el.style.cssText=`position:absolute;top:${top}px;height:${h}px;left:52px;right:12px;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:2;background:rgba(55,138,221,0.2);border-left:2px solid #378ADD;color:#7fb8e8;`;el.textContent=ev.label;container.appendChild(el);});
-  if(selStart>=TL_START&&selStart<TL_END){const top=(selStart-TL_START)*TL_HOUR_H,h=Math.max((schedDuration/60)*TL_HOUR_H-2,22);const hr=schedHour%12||12,mn=String(schedMin).padStart(2,'0'),ap=schedHour<12?'am':'pm';const el=document.createElement('div');el.style.cssText=`position:absolute;top:${top}px;height:${h}px;left:52px;right:12px;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:3;background:rgba(239,62,66,0.22);border-left:2px solid var(--red);color:#f08a8c;`;el.textContent=`${hr}:${mn}${ap} — ${title}`;container.appendChild(el);}
-  if(showNow){const top=(nowFrac-TL_START)*TL_HOUR_H;const nl=document.createElement('div');nl.style.cssText=`position:absolute;left:52px;right:0;height:1px;background:var(--red);z-index:5;top:${top}px;`;const dot=document.createElement('div');dot.style.cssText=`position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--red);`;nl.appendChild(dot);container.appendChild(nl);}
+  const posTop=frac=>(frac-TL_START)*(TL_HOUR_H/1);
+  schedDayEvs.forEach(ev=>{const top=(ev.start-TL_START)*TL_HOUR_H,h=Math.max(ev.dur*TL_HOUR_H-2,20);const el=document.createElement('div');el.style.cssText=`position:absolute;top:${top}px;height:${h}px;left:52px;right:12px;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:2;background:rgba(55,138,221,0.2);border-left:2px solid #378ADD;color:#7fb8e8;pointer-events:none;`;el.textContent=ev.label;container.appendChild(el);});
+  if(selStart>=TL_START&&selStart<TL_END){const top=(selStart-TL_START)*TL_HOUR_H,h=Math.max((schedDuration/60)*TL_HOUR_H-2,22);const hr=schedHour%12||12,mn=String(schedMin).padStart(2,'0'),ap=schedHour<12?'am':'pm';const el=document.createElement('div');el.style.cssText=`position:absolute;top:${top}px;height:${h}px;left:52px;right:12px;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:3;background:rgba(239,62,66,0.22);border-left:2px solid var(--red);color:#f08a8c;pointer-events:none;`;el.textContent=`${hr}:${mn}${ap} — ${title}`;container.appendChild(el);}
+  if(showNow){const top=(nowFrac-TL_START)*TL_HOUR_H;const nl=document.createElement('div');nl.style.cssText=`position:absolute;left:52px;right:0;height:1px;background:var(--red);z-index:5;top:${top}px;pointer-events:none;`;const dot=document.createElement('div');dot.style.cssText=`position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--red);`;nl.appendChild(dot);container.appendChild(nl);}
   body.scrollTop=Math.max(0,(selStart-TL_START-1.5))*TL_HOUR_H;
 }
+function schedClickSlot(h,m){schedHour=h;schedMin=m;schedUpdateTimeDisplay();schedRenderTimeline();}
 function schedClickHour(h){schedHour=h;schedMin=0;schedUpdateTimeDisplay();schedRenderTimeline();}
 async function createCalendarEvent(){
   const title=document.getElementById('sched-title').value.trim();
