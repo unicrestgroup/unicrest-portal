@@ -533,10 +533,10 @@ async function loadCalendar(){
     const evs=(data.value||[]).filter(e=>!e.isAllDay);
     document.getElementById('metric-meetings').textContent=evs.length||'0';
     if(!evs.length){body.innerHTML='<div class="empty">No meetings today.</div>';return;}
-    const fmt=t=>new Date(t).toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
+    const fmt=dtStr=>{const[,t]=dtStr.split('T');const[h,m]=t.split(':').map(Number);const ap=h<12?'am':'pm';const disp=(h%12||12)+':'+String(m).padStart(2,'0')+ap;return disp;};
+    const isNowFn=(startStr,endStr)=>{const[,st]=startStr.split('T');const[sh,sm]=st.split(':').map(Number);const[,et]=endStr.split('T');const[eh,em]=et.split(':').map(Number);const nowH=now.getHours()+now.getMinutes()/60;return nowH>=(sh+sm/60)&&nowH<=(eh+em/60);};
     body.innerHTML=evs.map(ev=>{
-      const sv=new Date(ev.start.dateTime),en=new Date(ev.end.dateTime);
-      const isNow=now>=sv&&now<=en;
+      const isNow=isNowFn(ev.start.dateTime,ev.end.dateTime);
       const loc=ev.location?.displayName?`<div class="cal-loc">${ev.location.displayName}</div>`:'';
       return `<div class="cal-item${isNow?' cal-now':''}"><div class="cal-time">${fmt(ev.start.dateTime)}</div><div class="cal-detail"><div class="cal-title">${ev.subject}${isNow?'<span class="now-badge">now</span>':''}</div>${loc}</div></div>`;
     }).join('');
@@ -729,7 +729,15 @@ async function schedLoadAndRender(){
   try{
     const s=new Date(schedSelDate+'T00:00:00').toISOString(),en=new Date(schedSelDate+'T23:59:59').toISOString();
     const data=await graphGet(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${s}&endDateTime=${en}&$orderby=start/dateTime&$select=subject,start,end,isAllDay&$top=20`);
-    schedDayEvs=(data.value||[]).filter(e=>!e.isAllDay).map(ev=>({label:ev.subject,start:new Date(ev.start.dateTime).getHours()+new Date(ev.start.dateTime).getMinutes()/60,dur:(new Date(ev.end.dateTime)-new Date(ev.start.dateTime))/3600000}));
+    schedDayEvs=(data.value||[]).filter(e=>!e.isAllDay).map(ev=>{
+      const startStr=ev.start.dateTime; // "2026-04-10T07:30:00" - local NZ time, don't pass to new Date()
+      const endStr=ev.end.dateTime;
+      const [,st]=startStr.split('T'); const [sh,sm]=st.split(':').map(Number);
+      const [,et]=endStr.split('T');   const [eh,em]=et.split(':').map(Number);
+      const startFrac=sh+sm/60;
+      const endFrac=eh+em/60;
+      return {label:ev.subject,start:startFrac,dur:endFrac-startFrac};
+    });
     document.getElementById('sched-tl-count').textContent=schedDayEvs.length?schedDayEvs.length+' appointment'+(schedDayEvs.length!==1?'s':''):'No appointments';
   }catch(err){document.getElementById('sched-tl-count').textContent='Could not load calendar';}
   schedRenderTimeline();
