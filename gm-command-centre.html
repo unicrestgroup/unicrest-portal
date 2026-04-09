@@ -1676,11 +1676,11 @@ async function loadEmails() {
   body.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
 
   try {
-    // Find the "Regan To Do" folder by name
+    // Search inbox child folders for "Regan To Do"
     const foldersData = await graphGet(
-      `https://graph.microsoft.com/v1.0/me/mailFolders?$top=50`
+      `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/childFolders?$top=50`
     );
-    console.log('Available folders:', (foldersData.value || []).map(f => f.displayName));
+    console.log('Inbox subfolders:', (foldersData.value || []).map(f => f.displayName));
     const folder = (foldersData.value || []).find(f =>
       f.displayName.toLowerCase() === 'regan to do'
     );
@@ -2124,11 +2124,11 @@ async function loadEmails() {
   body.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
 
   try {
-    // Find the "Regan To Do" folder by name
+    // Search inbox child folders for "Regan To Do"
     const foldersData = await graphGet(
-      `https://graph.microsoft.com/v1.0/me/mailFolders?$top=50`
+      `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/childFolders?$top=50`
     );
-    console.log('Available folders:', (foldersData.value || []).map(f => f.displayName));
+    console.log('Inbox subfolders:', (foldersData.value || []).map(f => f.displayName));
     const folder = (foldersData.value || []).find(f =>
       f.displayName.toLowerCase() === 'regan to do'
     );
