@@ -799,10 +799,9 @@ async function init() {
 
 async function signIn() {
   try {
-    if (!msalInstance) {
-      msalInstance = new msal.PublicClientApplication(msalConfig);
-      await msalInstance.initialize();
-    }
+    // Clear any stuck MSAL interaction state
+    Object.keys(sessionStorage).filter(k => k.startsWith('msal.')).forEach(k => sessionStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k.startsWith('msal.')).forEach(k => localStorage.removeItem(k));
     await msalInstance.loginRedirect({ scopes: SCOPES });
   } catch (e) {
     console.error(e);
