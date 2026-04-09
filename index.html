@@ -184,21 +184,52 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
 .cat-pill:hover { border-color: var(--purple); color: var(--purple); }
 .cat-pill.active { background: var(--purple); color: var(--white); border-color: var(--purple); }
 
-.app-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 16px; padding: 1.25rem 2rem 2rem;
+.columns-wrap {
+  display: flex; gap: 16px; padding: 1.25rem 2rem 2rem;
+  overflow-x: auto; align-items: flex-start;
+  min-height: 200px;
 }
-.app-card {
+.columns-wrap::-webkit-scrollbar { height: 6px; }
+.columns-wrap::-webkit-scrollbar-track { background: transparent; }
+.columns-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.cat-column {
+  flex: 0 0 260px; display: flex; flex-direction: column; gap: 10px;
+  transition: opacity 0.15s;
+}
+.cat-column.col-dragging { opacity: 0.35; }
+.cat-column.col-drag-over > .col-header { border-color: var(--purple); border-style: dashed; }
+.col-header {
+  display: flex; align-items: center; justify-content: space-between;
   background: var(--white); border: 1px solid var(--border); border-radius: 6px;
-  padding: 1.25rem; display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 14px; cursor: grab; user-select: none;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
-.app-card:hover { border-color: var(--purple); box-shadow: 0 2px 12px rgba(124,16,154,0.08); }
-.app-card[draggable="true"] { cursor: grab; }
-.app-card[draggable="true"]:active { cursor: grabbing; }
-.app-card.drag-over { border-color: var(--purple); border-style: dashed; opacity: 0.7; }
+.col-header:active { cursor: grabbing; }
+.col-header:hover { border-color: var(--purple); box-shadow: 0 1px 6px rgba(124,16,154,0.08); }
+.col-header-name {
+  font-size: 12px; font-weight: 700; color: var(--black);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.col-header-count {
+  font-size: 11px; color: var(--muted); font-weight: 300;
+  background: var(--light); border-radius: 10px; padding: 2px 8px;
+}
+.col-drop-zone {
+  min-height: 60px; border-radius: 6px;
+  border: 2px dashed transparent; transition: border-color 0.15s, background 0.15s;
+  padding: 4px;
+}
+.col-drop-zone.drop-active { border-color: rgba(124,16,154,0.25); background: rgba(124,16,154,0.03); }
+.app-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: 6px;
+  padding: 1.1rem 1.1rem 0.9rem; display: flex; flex-direction: column; gap: 7px;
+  transition: border-color 0.15s, box-shadow 0.15s; cursor: grab;
+}
+.app-card:active { cursor: grabbing; }
+.app-card:hover { border-color: var(--purple); box-shadow: 0 2px 8px rgba(124,16,154,0.08); }
 .app-card.dragging { opacity: 0.35; }
-.drag-hint { font-size: 11px; color: #BBBBBB; font-family: var(--lato); font-weight: 300; padding: 0 2rem 0.5rem; }
+.app-card.card-drag-over { border-color: var(--purple); border-style: dashed; }
+.drag-hint { font-size: 11px; color: #BBBBBB; font-family: var(--lato); font-weight: 300; padding: 0 2rem 0.25rem; }
 .card-top { display: flex; align-items: center; justify-content: space-between; }
 .card-emoji { font-size: 26px; line-height: 1; }
 .card-cat {
@@ -353,8 +384,8 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
       <input class="search-input" type="text" id="search-input"
              placeholder="Search apps..." oninput="filterApps(this.value)">
     </div>
-    <p class="drag-hint" id="drag-hint" style="display:none;">Drag cards to reorder</p>
-    <div class="app-grid" id="app-grid"></div>
+    <p class="drag-hint" id="drag-hint" style="display:none;">Drag cards or column headers to reorder</p>
+    <div class="columns-wrap" id="app-grid"></div>
     <div class="portal-footer">
       <span class="footer-tagline">Shadowspec Internal — Unicrest App Portal</span>
       <span class="footer-logo">SHADOWSPEC</span>
@@ -801,19 +832,20 @@ function showView(v) {
 }
 
 function filterApps(val) { currentSearch = val; renderGrid(); }
+function setCat(cat) { currentCat = cat; renderCatPills(); renderGrid(); }
 
-function getOrderKey() { return 'unicrest_order_' + currentUserEmail; }
+// ── Storage helpers ─────────────────────────────────────────
+function getKey(suffix) { return 'unicrest_' + suffix + '_' + currentUserEmail; }
+function load(suffix) { try { return JSON.parse(localStorage.getItem(getKey(suffix)) || 'null'); } catch { return null; } }
+function save(suffix, val) { try { localStorage.setItem(getKey(suffix), JSON.stringify(val)); } catch {} }
 
-function getSavedOrder() {
-  try { return JSON.parse(localStorage.getItem(getOrderKey()) || '[]'); } catch { return []; }
-}
+function getAppOrder(cat) { return load('apporder_' + cat) || []; }
+function saveAppOrder(cat, ids) { save('apporder_' + cat, ids); }
+function getColOrder() { return load('colorder') || []; }
+function saveColOrder(cats) { save('colorder', cats); }
 
-function saveOrder(ids) {
-  try { localStorage.setItem(getOrderKey(), JSON.stringify(ids)); } catch {}
-}
-
-function applyOrder(apps) {
-  const order = getSavedOrder();
+function applyAppOrder(apps, cat) {
+  const order = getAppOrder(cat);
   if (!order.length) return apps;
   const map = new Map(apps.map(a => [a.id, a]));
   const ordered = order.map(id => map.get(id)).filter(Boolean);
@@ -821,48 +853,111 @@ function applyOrder(apps) {
   return [...ordered, ...rest];
 }
 
-let dragSrcId = null;
+function applyColOrder(cats) {
+  const order = getColOrder();
+  if (!order.length) return cats;
+  const ordered = order.filter(c => cats.includes(c));
+  const rest = cats.filter(c => !order.includes(c));
+  return [...ordered, ...rest];
+}
 
-function onDragStart(e) {
-  dragSrcId = e.currentTarget.dataset.id;
+// ── Drag state ──────────────────────────────────────────────
+let dragCardId = null, dragCardCat = null;
+let dragColCat = null;
+
+// Card drag
+function cardDragStart(e, id, cat) {
+  dragCardId = id; dragCardCat = cat; dragColCat = null;
   e.currentTarget.classList.add('dragging');
   e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('type', 'card');
+  e.stopPropagation();
 }
-
-function onDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  e.currentTarget.classList.add('drag-over');
+function cardDragOver(e) {
+  if (!dragCardId) return;
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.add('card-drag-over');
 }
-
-function onDragLeave(e) {
-  e.currentTarget.classList.remove('drag-over');
-}
-
-function onDrop(e) {
-  e.preventDefault();
-  const targetId = e.currentTarget.dataset.id;
-  if (!dragSrcId || dragSrcId === targetId) return;
-  const ordered = getFiltered();
-  const ids = ordered.map(a => a.id);
-  const fromIdx = ids.indexOf(dragSrcId);
+function cardDragLeave(e) { e.currentTarget.classList.remove('card-drag-over'); }
+function cardDrop(e, targetId, targetCat) {
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('card-drag-over');
+  if (!dragCardId || dragCardId === targetId) return;
+  // Move card to targetCat if different
+  if (dragCardCat !== targetCat) {
+    const a = allApps.find(x => x.id === dragCardId);
+    if (a) a.category = targetCat;
+  }
+  // Reorder within target category
+  const catApps = applyAppOrder(allApps.filter(a => a.category === targetCat), targetCat);
+  const ids = catApps.map(a => a.id);
+  const fromIdx = ids.indexOf(dragCardId);
   const toIdx   = ids.indexOf(targetId);
-  if (fromIdx === -1 || toIdx === -1) return;
-  ids.splice(fromIdx, 1);
-  ids.splice(toIdx, 0, dragSrcId);
-  saveOrder(ids);
-  const map = new Map(allApps.map(a => [a.id, a]));
-  allApps = [...ids.map(id => map.get(id)).filter(Boolean), ...allApps.filter(a => !ids.includes(a.id))];
+  if (fromIdx !== -1) ids.splice(fromIdx, 1);
+  const insertAt = fromIdx !== -1 && fromIdx < toIdx ? toIdx : ids.indexOf(targetId);
+  ids.splice(insertAt !== -1 ? insertAt : ids.length, 0, dragCardId);
+  saveAppOrder(targetCat, ids);
+  if (dragCardCat !== targetCat) saveAppOrder(dragCardCat, applyAppOrder(allApps.filter(a => a.category === dragCardCat), dragCardCat).map(a => a.id).filter(id => id !== dragCardId));
+  renderGrid();
+}
+function cardDragEnd(e) {
+  document.querySelectorAll('.app-card').forEach(c => c.classList.remove('dragging','card-drag-over'));
+  dragCardId = null; dragCardCat = null;
+}
+
+// Zone drop (drop card onto empty zone or column)
+function zoneDragOver(e) {
+  if (!dragCardId) return;
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.add('drop-active');
+}
+function zoneDragLeave(e) { e.currentTarget.classList.remove('drop-active'); }
+function zoneDrop(e, targetCat) {
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('drop-active');
+  if (!dragCardId) return;
+  if (dragCardCat !== targetCat) {
+    const a = allApps.find(x => x.id === dragCardId);
+    if (a) a.category = targetCat;
+    const srcIds = applyAppOrder(allApps.filter(a2 => a2.category === dragCardCat), dragCardCat).map(a2 => a2.id).filter(id => id !== dragCardId);
+    saveAppOrder(dragCardCat, srcIds);
+  }
+  const catIds = applyAppOrder(allApps.filter(a => a.category === targetCat), targetCat).map(a => a.id);
+  if (!catIds.includes(dragCardId)) catIds.push(dragCardId);
+  saveAppOrder(targetCat, catIds);
   renderGrid();
 }
 
-function onDragEnd(e) {
-  document.querySelectorAll('.app-card').forEach(c => {
-    c.classList.remove('dragging', 'drag-over');
-  });
-  dragSrcId = null;
+// Column drag
+function colDragStart(e, cat) {
+  dragColCat = cat; dragCardId = null;
+  e.currentTarget.closest('.cat-column').classList.add('col-dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('type', 'col');
 }
-function setCat(cat) { currentCat = cat; renderCatPills(); renderGrid(); }
+function colDragOver(e, cat) {
+  if (!dragColCat || dragColCat === cat) return;
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.add('col-drag-over');
+}
+function colDragLeave(e) { e.currentTarget.classList.remove('col-drag-over'); }
+function colDrop(e, targetCat) {
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('col-drag-over');
+  if (!dragColCat || dragColCat === targetCat) return;
+  const allCats = applyColOrder([...new Set(allApps.filter(a => isVisible(a)).map(a => a.category))]);
+  const from = allCats.indexOf(dragColCat);
+  const to   = allCats.indexOf(targetCat);
+  if (from === -1 || to === -1) return;
+  allCats.splice(from, 1);
+  allCats.splice(to, 0, dragColCat);
+  saveColOrder(allCats);
+  renderGrid();
+}
+function colDragEnd(e) {
+  document.querySelectorAll('.cat-column').forEach(c => c.classList.remove('col-dragging','col-drag-over'));
+  dragColCat = null;
+}
 
 function isVisible(a) {
   if (ADMINS.includes(currentUserEmail)) return true;
@@ -873,12 +968,11 @@ function isVisible(a) {
 
 function getFiltered() {
   const s = currentSearch.toLowerCase();
-  const filtered = allApps.filter(a =>
+  return allApps.filter(a =>
     isVisible(a) &&
     (currentCat === 'All' || a.category === currentCat) &&
     (!s || a.name.toLowerCase().includes(s) || a.description.toLowerCase().includes(s))
   );
-  return applyOrder(filtered);
 }
 
 function renderCatPills() {
@@ -888,6 +982,32 @@ function renderCatPills() {
   ).join('');
 }
 
+function cardHTML(a) {
+  return `<div class="app-card" draggable="true" data-id="${a.id}" data-cat="${esc(a.category)}"
+    ondragstart="cardDragStart(event,'${a.id}','${esc(a.category)}')"
+    ondragover="cardDragOver(event)"
+    ondragleave="cardDragLeave(event)"
+    ondrop="cardDrop(event,'${a.id}','${esc(a.category)}')"
+    ondragend="cardDragEnd(event)">
+    <div class="card-top">
+      <span class="card-emoji">${a.emoji}</span>
+    </div>
+    <div class="card-name">${esc(a.name)}${a.visibleTo ? ' <span style="font-size:10px;font-weight:400;color:var(--muted);background:var(--light);border-radius:3px;padding:2px 6px;vertical-align:middle;">Restricted</span>' : ''}${a.appType==='url' ? ' <span style="font-size:10px;font-weight:400;color:var(--sky);background:rgba(0,161,222,0.08);border-radius:3px;padding:2px 6px;vertical-align:middle;">URL</span>' : ''}</div>
+    ${a.description ? `<div class="card-desc">${esc(a.description)}</div>` : ''}
+    <div class="card-footer">
+      <div class="card-meta">
+        <span class="card-date">${fmtDate(a.dateAdded)}</span>
+        ${a.addedBy ? `<span class="card-by">${esc(a.addedBy)}</span>` : ''}
+      </div>
+      <div class="card-actions">
+        ${canDelete(a) ? `<button class="btn-delete" onclick="deleteApp('${a.id}')" title="Remove">✕</button>` : ''}
+        <button class="btn-edit" onclick="editApp('${a.id}')">Edit</button>
+        <button class="btn-launch" onclick="launchApp('${a.id}')">${a.appType==='url' ? 'Open ↗' : 'Launch →'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderGrid() {
   renderCatPills();
   const apps = getFiltered();
@@ -895,39 +1015,40 @@ function renderGrid() {
   const hint = document.getElementById('drag-hint');
   if (!apps.length) {
     if (hint) hint.style.display = 'none';
-    grid.innerHTML = `<div class="empty">${
+    grid.innerHTML = `<div style="padding:4rem 0;text-align:center;color:#AAAAAA;font-size:14px;font-weight:300;line-height:2;">${
       allApps.length === 0
         ? 'No apps yet.<br>Click "+ Add app" to add your first one.'
         : 'No apps match your search.'
     }</div>`;
     return;
   }
-  if (hint) hint.style.display = apps.length > 1 ? 'block' : 'none';
-  grid.innerHTML = apps.map(a => `
-    <div class="app-card" draggable="true" data-id="${a.id}"
-      ondragstart="onDragStart(event)"
-      ondragover="onDragOver(event)"
-      ondragleave="onDragLeave(event)"
-      ondrop="onDrop(event)"
-      ondragend="onDragEnd(event)">
-      <div class="card-top">
-        <span class="card-emoji">${a.emoji}</span>
-        <span class="card-cat">${esc(a.category)}</span>
+  if (hint) hint.style.display = 'block';
+
+  // Get categories in user-defined order
+  const allCats = [...new Set(apps.map(a => a.category))];
+  const cats = applyColOrder(allCats);
+
+  grid.innerHTML = cats.map(cat => {
+    const catApps = applyAppOrder(apps.filter(a => a.category === cat), cat);
+    return `<div class="cat-column" data-cat="${esc(cat)}"
+      ondragover="colDragOver(event,'${esc(cat)}')"
+      ondragleave="colDragLeave(event)"
+      ondrop="colDrop(event,'${esc(cat)}')"
+      ondragend="colDragEnd(event)">
+      <div class="col-header" draggable="true"
+        ondragstart="colDragStart(event,'${esc(cat)}')"
+        ondragend="colDragEnd(event)">
+        <span class="col-header-name">${esc(cat)}</span>
+        <span class="col-header-count">${catApps.length}</span>
       </div>
-      <div class="card-name">${esc(a.name)}${a.visibleTo ? ' <span style="font-size:10px;font-weight:400;color:var(--muted);background:var(--light);border-radius:3px;padding:2px 6px;vertical-align:middle;">Restricted</span>' : ''}${a.appType==='url' ? ' <span style="font-size:10px;font-weight:400;color:var(--sky);background:rgba(0,161,222,0.08);border-radius:3px;padding:2px 6px;vertical-align:middle;">URL</span>' : ''}</div>
-      ${a.description ? `<div class="card-desc">${esc(a.description)}</div>` : ''}
-      <div class="card-footer">
-        <div class="card-meta">
-          <span class="card-date">${fmtDate(a.dateAdded)}</span>
-          ${a.addedBy ? `<span class="card-by">${esc(a.addedBy)}</span>` : ''}
-        </div>
-        <div class="card-actions">
-          ${canDelete(a) ? `<button class="btn-delete" onclick="deleteApp('${a.id}')" title="Remove">✕</button>` : ''}
-          <button class="btn-edit" onclick="editApp('${a.id}')">Edit</button>
-          <button class="btn-launch" onclick="launchApp('${a.id}')">${a.appType==='url' ? 'Open ↗' : 'Launch →'}</button>
-        </div>
+      <div class="col-drop-zone" data-cat="${esc(cat)}"
+        ondragover="zoneDragOver(event)"
+        ondragleave="zoneDragLeave(event)"
+        ondrop="zoneDrop(event,'${esc(cat)}')">
+        ${catApps.map(a => cardHTML(a)).join('')}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 let currentBlobUrl = null;
