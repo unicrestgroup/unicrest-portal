@@ -1048,11 +1048,17 @@ function renderEmailList(emails, folderLabel) {
 
 async function summariseEmails() {
   if (!rawEmails.length) return;
+
+  if (!CONFIG.anthropicKey || CONFIG.anthropicKey.startsWith('REPLACE')) {
+    alert('Anthropic API key not set. Add your key to the CONFIG block in the HTML file.');
+    return;
+  }
+
   const body = document.getElementById('email-body');
   body.innerHTML = '<div class="loading"><div class="spinner"></div>Analysing with AI...</div>';
 
   const emailText = rawEmails.slice(0, 10).map((e, i) =>
-    `${i+1}. From: ${e.from?.emailAddress?.name || 'Unknown'}\n   Subject: ${e.subject}\n   Preview: ${e.bodyPreview?.slice(0,200)}`
+    `${i+1}. From: ${e.from?.emailAddress?.name || 'Unknown'}\n   Subject: ${e.subject}\n   Folder: ${e._folder || ''}\n   Preview: ${e.bodyPreview?.slice(0,200)}`
   ).join('\n\n');
 
   try {
@@ -1070,6 +1076,7 @@ async function summariseEmails() {
         system: `You are a GM's assistant. Analyse these emails and return a JSON array of objects with:
 - from (string)
 - subject (string)
+- folder (string)
 - summary (1 sentence, plain English)
 - action (null, or a short action required)
 Return ONLY valid JSON, no markdown, no preamble.`,
@@ -1078,23 +1085,38 @@ Return ONLY valid JSON, no markdown, no preamble.`,
     });
 
     const result = await resp.json();
-    const text   = result.content?.[0]?.text || '[]';
-    const clean  = text.replace(/```json|```/g, '').trim();
-    const items  = JSON.parse(clean);
 
-    body.innerHTML = items.map(item => `
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    const text  = result.content?.[0]?.text || '[]';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const items = JSON.parse(clean);
+
+    if (!items.length) {
+      body.innerHTML = '<div class="empty">No results returned from AI.</div>';
+      return;
+    }
+
+    body.innerHTML = `
+      <div class="digest-status">${items.length} email${items.length !== 1 ? 's' : ''} summarised by AI.</div>
+      ${items.map(item => `
       <div class="digest-item">
-        <div class="digest-from">${item.from}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div class="digest-from">${item.from}</div>
+          ${item.folder ? `<span style="font-size:10px;color:var(--muted);font-style:italic;">${item.folder}</span>` : ''}
+        </div>
         <div class="digest-subject">${item.subject}</div>
         <div class="digest-summary">${item.summary}</div>
         ${item.action ? `<div style="margin-top:4px;font-size:11px;color:var(--amber);">▶ ${item.action}</div>` : ''}
-      </div>`).join('');
+      </div>`).join('')}`;
 
   } catch (err) {
-    renderEmailList(rawEmails);
-    body.insertAdjacentHTML('afterbegin',
-      '<div class="empty">AI summarise failed. Check your Anthropic API key.</div>');
     console.error(err);
+    renderEmailList(rawEmails, 'Selected folders');
+    document.getElementById('email-body').insertAdjacentHTML('afterbegin',
+      `<div class="empty" style="color:var(--red);">AI summarise failed: ${err.message}</div>`);
   }
 }
 
