@@ -505,6 +505,7 @@ async function signIn(){try{Object.keys(sessionStorage).filter(k=>k.startsWith('
 function signOut(){msalInstance.logoutRedirect({account:currentAccount});}
 async function getToken(){try{const r=await msalInstance.acquireTokenSilent({scopes:SCOPES,account:currentAccount});return r.accessToken;}catch(e){await msalInstance.acquireTokenRedirect({scopes:SCOPES});return null;}}
 async function graphGet(url){const t=await getToken();const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`}});return r.json();}
+async function calGet(url){const t=await getToken();const r=await fetch(url,{headers:{Authorization:`Bearer ${t}`,'Prefer':'outlook.timezone="New Zealand Standard Time"'}});return r.json();}
 
 function showApp(){
   document.getElementById('login-screen').style.display='none';
@@ -529,7 +530,7 @@ async function loadCalendar(){
     const now=new Date();
     const s=new Date(now);s.setHours(0,0,0,0);
     const e=new Date(now);e.setHours(23,59,59,999);
-    const data=await graphGet(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${s.toISOString()}&endDateTime=${e.toISOString()}&$orderby=start/dateTime&$select=subject,start,end,location,isAllDay&$top=20`);
+    const data=await calGet(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${s.toISOString()}&endDateTime=${e.toISOString()}&$orderby=start/dateTime&$select=subject,start,end,location,isAllDay&$top=20`);
     const evs=(data.value||[]).filter(e=>!e.isAllDay);
     document.getElementById('metric-meetings').textContent=evs.length||'0';
     if(!evs.length){body.innerHTML='<div class="empty">No meetings today.</div>';return;}
@@ -728,7 +729,7 @@ async function schedLoadAndRender(){
   schedDayEvs=[];schedRenderTimeline();
   try{
     const s=new Date(schedSelDate+'T00:00:00').toISOString(),en=new Date(schedSelDate+'T23:59:59').toISOString();
-    const data=await graphGet(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${s}&endDateTime=${en}&$orderby=start/dateTime&$select=subject,start,end,isAllDay&$top=20`);
+    const data=await calGet(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${s}&endDateTime=${en}&$orderby=start/dateTime&$select=subject,start,end,isAllDay&$top=20`);
     schedDayEvs=(data.value||[]).filter(e=>!e.isAllDay).map(ev=>{
       const startStr=ev.start.dateTime; // "2026-04-10T07:30:00" - local NZ time, don't pass to new Date()
       const endStr=ev.end.dateTime;
