@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GM Command Centre</title>
 <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-<script src="./msal-browser.min.js" onload="init()"></script>
+<script src="./msal-browser.min.js"></script>
 
 <style>
   /* ── CONFIG ── Replace these values before deploying ───────────────── */
@@ -757,7 +757,766 @@ const CONFIG = {
   clientId:       'c6595fee-5861-474a-b604-4487ac361580',
   tenantId:       '8c8bc073-973e-4ddf-9384-38498e8aa324',
   redirectUri:    'https://unicrestgroup.github.io/unicrest-portal/gm-command-centre.html',
-  anthropicKey:   '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'   // sk-ant-...
+  anthropicKey:   '<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GM Command Centre</title>
+<link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="./msal-browser.min.js"></script>
+
+<style>
+  /* ── CONFIG ── Replace these values before deploying ───────────────── */
+  /* See CONFIG block in <script> below                                    */
+
+  :root {
+    --red:      #EF3E42;
+    --dark:     #231F20;
+    --mid:      #464749;
+    --bg:       #141213;
+    --surface:  #1E1A1B;
+    --surface2: #282325;
+    --border:   rgba(255,255,255,0.07);
+    --text:     #F0EDED;
+    --muted:    #9A9597;
+    --green:    #3DBE7A;
+    --amber:    #F5A623;
+    --font:     'Arvo', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── LOGIN ────────────────────────────────────────────────────────── */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 32px;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(239,62,66,0.12) 0%, transparent 70%);
+  }
+
+  .login-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .login-wordmark {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .login-wordmark span { color: var(--red); }
+
+  .login-sub {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-style: italic;
+  }
+
+  .login-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 48px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+  }
+
+  .login-card h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .login-card p {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  .btn-ms {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-ms:hover { background: #d43336; }
+
+  /* ── APP SHELL ────────────────────────────────────────────────────── */
+  #app { display: none; flex-direction: column; min-height: 100vh; }
+
+  header {
+    background: var(--dark);
+    border-bottom: 2px solid var(--red);
+    padding: 0 28px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .header-wordmark {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  .header-wordmark span { color: var(--red); }
+
+  .header-tag {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-left: 1px solid var(--border);
+    padding-left: 16px;
+    font-style: italic;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-chip {
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+  }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.45);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+  /* ── DATE BANNER ──────────────────────────────────────────────────── */
+  .date-banner {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .date-today {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .date-sub {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── GRID ─────────────────────────────────────────────────────────── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+    padding: 20px 28px 28px;
+    flex: 1;
+  }
+
+  @media (max-width: 1100px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: 1fr; padding: 12px; }
+    header { padding: 0 16px; }
+    .date-banner { padding: 12px 16px; }
+  }
+
+  /* ── CARD ─────────────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+  }
+
+  .card-body {
+    padding: 16px 18px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 320px;
+  }
+
+  .card-body::-webkit-scrollbar { width: 4px; }
+  .card-body::-webkit-scrollbar-track { background: transparent; }
+  .card-body::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+  /* ── CALENDAR ─────────────────────────────────────────────────────── */
+  .cal-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cal-item:last-child { border-bottom: none; }
+
+  .cal-time {
+    font-size: 11px;
+    color: var(--red);
+    font-weight: 700;
+    min-width: 52px;
+    padding-top: 1px;
+  }
+
+  .cal-detail { flex: 1; }
+
+  .cal-title {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .cal-loc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .cal-now {
+    border-left: 2px solid var(--red);
+    padding-left: 10px;
+    margin-left: -10px;
+  }
+
+  /* ── EMAIL DIGEST ─────────────────────────────────────────────────── */
+  .digest-status {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    padding: 8px 0;
+  }
+
+  .digest-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .digest-item:last-child { border-bottom: none; }
+
+  .digest-from {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .digest-subject {
+    font-size: 11px;
+    color: var(--muted);
+    margin: 2px 0;
+  }
+
+  .digest-summary {
+    font-size: 12px;
+    color: var(--text);
+    opacity: 0.8;
+    line-height: 1.5;
+  }
+
+  .btn-sm {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-sm:hover { background: var(--mid); }
+
+  .btn-red {
+    background: var(--red);
+    border-color: var(--red);
+  }
+
+  .btn-red:hover { background: #d43336; }
+
+  /* ── PRIORITIES ───────────────────────────────────────────────────── */
+  .priority-list { list-style: none; }
+
+  .priority-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .priority-item:last-child { border-bottom: none; }
+
+  .priority-num {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--red);
+    line-height: 1;
+    min-width: 24px;
+    opacity: 0.4;
+  }
+
+  .priority-text {
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+    padding-top: 2px;
+  }
+
+  .priority-text[contenteditable="true"] {
+    outline: none;
+    border-bottom: 1px solid var(--red);
+  }
+
+  .priority-text[contenteditable="true"]:empty::before {
+    content: attr(data-placeholder);
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .priority-done {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    margin-top: 2px;
+    transition: background 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+  }
+
+  .priority-done.checked {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .priority-item.done .priority-text {
+    text-decoration: line-through;
+    opacity: 0.4;
+  }
+
+  /* ── PROJECTS RAG ─────────────────────────────────────────────────── */
+  .rag-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rag-item:last-child { border-bottom: none; }
+
+  .rag-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .rag-dot.green  { background: var(--green); box-shadow: 0 0 6px rgba(61,190,122,0.5); }
+  .rag-dot.amber  { background: var(--amber); box-shadow: 0 0 6px rgba(245,166,35,0.5); }
+  .rag-dot.red    { background: var(--red);   box-shadow: 0 0 6px rgba(239,62,66,0.5); }
+
+  .rag-detail { flex: 1; min-width: 0; }
+
+  .rag-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .rag-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .rag-controls {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .rag-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  .rag-btn:hover { transform: scale(1.2); }
+  .rag-btn.g { background: var(--green); }
+  .rag-btn.a { background: var(--amber); }
+  .rag-btn.r { background: var(--red); }
+  .rag-btn.active { border-color: #fff; }
+
+  .add-project-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .input-sm {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: var(--font);
+    color: var(--text);
+    outline: none;
+  }
+
+  .input-sm:focus { border-color: var(--red); }
+  .input-sm::placeholder { color: var(--muted); }
+
+  /* ── QUICK CAPTURE ────────────────────────────────────────────────── */
+  .capture-area {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 13px;
+    font-family: var(--font);
+    color: var(--text);
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    min-height: 120px;
+    transition: border-color 0.15s;
+  }
+
+  .capture-area:focus { border-color: var(--red); }
+  .capture-area::placeholder { color: var(--muted); }
+
+  .capture-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  .capture-ts {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .notes-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .note-item {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    position: relative;
+    border-left: 2px solid var(--red);
+  }
+
+  .note-ts {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .note-del {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+    opacity: 0.5;
+    transition: opacity 0.15s;
+  }
+
+  .note-del:hover { opacity: 1; }
+
+  /* ── LOADING / EMPTY ──────────────────────────────────────────────── */
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-style: italic;
+    padding: 12px 0;
+  }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty {
+    color: var(--muted);
+    font-size: 12px;
+    font-style: italic;
+    padding: 8px 0;
+  }
+
+  /* ── BADGE ────────────────────────────────────────────────────────── */
+  .badge {
+    font-size: 10px;
+    background: var(--red);
+    color: #fff;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ─────────────────────────────────────────────────────────── -->
+<div id="login-screen">
+  <div class="login-logo">
+    <div class="login-wordmark"><span>UNI</span>CREST GROUP</div>
+    <div class="login-sub">Proven Excellence</div>
+  </div>
+  <div class="login-card">
+    <h2>GM Command Centre</h2>
+    <p>Sign in with your Microsoft account to continue.</p>
+    <button class="btn-ms" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+        <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+        <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+        <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+      </svg>
+      Sign in with Microsoft
+    </button>
+  </div>
+</div>
+
+<!-- ── APP ───────────────────────────────────────────────────────────── -->
+<div id="app">
+
+  <header>
+    <div class="header-left">
+      <div class="header-wordmark"><span>UNI</span>CREST</div>
+      <div class="header-tag">GM Command Centre</div>
+    </div>
+    <div class="header-right">
+      <span class="user-chip" id="user-name">Loading...</span>
+      <button class="btn-ghost" onclick="signOut()">Sign out</button>
+    </div>
+  </header>
+
+  <div class="date-banner">
+    <div class="date-today" id="date-today"></div>
+    <div class="date-sub" id="date-greeting"></div>
+  </div>
+
+  <div class="grid">
+
+    <!-- Calendar -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-dot"></span>Today's Calendar</div>
+        <button class="btn-sm" onclick="loadCalendar()">↻</button>
+      </div>
+      <div class="card-body" id="cal-body">
+        <div class="loading"><div class="spinner"></div>Loading calendar...</div>
+      </div>
+    </div>
+
+    <!-- Email Digest -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-dot"></span>Morning Email Digest</div>
+        <button class="btn-sm btn-red" onclick="summariseEmails()">AI Summarise</button>
+      </div>
+      <div class="card-body" id="email-body">
+        <div class="loading"><div class="spinner"></div>Loading emails...</div>
+      </div>
+    </div>
+
+    <!-- Top 3 Priorities -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-dot"></span>Top 3 Priorities</div>
+        <button class="btn-sm" onclick="savePriorities()">Save</button>
+      </div>
+      <div class="card-body">
+        <ul class="priority-list" id="priority-list">
+          <li class="priority-item" id="p1">
+            <div class="priority-num">1</div>
+            <div class="priority-text" contenteditable="true" data-placeholder="Priority one..." id="pt1"></div>
+            <div class="priority-done" onclick="toggleDone(this, 'p1')"></div>
+          </li>
+          <li class="priority-item" id="p2">
+            <div class="priority-num">2</div>
+            <div class="priority-text" contenteditable="true" data-placeholder="Priority two..." id="pt2"></div>
+            <div class="priority-done" onclick="toggleDone(this, 'p2')"></div>
+          </li>
+          <li class="priority-item" id="p3">
+            <div class="priority-num">3</div>
+            <div class="priority-text" contenteditable="true" data-placeholder="Priority three..." id="pt3"></div>
+            <div class="priority-done" onclick="toggleDone(this, 'p3')"></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Projects RAG -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-dot"></span>Project Status</div>
+        <button class="btn-sm" onclick="saveProjects()">Save</button>
+      </div>
+      <div class="card-body">
+        <div id="rag-list"></div>
+        <div class="add-project-row">
+          <input class="input-sm" id="new-project-name" placeholder="Project name..." />
+          <button class="btn-sm btn-red" onclick="addProject()">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Capture -->
+    <div class="card" style="grid-column: span 2;">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-dot"></span>Quick Capture</div>
+        <span class="badge" id="notes-count">0</span>
+      </div>
+      <div class="card-body" style="max-height: none;">
+        <textarea class="capture-area" id="capture-input" placeholder="Capture a thought, decision, or action item..."></textarea>
+        <div class="capture-footer">
+          <span class="capture-ts" id="capture-ts"></span>
+          <button class="btn-sm btn-red" onclick="saveNote()">Save Note</button>
+        </div>
+        <div class="notes-list" id="notes-list"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIG — replace these values with your own before deploying
+// ─────────────────────────────────────────────────────────────────────────────
+const CONFIG = {
+  clientId:       'c6595fee-5861-474a-b604-4487ac361580',
+  tenantId:       '8c8bc073-973e-4ddf-9384-38498e8aa324',
+  redirectUri:    'https://unicrestgroup.github.io/unicrest-portal/gm-command-centre.html',
+  anthropicKey:   'REPLACE_WITH_ANTHROPIC_API_KEY'   // sk-ant-...
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1184,6 +1943,437 @@ function loadLocalData() {
 }
 
 // ── BOOT ── triggered by MSAL script onload
+init();
+</script>
+</body>
+</html>'   // sk-ant-...
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
+// MSAL setup
+const msalConfig = {
+  auth: {
+    clientId:    CONFIG.clientId,
+    authority:   `https://login.microsoftonline.com/${CONFIG.tenantId}`,
+    redirectUri: CONFIG.redirectUri
+  },
+  cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: false }
+};
+
+var msalInstance = null;
+
+var SCOPES = ['User.Read','Mail.Read','Calendars.Read'];
+
+var currentAccount = null;
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+
+async function init() {
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  await msalInstance.initialize();
+
+  const resp = await msalInstance.handleRedirectPromise();
+  if (resp) currentAccount = resp.account;
+
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    currentAccount = accounts[0];
+    showApp();
+  } else {
+    const btn = document.querySelector('.btn-ms');
+    if (btn) btn.disabled = false;
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+}
+
+async function signIn() {
+  try {
+    // Clear any stuck MSAL interaction state
+    Object.keys(sessionStorage).filter(k => k.startsWith('msal.')).forEach(k => sessionStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k.startsWith('msal.')).forEach(k => localStorage.removeItem(k));
+    if (!msalInstance) {
+      msalInstance = new msal.PublicClientApplication(msalConfig);
+      await msalInstance.initialize();
+    }
+    await msalInstance.loginRedirect({ scopes: SCOPES });
+  } catch (e) {
+    console.error(e);
+    alert('Sign in error: ' + e.message);
+  }
+}
+
+function signOut() {
+  msalInstance.logoutRedirect({ account: currentAccount });
+}
+
+async function getToken() {
+  try {
+    const resp = await msalInstance.acquireTokenSilent({
+      scopes: SCOPES,
+      account: currentAccount
+    });
+    return resp.accessToken;
+  } catch (e) {
+    const resp = await msalInstance.acquireTokenRedirect({ scopes: SCOPES });
+    return null;
+  }
+}
+
+async function graphGet(url) {
+  const token = await getToken();
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  return r.json();
+}
+
+// ── SHOW APP ──────────────────────────────────────────────────────────────────
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+
+  const name = currentAccount.name || currentAccount.username;
+  const first = name.split(' ')[0];
+  document.getElementById('user-name').textContent = name;
+
+  // Date + greeting
+  const now = new Date();
+  const days    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('date-today').textContent =
+    `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+  const h = now.getHours();
+  const greeting = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+  document.getElementById('date-greeting').textContent = `${greeting}, ${first}.`;
+
+  loadCalendar();
+  loadEmails();
+  loadLocalData();
+  setInterval(updateCaptureTs, 30000);
+  updateCaptureTs();
+}
+
+// ── CALENDAR ──────────────────────────────────────────────────────────────────
+
+async function loadCalendar() {
+  const body = document.getElementById('cal-body');
+  body.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+  try {
+    const now   = new Date();
+    const start = new Date(now); start.setHours(0,0,0,0);
+    const end   = new Date(now); end.setHours(23,59,59,999);
+
+    const url = `https://graph.microsoft.com/v1.0/me/calendarView`
+      + `?startDateTime=${start.toISOString()}&endDateTime=${end.toISOString()}`
+      + `&$orderby=start/dateTime&$select=subject,start,end,location,isAllDay`
+      + `&$top=20`;
+
+    const data = await graphGet(url);
+    const events = (data.value || []).filter(e => !e.isAllDay);
+
+    if (!events.length) {
+      body.innerHTML = '<div class="empty">No meetings scheduled today.</div>';
+      return;
+    }
+
+    body.innerHTML = events.map(e => {
+      const s     = new Date(e.start.dateTime);
+      const en    = new Date(e.end.dateTime);
+      const fmt   = t => t.toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit', hour12: true });
+      const isNow = now >= s && now <= en;
+      const loc   = e.location?.displayName ? `<div class="cal-loc">${e.location.displayName}</div>` : '';
+      return `<div class="cal-item ${isNow ? 'cal-now' : ''}">
+        <div class="cal-time">${fmt(s)}</div>
+        <div class="cal-detail">
+          <div class="cal-title">${e.subject}</div>
+          ${loc}
+        </div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    body.innerHTML = `<div class="empty">Could not load calendar. Check permissions.</div>`;
+    console.error(err);
+  }
+}
+
+// ── EMAILS ────────────────────────────────────────────────────────────────────
+
+let rawEmails = [];
+
+async function loadEmails() {
+  const body = document.getElementById('email-body');
+  body.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+  try {
+    const since = new Date(); since.setHours(0,0,0,0);
+    const url = `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`
+      + `?$filter=receivedDateTime ge ${since.toISOString()}&$orderby=receivedDateTime desc`
+      + `&$select=subject,from,bodyPreview,receivedDateTime,isRead&$top=15`;
+
+    const data = await graphGet(url);
+    rawEmails = data.value || [];
+
+    if (!rawEmails.length) {
+      body.innerHTML = '<div class="empty">No new emails today.</div>';
+      return;
+    }
+
+    renderEmailList(rawEmails);
+  } catch (err) {
+    body.innerHTML = `<div class="empty">Could not load emails. Check permissions.</div>`;
+    console.error(err);
+  }
+}
+
+function renderEmailList(emails) {
+  const body = document.getElementById('email-body');
+  body.innerHTML = `
+    <div class="digest-status">${emails.length} email${emails.length !== 1 ? 's' : ''} today. Press "AI Summarise" to analyse.</div>
+    ${emails.slice(0,8).map(e => `
+      <div class="digest-item">
+        <div class="digest-from">${e.from?.emailAddress?.name || e.from?.emailAddress?.address || 'Unknown'}</div>
+        <div class="digest-subject">${e.subject}</div>
+      </div>`).join('')}
+  `;
+}
+
+async function summariseEmails() {
+  if (!rawEmails.length) return;
+  const body = document.getElementById('email-body');
+  body.innerHTML = '<div class="loading"><div class="spinner"></div>Analysing with AI...</div>';
+
+  const emailText = rawEmails.slice(0, 10).map((e, i) =>
+    `${i+1}. From: ${e.from?.emailAddress?.name || 'Unknown'}\n   Subject: ${e.subject}\n   Preview: ${e.bodyPreview?.slice(0,200)}`
+  ).join('\n\n');
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CONFIG.anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are a GM's assistant. Analyse these emails and return a JSON array of objects with:
+- from (string)
+- subject (string)
+- summary (1 sentence, plain English)
+- action (null, or a short action required)
+Return ONLY valid JSON, no markdown, no preamble.`,
+        messages: [{ role: 'user', content: emailText }]
+      })
+    });
+
+    const result = await resp.json();
+    const text   = result.content?.[0]?.text || '[]';
+    const clean  = text.replace(/```json|```/g, '').trim();
+    const items  = JSON.parse(clean);
+
+    body.innerHTML = items.map(item => `
+      <div class="digest-item">
+        <div class="digest-from">${item.from}</div>
+        <div class="digest-subject">${item.subject}</div>
+        <div class="digest-summary">${item.summary}</div>
+        ${item.action ? `<div style="margin-top:4px;font-size:11px;color:var(--amber);">▶ ${item.action}</div>` : ''}
+      </div>`).join('');
+
+  } catch (err) {
+    renderEmailList(rawEmails);
+    body.insertAdjacentHTML('afterbegin',
+      '<div class="empty">AI summarise failed. Check your Anthropic API key.</div>');
+    console.error(err);
+  }
+}
+
+// ── PRIORITIES ────────────────────────────────────────────────────────────────
+
+function savePriorities() {
+  const data = {
+    p1: { text: document.getElementById('pt1').textContent, done: document.getElementById('p1').classList.contains('done') },
+    p2: { text: document.getElementById('pt2').textContent, done: document.getElementById('p2').classList.contains('done') },
+    p3: { text: document.getElementById('pt3').textContent, done: document.getElementById('p3').classList.contains('done') },
+    date: new Date().toDateString()
+  };
+  localStorage.setItem('gm_priorities', JSON.stringify(data));
+}
+
+function loadPriorities() {
+  try {
+    const raw  = localStorage.getItem('gm_priorities');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    // Reset if it's a new day
+    if (data.date !== new Date().toDateString()) {
+      localStorage.removeItem('gm_priorities');
+      return;
+    }
+    ['p1','p2','p3'].forEach(id => {
+      const d = data[id];
+      if (!d) return;
+      document.getElementById('p' + id.slice(1) + 't' || 'pt' + id[1]).textContent = d.text;
+      const textEl = document.getElementById('pt' + id[1]);
+      if (textEl) textEl.textContent = d.text;
+      if (d.done) {
+        document.getElementById(id).classList.add('done');
+        document.querySelector(`#${id} .priority-done`).classList.add('checked');
+      }
+    });
+    // Simpler approach
+    document.getElementById('pt1').textContent = data.p1?.text || '';
+    document.getElementById('pt2').textContent = data.p2?.text || '';
+    document.getElementById('pt3').textContent = data.p3?.text || '';
+    if (data.p1?.done) toggleDoneById('p1');
+    if (data.p2?.done) toggleDoneById('p2');
+    if (data.p3?.done) toggleDoneById('p3');
+  } catch(e) {}
+}
+
+function toggleDone(btn, id) {
+  btn.classList.toggle('checked');
+  document.getElementById(id).classList.toggle('done');
+  savePriorities();
+}
+
+function toggleDoneById(id) {
+  const item = document.getElementById(id);
+  const btn  = item?.querySelector('.priority-done');
+  if (!item || !btn) return;
+  btn.classList.add('checked');
+  item.classList.add('done');
+}
+
+// ── PROJECTS RAG ──────────────────────────────────────────────────────────────
+
+let projects = [];
+
+function renderProjects() {
+  const list = document.getElementById('rag-list');
+  if (!projects.length) {
+    list.innerHTML = '<div class="empty">No projects yet. Add one below.</div>';
+    return;
+  }
+  list.innerHTML = projects.map((p, i) => `
+    <div class="rag-item">
+      <div class="rag-dot ${p.rag}"></div>
+      <div class="rag-detail">
+        <div class="rag-name">${p.name}</div>
+        <input class="input-sm" style="margin-top:4px;font-size:11px;"
+          value="${p.note || ''}"
+          placeholder="One-line status..."
+          onchange="updateNote(${i}, this.value)" />
+      </div>
+      <div class="rag-controls">
+        <div class="rag-btn g ${p.rag==='green'?'active':''}" onclick="setRag(${i},'green')" title="Green"></div>
+        <div class="rag-btn a ${p.rag==='amber'?'active':''}" onclick="setRag(${i},'amber')" title="Amber"></div>
+        <div class="rag-btn r ${p.rag==='red'?'active':''}"   onclick="setRag(${i},'red')"   title="Red"></div>
+        <button class="btn-ghost" style="padding:2px 7px;font-size:11px;" onclick="removeProject(${i})">×</button>
+      </div>
+    </div>`).join('');
+}
+
+function setRag(i, rag) {
+  projects[i].rag = rag;
+  renderProjects();
+  saveProjects();
+}
+
+function updateNote(i, val) {
+  projects[i].note = val;
+  saveProjects();
+}
+
+function addProject() {
+  const inp = document.getElementById('new-project-name');
+  const name = inp.value.trim();
+  if (!name) return;
+  projects.push({ name, rag: 'green', note: '' });
+  inp.value = '';
+  renderProjects();
+  saveProjects();
+}
+
+function removeProject(i) {
+  projects.splice(i, 1);
+  renderProjects();
+  saveProjects();
+}
+
+function saveProjects() {
+  localStorage.setItem('gm_projects', JSON.stringify(projects));
+}
+
+function loadProjects() {
+  try {
+    const raw = localStorage.getItem('gm_projects');
+    projects = raw ? JSON.parse(raw) : [];
+  } catch(e) { projects = []; }
+  renderProjects();
+}
+
+// ── QUICK CAPTURE ─────────────────────────────────────────────────────────────
+
+function updateCaptureTs() {
+  const now = new Date();
+  document.getElementById('capture-ts').textContent =
+    now.toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
+function saveNote() {
+  const input = document.getElementById('capture-input');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  const notes = loadNotes();
+  notes.unshift({
+    text,
+    ts: new Date().toLocaleString('en-NZ', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit', hour12:true })
+  });
+  localStorage.setItem('gm_notes', JSON.stringify(notes));
+  input.value = '';
+  renderNotes();
+}
+
+function loadNotes() {
+  try { return JSON.parse(localStorage.getItem('gm_notes') || '[]'); }
+  catch(e) { return []; }
+}
+
+function deleteNote(i) {
+  const notes = loadNotes();
+  notes.splice(i, 1);
+  localStorage.setItem('gm_notes', JSON.stringify(notes));
+  renderNotes();
+}
+
+function renderNotes() {
+  const notes = loadNotes();
+  const list  = document.getElementById('notes-list');
+  const badge = document.getElementById('notes-count');
+  badge.textContent = notes.length;
+  if (!notes.length) { list.innerHTML = ''; return; }
+  list.innerHTML = notes.map((n, i) => `
+    <div class="note-item">
+      ${n.text}
+      <div class="note-ts">${n.ts}</div>
+      <button class="note-del" onclick="deleteNote(${i})">×</button>
+    </div>`).join('');
+}
+
+// ── LOCAL DATA ────────────────────────────────────────────────────────────────
+
+function loadLocalData() {
+  loadPriorities();
+  loadProjects();
+  renderNotes();
+}
+
+// ── BOOT ── triggered by MSAL script onload
+init();
 </script>
 </body>
 </html>
