@@ -598,6 +598,20 @@
     border-color: var(--red);
     color: #fff;
   }
+  .sched-inc-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: all 0.12s;
+  }
+  .sched-inc-btn:hover { border-color: rgba(239,62,66,0.4); color: var(--text); }
+  .sched-inc-active { background: rgba(239,62,66,0.15) !important; border-color: var(--red) !important; color: var(--red) !important; font-weight: 700; }
+
   .sched-dur-btn {
     flex: 1;
     background: rgba(255,255,255,0.05);
@@ -899,14 +913,21 @@
         <span id="sched-tl-label" style="font-size:13px;font-weight:700;color:var(--text);"></span>
         <span id="sched-tl-count" style="font-size:11px;color:var(--muted);"></span>
       </div>
-      <div style="padding:10px 20px;border-bottom:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);display:flex;align-items:center;gap:10px;">
+      <div style="padding:10px 20px;border-bottom:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);">Start</span>
-        <span id="sched-time-display" style="font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:0.02em;"></span>
+        <span id="sched-time-display" style="font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:0.02em;min-width:80px;"></span>
         <div style="display:flex;flex-direction:column;gap:1px;">
-          <button onclick="schedAdjustTime(30)"  style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:20px;height:16px;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">▲</button>
-          <button onclick="schedAdjustTime(-30)" style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:20px;height:16px;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">▼</button>
+          <button onclick="schedAdjustTime(schedIncrement)"  style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:20px;height:16px;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">▲</button>
+          <button onclick="schedAdjustTime(-schedIncrement)" style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:20px;height:16px;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">▼</button>
         </div>
-        <span style="font-size:11px;color:var(--muted);">or click timeline to set time</span>
+        <div style="display:flex;align-items:center;gap:5px;margin-left:4px;">
+          <span style="font-size:10px;color:var(--muted);">Step:</span>
+          <button class="sched-inc-btn sched-inc-active" onclick="schedSetIncrement(5,this)">5m</button>
+          <button class="sched-inc-btn" onclick="schedSetIncrement(10,this)">10m</button>
+          <button class="sched-inc-btn" onclick="schedSetIncrement(15,this)">15m</button>
+          <button class="sched-inc-btn" onclick="schedSetIncrement(30,this)">30m</button>
+        </div>
+        <span style="font-size:11px;color:var(--muted);">or click timeline</span>
       </div>
       <div id="sched-timeline" style="flex:1;overflow-y:auto;position:relative;"></div>
     </div>
@@ -1609,6 +1630,13 @@ var schedHour      = 10;
 var schedMin       = 0;
 var schedDuration  = 60;
 var schedDayEvs    = [];
+var schedIncrement = 5;
+
+function schedSetIncrement(mins, btn) {
+  schedIncrement = mins;
+  document.querySelectorAll('.sched-inc-btn').forEach(b => b.classList.remove('sched-inc-active'));
+  btn.classList.add('sched-inc-active');
+}
 
 const SCHED_MONTHS   = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const SCHED_DAYS_S   = ['Mo','Tu','We','Th','Fr','Sa','Su'];
@@ -1808,7 +1836,6 @@ function schedClickHour(h) {
   schedUpdateTimeDisplay();
   schedRenderTimeline();
 }
-
 async function createCalendarEvent() {
   const title = document.getElementById('sched-title').value.trim();
   if (!title || !schedSelDate) {
