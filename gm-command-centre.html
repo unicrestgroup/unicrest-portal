@@ -598,6 +598,22 @@
     border-color: var(--red);
     color: #fff;
   }
+  .sched-dur-btn {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 7px;
+    padding: 7px 4px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: var(--font);
+    text-align: center;
+    transition: all 0.12s;
+  }
+  .sched-dur-btn:hover { border-color: rgba(239,62,66,0.4); color: var(--text); }
+  .sched-dur-active { background: rgba(239,62,66,0.15) !important; border-color: var(--red) !important; color: var(--red) !important; font-weight: 700; }
+
   .ep-action-btn {
     display: inline-flex; align-items: center; gap: 6px;
     border: 1px solid rgba(255,255,255,0.12); background: var(--surface2);
@@ -827,59 +843,74 @@
 </div>
 
 <!-- ── SCHEDULE MODAL ─────────────────────────────────────────────────────── -->
-<div id="schedule-overlay" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
-  <div style="background:var(--surface);border:1px solid rgba(255,255,255,0.12);border-radius:14px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);">
-      <span style="font-size:14px;font-weight:700;color:var(--text);">📅 Schedule to Calendar</span>
-      <button onclick="closeScheduleModal()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;">×</button>
-    </div>
-    <div style="padding:18px 20px;">
-      <div style="margin-bottom:14px;">
-        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Event title</label>
-        <input class="input-sm" id="sched-title" style="width:100%;" placeholder="Event title..." />
-      </div>
-      <div style="display:flex;gap:10px;margin-bottom:14px;">
-        <div style="flex:1;">
-          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Date</label>
-          <input class="input-sm" id="sched-date" type="date" style="width:100%;" onchange="loadSchedCalendar()" />
+<div id="schedule-overlay" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.75);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#1A1617;border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;display:flex;width:780px;max-width:100%;max-height:90vh;box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+
+    <!-- Left panel -->
+    <div style="width:290px;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;">
+      <div style="padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:13px;font-weight:700;color:var(--text);">Schedule to calendar</span>
+          <button onclick="closeScheduleModal()" style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:24px;height:24px;border-radius:6px;cursor:pointer;font-size:14px;">×</button>
         </div>
-        <div style="flex:1;">
-          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Start time</label>
-          <input class="input-sm" id="sched-time" type="time" style="width:100%;" />
-        </div>
-        <div style="flex:1;">
-          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Duration</label>
-          <select class="input-sm" id="sched-duration" style="width:100%;">
-            <option value="30">30 min</option>
-            <option value="60" selected>1 hour</option>
-            <option value="90">1.5 hours</option>
-            <option value="120">2 hours</option>
-          </select>
-        </div>
+        <div id="sched-email-ref" style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;"></div>
       </div>
 
-      <!-- Mini calendar -->
-      <div style="margin-bottom:14px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span id="sched-cal-month" style="font-size:12px;font-weight:700;color:var(--text);"></span>
-          <div style="display:flex;gap:4px;">
-            <button onclick="schedCalNav(-1)" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px;">‹</button>
-            <button onclick="schedCalNav(1)"  style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px;">›</button>
+      <div style="padding:16px 20px;flex:1;display:flex;flex-direction:column;gap:16px;overflow-y:auto;">
+
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);margin-bottom:6px;">Event title</div>
+          <input class="input-sm" id="sched-title" style="width:100%;" placeholder="Event title..." oninput="schedRenderTimeline()" />
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);margin-bottom:8px;">Date</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span id="sched-cal-label" style="font-size:12px;font-weight:700;color:var(--text);"></span>
+            <div style="display:flex;gap:4px;">
+              <button onclick="schedCalNav(-1)" style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:12px;">‹</button>
+              <button onclick="schedCalNav(1)"  style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:12px;">›</button>
+            </div>
+          </div>
+          <div id="sched-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center;"></div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);margin-bottom:8px;">Duration</div>
+          <div style="display:flex;gap:5px;" id="sched-dur-btns">
+            <button class="sched-dur-btn" onclick="schedSetDur(30,this)">30m</button>
+            <button class="sched-dur-btn sched-dur-active" onclick="schedSetDur(60,this)">1h</button>
+            <button class="sched-dur-btn" onclick="schedSetDur(90,this)">1.5h</button>
+            <button class="sched-dur-btn" onclick="schedSetDur(120,this)">2h</button>
           </div>
         </div>
-        <div id="sched-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;"></div>
+
       </div>
 
-      <!-- Appointments on selected day -->
-      <div>
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;" id="sched-appt-label">Appointments on selected day</div>
-        <div id="sched-appts" style="font-size:12px;color:var(--muted);font-style:italic;">Select a date to see appointments.</div>
+      <div style="padding:14px 20px;border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:8px;">
+        <button onclick="closeScheduleModal()" style="flex:1;background:none;border:1px solid rgba(255,255,255,0.12);color:var(--muted);border-radius:8px;padding:9px;font-size:12px;cursor:pointer;font-family:var(--font);">Cancel</button>
+        <button onclick="createCalendarEvent()" style="flex:2;background:var(--red);border:none;color:#fff;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);">Add to Calendar</button>
       </div>
     </div>
-    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;">
-      <button onclick="closeScheduleModal()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:6px;padding:8px 18px;font-size:12px;cursor:pointer;font-family:var(--font);">Cancel</button>
-      <button onclick="createCalendarEvent()" style="background:var(--red);border:none;color:#fff;border-radius:6px;padding:8px 18px;font-size:12px;cursor:pointer;font-family:var(--font);font-weight:700;">Add to Calendar</button>
+
+    <!-- Right panel: timeline -->
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:480px;">
+      <div style="padding:18px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:baseline;gap:10px;">
+        <span id="sched-tl-label" style="font-size:13px;font-weight:700;color:var(--text);"></span>
+        <span id="sched-tl-count" style="font-size:11px;color:var(--muted);"></span>
+      </div>
+      <div style="padding:10px 20px;border-bottom:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);display:flex;align-items:center;gap:10px;">
+        <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);">Start</span>
+        <span id="sched-time-display" style="font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:0.02em;"></span>
+        <div style="display:flex;flex-direction:column;gap:1px;">
+          <button onclick="schedAdjustTime(30)"  style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:20px;height:16px;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">▲</button>
+          <button onclick="schedAdjustTime(-30)" style="background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:20px;height:16px;border-radius:4px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;">▼</button>
+        </div>
+        <span style="font-size:11px;color:var(--muted);">or click timeline to set time</span>
+      </div>
+      <div id="sched-timeline" style="flex:1;overflow-y:auto;position:relative;"></div>
     </div>
+
   </div>
 </div>
 
@@ -906,7 +937,7 @@ const msalConfig = {
 
 var msalInstance = null;
 
-var SCOPES = ['User.Read','Mail.Read','Mail.ReadWrite','Calendars.Read'];
+var SCOPES = ['User.Read','Mail.Read','Mail.ReadWrite','Calendars.ReadWrite'];
 
 var currentAccount = null;
 
@@ -1571,25 +1602,41 @@ function epReply() {
 
 // ── SCHEDULE MODAL ────────────────────────────────────────────────────────────
 
-var schedCalYear  = new Date().getFullYear();
-var schedCalMonth = new Date().getMonth();
-var schedDayEvents = [];
+var schedCalYear   = new Date().getFullYear();
+var schedCalMonth  = new Date().getMonth();
+var schedSelDate   = '';
+var schedHour      = 10;
+var schedMin       = 0;
+var schedDuration  = 60;
+var schedDayEvs    = [];
+
+const SCHED_MONTHS   = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const SCHED_DAYS_S   = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+const SCHED_DAYS_L   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const TL_START       = 7;
+const TL_END         = 23;
+const TL_HOUR_H      = 52;
 
 function openScheduleModal() {
   const e = currentEmailIndex !== null ? rawEmails[currentEmailIndex] : null;
-  const title = e ? (e.subject || '') : '';
-  document.getElementById('sched-title').value = title;
+  document.getElementById('sched-title').value = e ? (e.subject || '') : '';
+  document.getElementById('sched-email-ref').textContent = e ? (e.subject || '') : '';
 
   const now = new Date();
   now.setDate(now.getDate() + 1);
-  const dateStr = now.toISOString().split('T')[0];
-  document.getElementById('sched-date').value = dateStr;
-  document.getElementById('sched-time').value = '10:00';
-
+  schedSelDate  = now.toISOString().split('T')[0];
   schedCalYear  = now.getFullYear();
   schedCalMonth = now.getMonth();
-  renderSchedCalendar();
-  loadSchedCalendar();
+  schedHour     = 10;
+  schedMin      = 0;
+  schedDuration = 60;
+
+  document.querySelectorAll('.sched-dur-btn').forEach(b => b.classList.remove('sched-dur-active'));
+  document.querySelectorAll('.sched-dur-btn')[1].classList.add('sched-dur-active');
+
+  schedRenderCal();
+  schedUpdateTimeDisplay();
+  schedLoadAndRender();
 
   document.getElementById('schedule-overlay').style.display = 'flex';
 }
@@ -1602,103 +1649,178 @@ function schedCalNav(dir) {
   schedCalMonth += dir;
   if (schedCalMonth > 11) { schedCalMonth = 0; schedCalYear++; }
   if (schedCalMonth < 0)  { schedCalMonth = 11; schedCalYear--; }
-  renderSchedCalendar();
+  schedRenderCal();
 }
 
-function renderSchedCalendar() {
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('sched-cal-month').textContent = months[schedCalMonth] + ' ' + schedCalYear;
+function schedSetDur(mins, btn) {
+  schedDuration = mins;
+  document.querySelectorAll('.sched-dur-btn').forEach(b => b.classList.remove('sched-dur-active'));
+  btn.classList.add('sched-dur-active');
+  schedRenderTimeline();
+}
 
-  const grid = document.getElementById('sched-cal-grid');
-  const days = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+function schedRenderCal() {
+  document.getElementById('sched-cal-label').textContent = SCHED_MONTHS[schedCalMonth] + ' ' + schedCalYear;
+  const grid  = document.getElementById('sched-cal-grid');
   const today = new Date(); today.setHours(0,0,0,0);
-  const selected = document.getElementById('sched-date').value;
 
-  const firstDay = new Date(schedCalYear, schedCalMonth, 1);
-  let startDow = firstDay.getDay(); // 0=Sun
-  startDow = startDow === 0 ? 6 : startDow - 1; // convert to Mon=0
-  const daysInMonth = new Date(schedCalYear, schedCalMonth + 1, 0).getDate();
+  let html = SCHED_DAYS_S.map(d => `<div style="font-size:9px;color:var(--muted);text-align:center;padding:2px 0;font-weight:700;letter-spacing:0.05em;">${d}</div>`).join('');
 
-  let html = days.map(d => `<div style="font-size:9px;color:var(--muted);text-align:center;padding:2px 0;">${d}</div>`).join('');
+  const first  = new Date(schedCalYear, schedCalMonth, 1);
+  let dow      = first.getDay();
+  dow          = dow === 0 ? 6 : dow - 1;
+  const dim    = new Date(schedCalYear, schedCalMonth + 1, 0).getDate();
 
-  for (let i = 0; i < startDow; i++) html += '<div></div>';
+  for (let i = 0; i < dow; i++) html += '<div></div>';
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dt = new Date(schedCalYear, schedCalMonth, d);
-    dt.setHours(0,0,0,0);
-    const isToday    = dt.getTime() === today.getTime();
-    const dateStr    = `${schedCalYear}-${String(schedCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isSelected = dateStr === selected;
-    let bg = 'transparent', color = 'var(--muted)', fw = '400';
-    if (isSelected) { bg = 'var(--red)'; color = '#fff'; fw = '700'; }
-    else if (isToday) { bg = 'rgba(239,62,66,0.2)'; color = 'var(--red)'; fw = '700'; }
-    html += `<div onclick="selectSchedDate('${dateStr}')" style="font-size:10px;text-align:center;padding:4px 2px;border-radius:4px;cursor:pointer;background:${bg};color:${color};font-weight:${fw};">${d}</div>`;
+  for (let d = 1; d <= dim; d++) {
+    const ds  = schedCalYear + '-' + String(schedCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const dt  = new Date(schedCalYear, schedCalMonth, d); dt.setHours(0,0,0,0);
+    const isTod = dt.getTime() === today.getTime();
+    const isSel = ds === schedSelDate;
+    let bg = 'transparent', col = 'rgba(255,255,255,0.35)', fw = '400', br = '5px';
+    if (isSel)       { bg = 'var(--red)'; col = '#fff'; fw = '700'; }
+    else if (isTod)  { bg = 'rgba(239,62,66,0.2)'; col = 'var(--red)'; fw = '700'; }
+    html += `<div onclick="schedSelectDate('${ds}')" style="font-size:11px;text-align:center;padding:4px 2px;border-radius:${br};cursor:pointer;background:${bg};color:${col};font-weight:${fw};">${d}</div>`;
   }
-
   grid.innerHTML = html;
 }
 
-function selectSchedDate(dateStr) {
-  document.getElementById('sched-date').value = dateStr;
-  const parts = dateStr.split('-');
+function schedSelectDate(ds) {
+  schedSelDate  = ds;
+  const parts   = ds.split('-');
   schedCalYear  = parseInt(parts[0]);
   schedCalMonth = parseInt(parts[1]) - 1;
-  renderSchedCalendar();
-  loadSchedCalendar();
+  schedRenderCal();
+  schedLoadAndRender();
 }
 
-async function loadSchedCalendar() {
-  const dateStr = document.getElementById('sched-date').value;
-  if (!dateStr) return;
+function schedUpdateTimeDisplay() {
+  const h  = schedHour % 12 || 12;
+  const m  = String(schedMin).padStart(2,'0');
+  const ap = schedHour < 12 ? 'am' : 'pm';
+  document.getElementById('sched-time-display').textContent = h + ':' + m + ' ' + ap;
+}
 
-  const label = document.getElementById('sched-appt-label');
-  const appts = document.getElementById('sched-appts');
-  appts.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;">Loading...</div>';
+function schedAdjustTime(mins) {
+  let total = schedHour * 60 + schedMin + mins;
+  total = Math.max(0, Math.min(23*60+30, total));
+  schedHour = Math.floor(total / 60);
+  schedMin  = total % 60;
+  schedUpdateTimeDisplay();
+  schedRenderTimeline();
+}
 
-  const d = new Date(dateStr + 'T00:00:00');
-  const label_months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const days_long = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  label.textContent = days_long[d.getDay()] + ' ' + d.getDate() + ' ' + label_months[d.getMonth()] + ', existing appointments';
+async function schedLoadAndRender() {
+  if (!schedSelDate) return;
+
+  const dt = new Date(schedSelDate + 'T00:00:00');
+  document.getElementById('sched-tl-label').textContent =
+    SCHED_DAYS_L[dt.getDay()] + ' ' + dt.getDate() + ' ' + SCHED_MONTHS[dt.getMonth()];
+  document.getElementById('sched-tl-count').textContent = 'Loading...';
+
+  schedDayEvs = [];
+  schedRenderTimeline();
 
   try {
-    const start = new Date(dateStr + 'T00:00:00').toISOString();
-    const end   = new Date(dateStr + 'T23:59:59').toISOString();
+    const start = new Date(schedSelDate + 'T00:00:00').toISOString();
+    const end   = new Date(schedSelDate + 'T23:59:59').toISOString();
     const data  = await graphGet(
       `https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${start}&endDateTime=${end}&$orderby=start/dateTime&$select=subject,start,end,isAllDay&$top=20`
     );
-    const events = (data.value || []).filter(e => !e.isAllDay);
-    if (!events.length) {
-      appts.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;">No appointments, day is free.</div>';
-      return;
-    }
-    appts.innerHTML = events.map(ev => {
-      const s = new Date(ev.start.dateTime);
-      const t = s.toLocaleTimeString('en-NZ', { hour:'2-digit', minute:'2-digit', hour12:true });
-      return `<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);">
-        <span style="font-size:11px;color:var(--red);font-weight:700;min-width:56px;">${t}</span>
-        <span style="font-size:12px;color:var(--text);">${ev.subject}</span>
-      </div>`;
-    }).join('');
+    schedDayEvs = (data.value || []).filter(e => !e.isAllDay).map(ev => ({
+      label: ev.subject,
+      start: new Date(ev.start.dateTime).getHours() + new Date(ev.start.dateTime).getMinutes()/60,
+      dur:   (new Date(ev.end.dateTime) - new Date(ev.start.dateTime)) / 3600000
+    }));
+    document.getElementById('sched-tl-count').textContent =
+      schedDayEvs.length ? schedDayEvs.length + ' appointment' + (schedDayEvs.length !== 1 ? 's' : '') : 'No appointments';
   } catch(err) {
-    appts.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;">Could not load calendar.</div>';
+    document.getElementById('sched-tl-count').textContent = 'Could not load calendar';
   }
+  schedRenderTimeline();
+}
+
+function schedRenderTimeline() {
+  const body     = document.getElementById('sched-timeline');
+  const selStart = schedHour + schedMin / 60;
+  const title    = document.getElementById('sched-title')?.value || 'New event';
+
+  const now    = new Date();
+  const todStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  const nowFrac = now.getHours() + now.getMinutes()/60;
+  const showNow = schedSelDate === todStr && nowFrac >= TL_START && nowFrac <= TL_END;
+
+  let rows = '';
+  for (let h = TL_START; h < TL_END; h++) {
+    const ap   = h < 12 ? 'am' : 'pm';
+    const disp = (h % 12 || 12) + ap;
+    rows += `<div onclick="schedClickHour(${h})" style="display:flex;min-height:${TL_HOUR_H}px;cursor:pointer;transition:background 0.1s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+      <div style="width:52px;flex-shrink:0;font-size:10px;color:rgba(255,255,255,0.2);text-align:right;padding:4px 10px 0 0;line-height:1;">${disp}</div>
+      <div style="flex:1;border-top:1px solid rgba(255,255,255,0.05);position:relative;height:${TL_HOUR_H}px;padding-right:12px;"></div>
+    </div>`;
+  }
+
+  body.innerHTML = `<div style="position:relative;">${rows}</div>`;
+  const container = body.querySelector('div');
+
+  // Existing events
+  schedDayEvs.forEach(ev => {
+    const top = (ev.start - TL_START) * TL_HOUR_H;
+    const h   = Math.max(ev.dur * TL_HOUR_H - 2, 20);
+    const el  = document.createElement('div');
+    el.style.cssText = `position:absolute;top:${top}px;height:${h}px;left:52px;right:12px;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:2;background:rgba(55,138,221,0.2);border-left:2px solid #378ADD;color:#7fb8e8;`;
+    el.textContent = ev.label;
+    container.appendChild(el);
+  });
+
+  // New event block
+  if (selStart >= TL_START && selStart < TL_END) {
+    const top = (selStart - TL_START) * TL_HOUR_H;
+    const h   = Math.max((schedDuration / 60) * TL_HOUR_H - 2, 22);
+    const hr  = schedHour % 12 || 12;
+    const mn  = String(schedMin).padStart(2,'0');
+    const ap  = schedHour < 12 ? 'am' : 'pm';
+    const el  = document.createElement('div');
+    el.style.cssText = `position:absolute;top:${top}px;height:${h}px;left:52px;right:12px;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:3;background:rgba(239,62,66,0.22);border-left:2px solid var(--red);color:#f08a8c;`;
+    el.textContent = `${hr}:${mn}${ap} — ${title}`;
+    container.appendChild(el);
+  }
+
+  // Now line
+  if (showNow) {
+    const top = (nowFrac - TL_START) * TL_HOUR_H;
+    const nl  = document.createElement('div');
+    nl.style.cssText = `position:absolute;left:52px;right:0;height:1px;background:var(--red);z-index:5;top:${top}px;`;
+    const dot = document.createElement('div');
+    dot.style.cssText = `position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:var(--red);`;
+    nl.appendChild(dot);
+    container.appendChild(nl);
+  }
+
+  // Scroll to selected time
+  body.scrollTop = Math.max(0, (selStart - TL_START - 1.5)) * TL_HOUR_H;
+}
+
+function schedClickHour(h) {
+  schedHour = h;
+  schedMin  = 0;
+  schedUpdateTimeDisplay();
+  schedRenderTimeline();
 }
 
 async function createCalendarEvent() {
-  const title    = document.getElementById('sched-title').value.trim();
-  const dateStr  = document.getElementById('sched-date').value;
-  const timeStr  = document.getElementById('sched-time').value;
-  const duration = parseInt(document.getElementById('sched-duration').value);
-
-  if (!title || !dateStr || !timeStr) {
-    alert('Please fill in title, date and time.');
+  const title = document.getElementById('sched-title').value.trim();
+  if (!title || !schedSelDate) {
+    alert('Please fill in the title and select a date.');
     return;
   }
 
-  const start = new Date(`${dateStr}T${timeStr}:00`);
-  const end   = new Date(start.getTime() + duration * 60000);
+  const timeStr = String(schedHour).padStart(2,'0') + ':' + String(schedMin).padStart(2,'0');
+  const start   = new Date(`${schedSelDate}T${timeStr}:00`);
+  const end     = new Date(start.getTime() + schedDuration * 60000);
 
-  const body = {
+  const payload = {
     subject: title,
     start: { dateTime: start.toISOString(), timeZone: 'New Zealand Standard Time' },
     end:   { dateTime: end.toISOString(),   timeZone: 'New Zealand Standard Time' }
@@ -1709,7 +1831,7 @@ async function createCalendarEvent() {
     const resp  = await fetch('https://graph.microsoft.com/v1.0/me/events', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(payload)
     });
     if (!resp.ok) throw new Error('Calendar API error ' + resp.status);
     closeScheduleModal();
