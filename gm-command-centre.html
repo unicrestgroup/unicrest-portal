@@ -598,6 +598,17 @@
     border-color: var(--red);
     color: #fff;
   }
+  .ep-action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid rgba(255,255,255,0.12); background: var(--surface2);
+    color: var(--text); border-radius: 6px; padding: 8px 16px; font-size: 13px;
+    cursor: pointer; font-family: var(--font); transition: opacity 0.15s;
+  }
+  .ep-action-btn:hover { opacity: 0.85; }
+  .ep-success { background: var(--green); border-color: var(--green); color: #0a2e1a; }
+  .ep-danger  { background: var(--red);   border-color: var(--red);   color: #fff; }
+  .ep-info    { background: #378ADD;      border-color: #378ADD;      color: #fff; }
+
   .loading {
     display: flex;
     align-items: center;
@@ -790,6 +801,85 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ── FULL EMAIL PANEL ───────────────────────────────────────────────────── -->
+<div id="email-panel" style="display:none; position:fixed; inset:0; z-index:200; background:var(--bg); overflow-y:auto;">
+  <div style="max-width:860px; margin:0 auto; padding:20px 24px 60px;">
+    <button onclick="closeEmailPanel()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:0;margin-bottom:16px;">← Back to digest</button>
+    <div id="ep-subject" style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.3;"></div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+      <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="font-size:11px;color:var(--muted);min-width:44px;">From</span><span id="ep-from" style="font-size:12px;color:var(--text);"></span></div>
+      <div style="display:flex;gap:8px;margin-bottom:4px;"><span style="font-size:11px;color:var(--muted);min-width:44px;">Date</span><span id="ep-date" style="font-size:12px;color:var(--text);"></span></div>
+      <div style="display:flex;gap:8px;"><span style="font-size:11px;color:var(--muted);min-width:44px;">Folder</span><span id="ep-folder" style="font-size:12px;color:var(--red);"></span></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="ep-action-btn ep-success" onclick="epMoveToDone()">✓ Move to Done</button>
+      <button class="ep-action-btn ep-danger" onclick="epMoveToJunk()">✕ Move to Junk</button>
+      <button class="ep-action-btn ep-info" onclick="openScheduleModal()">📅 Schedule to Calendar</button>
+      <button class="ep-action-btn" onclick="epReply()">↩ Reply</button>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px 24px;">
+      <div id="ep-body" style="font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCHEDULE MODAL ─────────────────────────────────────────────────────── -->
+<div id="schedule-overlay" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid rgba(255,255,255,0.12);border-radius:14px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);">
+      <span style="font-size:14px;font-weight:700;color:var(--text);">📅 Schedule to Calendar</span>
+      <button onclick="closeScheduleModal()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <div style="margin-bottom:14px;">
+        <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Event title</label>
+        <input class="input-sm" id="sched-title" style="width:100%;" placeholder="Event title..." />
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <div style="flex:1;">
+          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Date</label>
+          <input class="input-sm" id="sched-date" type="date" style="width:100%;" onchange="loadSchedCalendar()" />
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Start time</label>
+          <input class="input-sm" id="sched-time" type="time" style="width:100%;" />
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);display:block;margin-bottom:6px;">Duration</label>
+          <select class="input-sm" id="sched-duration" style="width:100%;">
+            <option value="30">30 min</option>
+            <option value="60" selected>1 hour</option>
+            <option value="90">1.5 hours</option>
+            <option value="120">2 hours</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Mini calendar -->
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span id="sched-cal-month" style="font-size:12px;font-weight:700;color:var(--text);"></span>
+          <div style="display:flex;gap:4px;">
+            <button onclick="schedCalNav(-1)" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px;">‹</button>
+            <button onclick="schedCalNav(1)"  style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:2px 8px;cursor:pointer;font-size:12px;">›</button>
+          </div>
+        </div>
+        <div id="sched-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;"></div>
+      </div>
+
+      <!-- Appointments on selected day -->
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;" id="sched-appt-label">Appointments on selected day</div>
+        <div id="sched-appts" style="font-size:12px;color:var(--muted);font-style:italic;">Select a date to see appointments.</div>
+      </div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeScheduleModal()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:6px;padding:8px 18px;font-size:12px;cursor:pointer;font-family:var(--font);">Cancel</button>
+      <button onclick="createCalendarEvent()" style="background:var(--red);border:none;color:#fff;border-radius:6px;padding:8px 18px;font-size:12px;cursor:pointer;font-family:var(--font);font-weight:700;">Add to Calendar</button>
+    </div>
   </div>
 </div>
 
@@ -1090,9 +1180,11 @@ function renderEmailList(emails, folderLabel) {
           ${e._folder ? `<span style="font-size:10px;color:var(--muted);font-style:italic;">${e._folder}</span>` : ''}
         </div>
         <div class="digest-subject">${e.subject}</div>
-        <div style="display:flex;gap:6px;margin-top:7px;">
-          <button class="btn-sm" style="font-size:10px;padding:3px 8px;background:var(--green);border-color:var(--green);color:#fff;" onclick="moveToDone(${i})">✓ Done</button>
+        <div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;">
+          <button class="btn-sm" style="font-size:10px;padding:3px 8px;background:var(--green);border-color:var(--green);color:#0a2e1a;" onclick="moveToDone(${i})">✓ Done</button>
           <button class="btn-sm" style="font-size:10px;padding:3px 8px;background:var(--red);border-color:var(--red);color:#fff;" onclick="moveToJunk(${i})">✕ Junk</button>
+          <button class="btn-sm" style="font-size:10px;padding:3px 8px;background:#378ADD;border-color:#378ADD;color:#fff;" onclick="currentEmailIndex=${i};openScheduleModal()">📅 Schedule</button>
+          <button class="btn-sm" style="font-size:10px;padding:3px 8px;" onclick="openEmailPanel(${i})">Open →</button>
         </div>
       </div>`).join('')}
   `;
@@ -1409,6 +1501,224 @@ function loadLocalData() {
   loadPriorities();
   loadProjects();
   renderNotes();
+}
+
+// ── EMAIL PANEL ───────────────────────────────────────────────────────────────
+
+var currentEmailIndex = null;
+
+function openEmailPanel(i) {
+  const e = rawEmails[i];
+  if (!e) return;
+  currentEmailIndex = i;
+
+  document.getElementById('ep-subject').textContent = e.subject || '(no subject)';
+  document.getElementById('ep-from').textContent =
+    (e.from?.emailAddress?.name ? e.from.emailAddress.name + '  ' : '') +
+    '<' + (e.from?.emailAddress?.address || '') + '>';
+  document.getElementById('ep-date').textContent =
+    e.receivedDateTime ? new Date(e.receivedDateTime).toLocaleString('en-NZ', {
+      weekday:'long', day:'2-digit', month:'long', year:'numeric',
+      hour:'2-digit', minute:'2-digit', hour12:true
+    }) : '';
+  document.getElementById('ep-folder').textContent = e._folder || '';
+  document.getElementById('ep-body').textContent = e.bodyPreview || '(no preview available)';
+
+  document.getElementById('email-panel').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+
+  // Load full body async
+  loadFullEmailBody(e.id);
+}
+
+async function loadFullEmailBody(id) {
+  try {
+    const data = await graphGet(`https://graph.microsoft.com/v1.0/me/messages/${id}?$select=body`);
+    const html = data.body?.content || '';
+    const el = document.getElementById('ep-body');
+    if (data.body?.contentType === 'html') {
+      el.innerHTML = html;
+      el.style.whiteSpace = 'normal';
+    } else {
+      el.textContent = html;
+    }
+  } catch(e) { console.error(e); }
+}
+
+function closeEmailPanel() {
+  document.getElementById('email-panel').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function epMoveToDone() {
+  if (currentEmailIndex === null) return;
+  await moveToDone(currentEmailIndex);
+  closeEmailPanel();
+}
+
+async function epMoveToJunk() {
+  if (currentEmailIndex === null) return;
+  await moveToJunk(currentEmailIndex);
+  closeEmailPanel();
+}
+
+function epReply() {
+  const e = rawEmails[currentEmailIndex];
+  if (!e) return;
+  const addr = e.from?.emailAddress?.address || '';
+  window.open('mailto:' + addr + '?subject=Re: ' + encodeURIComponent(e.subject || ''));
+}
+
+// ── SCHEDULE MODAL ────────────────────────────────────────────────────────────
+
+var schedCalYear  = new Date().getFullYear();
+var schedCalMonth = new Date().getMonth();
+var schedDayEvents = [];
+
+function openScheduleModal() {
+  const e = currentEmailIndex !== null ? rawEmails[currentEmailIndex] : null;
+  const title = e ? (e.subject || '') : '';
+  document.getElementById('sched-title').value = title;
+
+  const now = new Date();
+  now.setDate(now.getDate() + 1);
+  const dateStr = now.toISOString().split('T')[0];
+  document.getElementById('sched-date').value = dateStr;
+  document.getElementById('sched-time').value = '10:00';
+
+  schedCalYear  = now.getFullYear();
+  schedCalMonth = now.getMonth();
+  renderSchedCalendar();
+  loadSchedCalendar();
+
+  document.getElementById('schedule-overlay').style.display = 'flex';
+}
+
+function closeScheduleModal() {
+  document.getElementById('schedule-overlay').style.display = 'none';
+}
+
+function schedCalNav(dir) {
+  schedCalMonth += dir;
+  if (schedCalMonth > 11) { schedCalMonth = 0; schedCalYear++; }
+  if (schedCalMonth < 0)  { schedCalMonth = 11; schedCalYear--; }
+  renderSchedCalendar();
+}
+
+function renderSchedCalendar() {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('sched-cal-month').textContent = months[schedCalMonth] + ' ' + schedCalYear;
+
+  const grid = document.getElementById('sched-cal-grid');
+  const days = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const today = new Date(); today.setHours(0,0,0,0);
+  const selected = document.getElementById('sched-date').value;
+
+  const firstDay = new Date(schedCalYear, schedCalMonth, 1);
+  let startDow = firstDay.getDay(); // 0=Sun
+  startDow = startDow === 0 ? 6 : startDow - 1; // convert to Mon=0
+  const daysInMonth = new Date(schedCalYear, schedCalMonth + 1, 0).getDate();
+
+  let html = days.map(d => `<div style="font-size:9px;color:var(--muted);text-align:center;padding:2px 0;">${d}</div>`).join('');
+
+  for (let i = 0; i < startDow; i++) html += '<div></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dt = new Date(schedCalYear, schedCalMonth, d);
+    dt.setHours(0,0,0,0);
+    const isToday    = dt.getTime() === today.getTime();
+    const dateStr    = `${schedCalYear}-${String(schedCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isSelected = dateStr === selected;
+    let bg = 'transparent', color = 'var(--muted)', fw = '400';
+    if (isSelected) { bg = 'var(--red)'; color = '#fff'; fw = '700'; }
+    else if (isToday) { bg = 'rgba(239,62,66,0.2)'; color = 'var(--red)'; fw = '700'; }
+    html += `<div onclick="selectSchedDate('${dateStr}')" style="font-size:10px;text-align:center;padding:4px 2px;border-radius:4px;cursor:pointer;background:${bg};color:${color};font-weight:${fw};">${d}</div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function selectSchedDate(dateStr) {
+  document.getElementById('sched-date').value = dateStr;
+  const parts = dateStr.split('-');
+  schedCalYear  = parseInt(parts[0]);
+  schedCalMonth = parseInt(parts[1]) - 1;
+  renderSchedCalendar();
+  loadSchedCalendar();
+}
+
+async function loadSchedCalendar() {
+  const dateStr = document.getElementById('sched-date').value;
+  if (!dateStr) return;
+
+  const label = document.getElementById('sched-appt-label');
+  const appts = document.getElementById('sched-appts');
+  appts.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;">Loading...</div>';
+
+  const d = new Date(dateStr + 'T00:00:00');
+  const label_months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const days_long = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  label.textContent = days_long[d.getDay()] + ' ' + d.getDate() + ' ' + label_months[d.getMonth()] + ', existing appointments';
+
+  try {
+    const start = new Date(dateStr + 'T00:00:00').toISOString();
+    const end   = new Date(dateStr + 'T23:59:59').toISOString();
+    const data  = await graphGet(
+      `https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${start}&endDateTime=${end}&$orderby=start/dateTime&$select=subject,start,end,isAllDay&$top=20`
+    );
+    const events = (data.value || []).filter(e => !e.isAllDay);
+    if (!events.length) {
+      appts.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;">No appointments, day is free.</div>';
+      return;
+    }
+    appts.innerHTML = events.map(ev => {
+      const s = new Date(ev.start.dateTime);
+      const t = s.toLocaleTimeString('en-NZ', { hour:'2-digit', minute:'2-digit', hour12:true });
+      return `<div style="display:flex;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:11px;color:var(--red);font-weight:700;min-width:56px;">${t}</span>
+        <span style="font-size:12px;color:var(--text);">${ev.subject}</span>
+      </div>`;
+    }).join('');
+  } catch(err) {
+    appts.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;">Could not load calendar.</div>';
+  }
+}
+
+async function createCalendarEvent() {
+  const title    = document.getElementById('sched-title').value.trim();
+  const dateStr  = document.getElementById('sched-date').value;
+  const timeStr  = document.getElementById('sched-time').value;
+  const duration = parseInt(document.getElementById('sched-duration').value);
+
+  if (!title || !dateStr || !timeStr) {
+    alert('Please fill in title, date and time.');
+    return;
+  }
+
+  const start = new Date(`${dateStr}T${timeStr}:00`);
+  const end   = new Date(start.getTime() + duration * 60000);
+
+  const body = {
+    subject: title,
+    start: { dateTime: start.toISOString(), timeZone: 'New Zealand Standard Time' },
+    end:   { dateTime: end.toISOString(),   timeZone: 'New Zealand Standard Time' }
+  };
+
+  try {
+    const token = await getToken();
+    const resp  = await fetch('https://graph.microsoft.com/v1.0/me/events', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) throw new Error('Calendar API error ' + resp.status);
+    closeScheduleModal();
+    loadCalendar();
+    alert('Added to calendar: ' + title);
+  } catch(err) {
+    alert('Could not create event: ' + err.message);
+    console.error(err);
+  }
 }
 
 // ── BOOT ── triggered by MSAL script onload
