@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meeting Runner | Unicrest Group</title>
 <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-authentication-library-js/2.38.0/msal-browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.0/lib/msal-browser.min.js"></script>
 <style>
 :root {
   --red:#EF3E42;--dark:#231F20;--mid:#464749;--bg:#EEEEEE;--white:#fff;
@@ -196,27 +196,39 @@ function saveCF(sid, actions) {
 
 /* ═══ AUTH ═══ */
 async function initAuth() {
-  msalApp = new msal.PublicClientApplication({
-    auth: { clientId:CONFIG.clientId, authority:CONFIG.authority, redirectUri:CONFIG.redirectUri },
-    cache: { cacheLocation:'localStorage', storeAuthStateInCookie:false }
-  });
-  await msalApp.initialize();
-  const resp = await msalApp.handleRedirectPromise();
-  if (resp) { accessToken=resp.accessToken; currentUser=resp.account; }
-  else {
-    const accts = msalApp.getAllAccounts();
-    if (accts.length) {
-      currentUser = accts[0];
-      try { const t = await msalApp.acquireTokenSilent({scopes:CONFIG.scopes, account:currentUser}); accessToken=t.accessToken; }
-      catch { currentUser=null; }
+  try {
+    if (typeof msal === 'undefined') { showErr('MSAL library failed to load. Check your internet connection.'); return; }
+    msalApp = new msal.PublicClientApplication({
+      auth: { clientId:CONFIG.clientId, authority:CONFIG.authority, redirectUri:CONFIG.redirectUri },
+      cache: { cacheLocation:'localStorage', storeAuthStateInCookie:false }
+    });
+    await msalApp.initialize();
+    const resp = await msalApp.handleRedirectPromise();
+    if (resp) { accessToken=resp.accessToken; currentUser=resp.account; }
+    else {
+      const accts = msalApp.getAllAccounts();
+      if (accts.length) {
+        currentUser = accts[0];
+        try { const t = await msalApp.acquireTokenSilent({scopes:CONFIG.scopes, account:currentUser}); accessToken=t.accessToken; }
+        catch { currentUser=null; }
+      }
     }
+    if (currentUser && accessToken) {
+      S.screen='dash';
+      document.getElementById('userEl').textContent = currentUser.name||currentUser.username;
+      loadCal();
+    }
+    render();
+  } catch(err) {
+    console.error('Auth init error:', err);
+    showErr('Auth error: ' + err.message);
+    S.screen='login';
+    render();
   }
-  if (currentUser && accessToken) {
-    S.screen='dash';
-    document.getElementById('userEl').textContent = currentUser.name||currentUser.username;
-    loadCal();
-  }
-  render();
+}
+function showErr(msg) {
+  const app=document.getElementById('app');
+  app.innerHTML='<div style="background:var(--lr);color:var(--red);padding:14px 16px;border-radius:var(--r);margin:20px 0;font-size:13px"><strong>Error:</strong> '+e(msg)+'</div>' + rLogin();
 }
 
 async function login() { try { await msalApp.loginRedirect({scopes:CONFIG.scopes}); } catch(e) { alert('Login failed: '+e.message); } }
@@ -505,6 +517,7 @@ function copySummary(){
 function e(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 /* ═══ INIT ═══ */
+render();
 initAuth();
 </script>
 </body>
