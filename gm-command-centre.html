@@ -581,7 +581,23 @@
 
   .note-del:hover { opacity: 1; }
 
-  /* ── LOADING / EMPTY ──────────────────────────────────────────────── */
+  .folder-toggle {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .folder-toggle.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
   .loading {
     display: flex;
     align-items: center;
@@ -682,6 +698,12 @@
       <div class="card-header">
         <div class="card-title"><span class="card-title-dot"></span>Morning Email Digest</div>
         <button class="btn-sm btn-red" onclick="summariseEmails()">AI Summarise</button>
+      </div>
+      <div style="padding: 8px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap;">
+        <button class="folder-toggle active" id="ft-inbox" onclick="toggleFolder('inbox')">Inbox</button>
+        <button class="folder-toggle active" id="ft-regan" onclick="toggleFolder('regan')">Regan To Do</button>
+        <button class="folder-toggle active" id="ft-toolbox" onclick="toggleFolder('toolbox')">Toolbox Meeting</button>
+        <button class="btn-sm" style="margin-left:auto;" onclick="loadEmails()">↻</button>
       </div>
       <div class="card-body" id="email-body">
         <div class="loading"><div class="spinner"></div>Loading emails...</div>
@@ -1340,7 +1362,23 @@ const CONFIG = {
 
   .note-del:hover { opacity: 1; }
 
-  /* ── LOADING / EMPTY ──────────────────────────────────────────────── */
+  .folder-toggle {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .folder-toggle.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+  }
   .loading {
     display: flex;
     align-items: center;
@@ -1441,6 +1479,12 @@ const CONFIG = {
       <div class="card-header">
         <div class="card-title"><span class="card-title-dot"></span>Morning Email Digest</div>
         <button class="btn-sm btn-red" onclick="summariseEmails()">AI Summarise</button>
+      </div>
+      <div style="padding: 8px 18px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap;">
+        <button class="folder-toggle active" id="ft-inbox" onclick="toggleFolder('inbox')">Inbox</button>
+        <button class="folder-toggle active" id="ft-regan" onclick="toggleFolder('regan')">Regan To Do</button>
+        <button class="folder-toggle active" id="ft-toolbox" onclick="toggleFolder('toolbox')">Toolbox Meeting</button>
+        <button class="btn-sm" style="margin-left:auto;" onclick="loadEmails()">↻</button>
       </div>
       <div class="card-body" id="email-body">
         <div class="loading"><div class="spinner"></div>Loading emails...</div>
@@ -1671,42 +1715,64 @@ async function loadCalendar() {
 
 let rawEmails = [];
 
+var activeFolders = { inbox: true, regan: true, toolbox: true };
+
+function toggleFolder(key) {
+  activeFolders[key] = !activeFolders[key];
+  const btn = document.getElementById('ft-' + key);
+  btn.classList.toggle('active', activeFolders[key]);
+  loadEmails();
+}
+
 async function loadEmails() {
   const body = document.getElementById('email-body');
   body.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
 
   try {
-    // Search inbox child folders for "Regan To Do"
+    // Get inbox child folders once
     const foldersData = await graphGet(
       `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/childFolders?$top=50`
     );
-    console.log('Inbox subfolders:', (foldersData.value || []).map(f => f.displayName));
-    const folder = (foldersData.value || []).find(f =>
-      f.displayName.toLowerCase() === 'regan to do'
-    );
+    const childFolders = foldersData.value || [];
 
-    let url;
-    if (folder) {
-      url = `https://graph.microsoft.com/v1.0/me/mailFolders/${folder.id}/messages`
-        + `?$orderby=receivedDateTime desc`
-        + `&$select=subject,from,bodyPreview,receivedDateTime,isRead&$top=20`;
-    } else {
-      // Fallback to inbox if folder not found
-      url = `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`
-        + `?$orderby=receivedDateTime desc`
-        + `&$select=subject,from,bodyPreview,receivedDateTime,isRead&$top=20`;
+    const findChild = name => childFolders.find(f => f.displayName.toLowerCase() === name.toLowerCase());
+
+    // Build list of folder IDs to query
+    const targets = [];
+    if (activeFolders.inbox)   targets.push({ label: 'Inbox',           url: `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages` });
+    if (activeFolders.regan) {
+      const f = findChild('Regan To Do');
+      if (f) targets.push({ label: 'Regan To Do', url: `https://graph.microsoft.com/v1.0/me/mailFolders/${f.id}/messages` });
+    }
+    if (activeFolders.toolbox) {
+      const f = findChild('Toolbox Meeting');
+      if (f) targets.push({ label: 'Toolbox Meeting', url: `https://graph.microsoft.com/v1.0/me/mailFolders/${f.id}/messages` });
     }
 
-    const data = await graphGet(url);
-    rawEmails = data.value || [];
-
-    if (!rawEmails.length) {
-      body.innerHTML = `<div class="empty">${folder ? '"Regan To Do"' : 'Inbox'} is empty.</div>`;
+    if (!targets.length) {
+      body.innerHTML = '<div class="empty">No folders selected.</div>';
+      rawEmails = [];
       return;
     }
 
-    const folderLabel = folder ? '"Regan To Do"' : 'Inbox (folder not found)';
-    renderEmailList(rawEmails, folderLabel);
+    // Fetch all selected folders in parallel
+    const results = await Promise.all(targets.map(t =>
+      graphGet(t.url + `?$orderby=receivedDateTime desc&$select=subject,from,bodyPreview,receivedDateTime,isRead&$top=15`)
+        .then(d => (d.value || []).map(e => ({ ...e, _folder: t.label })))
+    ));
+
+    // Merge and sort by date
+    rawEmails = results.flat().sort((a, b) =>
+      new Date(b.receivedDateTime) - new Date(a.receivedDateTime)
+    );
+
+    if (!rawEmails.length) {
+      body.innerHTML = '<div class="empty">No emails in selected folders.</div>';
+      return;
+    }
+
+    const labels = targets.map(t => t.label).join(', ');
+    renderEmailList(rawEmails, labels);
   } catch (err) {
     body.innerHTML = `<div class="empty">Could not load emails. Check permissions.</div>`;
     console.error(err);
@@ -1718,9 +1784,12 @@ function renderEmailList(emails, folderLabel) {
   const label = folderLabel || 'Inbox';
   body.innerHTML = `
     <div class="digest-status">${emails.length} email${emails.length !== 1 ? 's' : ''} in ${label}. Press "AI Summarise" to analyse.</div>
-    ${emails.slice(0,8).map(e => `
+    ${emails.slice(0,12).map(e => `
       <div class="digest-item">
-        <div class="digest-from">${e.from?.emailAddress?.name || e.from?.emailAddress?.address || 'Unknown'}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div class="digest-from">${e.from?.emailAddress?.name || e.from?.emailAddress?.address || 'Unknown'}</div>
+          ${e._folder ? `<span style="font-size:10px;color:var(--muted);font-style:italic;">${e._folder}</span>` : ''}
+        </div>
         <div class="digest-subject">${e.subject}</div>
       </div>`).join('')}
   `;
@@ -2119,42 +2188,64 @@ async function loadCalendar() {
 
 let rawEmails = [];
 
+var activeFolders = { inbox: true, regan: true, toolbox: true };
+
+function toggleFolder(key) {
+  activeFolders[key] = !activeFolders[key];
+  const btn = document.getElementById('ft-' + key);
+  btn.classList.toggle('active', activeFolders[key]);
+  loadEmails();
+}
+
 async function loadEmails() {
   const body = document.getElementById('email-body');
   body.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
 
   try {
-    // Search inbox child folders for "Regan To Do"
+    // Get inbox child folders once
     const foldersData = await graphGet(
       `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/childFolders?$top=50`
     );
-    console.log('Inbox subfolders:', (foldersData.value || []).map(f => f.displayName));
-    const folder = (foldersData.value || []).find(f =>
-      f.displayName.toLowerCase() === 'regan to do'
-    );
+    const childFolders = foldersData.value || [];
 
-    let url;
-    if (folder) {
-      url = `https://graph.microsoft.com/v1.0/me/mailFolders/${folder.id}/messages`
-        + `?$orderby=receivedDateTime desc`
-        + `&$select=subject,from,bodyPreview,receivedDateTime,isRead&$top=20`;
-    } else {
-      // Fallback to inbox if folder not found
-      url = `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages`
-        + `?$orderby=receivedDateTime desc`
-        + `&$select=subject,from,bodyPreview,receivedDateTime,isRead&$top=20`;
+    const findChild = name => childFolders.find(f => f.displayName.toLowerCase() === name.toLowerCase());
+
+    // Build list of folder IDs to query
+    const targets = [];
+    if (activeFolders.inbox)   targets.push({ label: 'Inbox',           url: `https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages` });
+    if (activeFolders.regan) {
+      const f = findChild('Regan To Do');
+      if (f) targets.push({ label: 'Regan To Do', url: `https://graph.microsoft.com/v1.0/me/mailFolders/${f.id}/messages` });
+    }
+    if (activeFolders.toolbox) {
+      const f = findChild('Toolbox Meeting');
+      if (f) targets.push({ label: 'Toolbox Meeting', url: `https://graph.microsoft.com/v1.0/me/mailFolders/${f.id}/messages` });
     }
 
-    const data = await graphGet(url);
-    rawEmails = data.value || [];
-
-    if (!rawEmails.length) {
-      body.innerHTML = `<div class="empty">${folder ? '"Regan To Do"' : 'Inbox'} is empty.</div>`;
+    if (!targets.length) {
+      body.innerHTML = '<div class="empty">No folders selected.</div>';
+      rawEmails = [];
       return;
     }
 
-    const folderLabel = folder ? '"Regan To Do"' : 'Inbox (folder not found)';
-    renderEmailList(rawEmails, folderLabel);
+    // Fetch all selected folders in parallel
+    const results = await Promise.all(targets.map(t =>
+      graphGet(t.url + `?$orderby=receivedDateTime desc&$select=subject,from,bodyPreview,receivedDateTime,isRead&$top=15`)
+        .then(d => (d.value || []).map(e => ({ ...e, _folder: t.label })))
+    ));
+
+    // Merge and sort by date
+    rawEmails = results.flat().sort((a, b) =>
+      new Date(b.receivedDateTime) - new Date(a.receivedDateTime)
+    );
+
+    if (!rawEmails.length) {
+      body.innerHTML = '<div class="empty">No emails in selected folders.</div>';
+      return;
+    }
+
+    const labels = targets.map(t => t.label).join(', ');
+    renderEmailList(rawEmails, labels);
   } catch (err) {
     body.innerHTML = `<div class="empty">Could not load emails. Check permissions.</div>`;
     console.error(err);
@@ -2166,9 +2257,12 @@ function renderEmailList(emails, folderLabel) {
   const label = folderLabel || 'Inbox';
   body.innerHTML = `
     <div class="digest-status">${emails.length} email${emails.length !== 1 ? 's' : ''} in ${label}. Press "AI Summarise" to analyse.</div>
-    ${emails.slice(0,8).map(e => `
+    ${emails.slice(0,12).map(e => `
       <div class="digest-item">
-        <div class="digest-from">${e.from?.emailAddress?.name || e.from?.emailAddress?.address || 'Unknown'}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <div class="digest-from">${e.from?.emailAddress?.name || e.from?.emailAddress?.address || 'Unknown'}</div>
+          ${e._folder ? `<span style="font-size:10px;color:var(--muted);font-style:italic;">${e._folder}</span>` : ''}
+        </div>
         <div class="digest-subject">${e.subject}</div>
       </div>`).join('')}
   `;
