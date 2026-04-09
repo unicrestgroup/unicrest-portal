@@ -1152,6 +1152,8 @@ async function moveToJunk(i) {
     alert('Could not move email: ' + err.message);
   }
 }
+
+async function summariseEmails() {
   if (!rawEmails.length) return;
 
   const apiKey = getApiKey();
