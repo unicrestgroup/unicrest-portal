@@ -194,6 +194,11 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .app-card:hover { border-color: var(--purple); box-shadow: 0 2px 12px rgba(124,16,154,0.08); }
+.app-card[draggable="true"] { cursor: grab; }
+.app-card[draggable="true"]:active { cursor: grabbing; }
+.app-card.drag-over { border-color: var(--purple); border-style: dashed; opacity: 0.7; }
+.app-card.dragging { opacity: 0.35; }
+.drag-hint { font-size: 11px; color: #BBBBBB; font-family: var(--lato); font-weight: 300; padding: 0 2rem 0.5rem; }
 .card-top { display: flex; align-items: center; justify-content: space-between; }
 .card-emoji { font-size: 26px; line-height: 1; }
 .card-cat {
@@ -348,6 +353,7 @@ header { background: var(--black); position: sticky; top: 0; z-index: 10; }
       <input class="search-input" type="text" id="search-input"
              placeholder="Search apps..." oninput="filterApps(this.value)">
     </div>
+    <p class="drag-hint" id="drag-hint" style="display:none;">Drag cards to reorder</p>
     <div class="app-grid" id="app-grid"></div>
     <div class="portal-footer">
       <span class="footer-tagline">Shadowspec Internal — Unicrest App Portal</span>
@@ -795,6 +801,67 @@ function showView(v) {
 }
 
 function filterApps(val) { currentSearch = val; renderGrid(); }
+
+function getOrderKey() { return 'unicrest_order_' + currentUserEmail; }
+
+function getSavedOrder() {
+  try { return JSON.parse(localStorage.getItem(getOrderKey()) || '[]'); } catch { return []; }
+}
+
+function saveOrder(ids) {
+  try { localStorage.setItem(getOrderKey(), JSON.stringify(ids)); } catch {}
+}
+
+function applyOrder(apps) {
+  const order = getSavedOrder();
+  if (!order.length) return apps;
+  const map = new Map(apps.map(a => [a.id, a]));
+  const ordered = order.map(id => map.get(id)).filter(Boolean);
+  const rest = apps.filter(a => !order.includes(a.id));
+  return [...ordered, ...rest];
+}
+
+let dragSrcId = null;
+
+function onDragStart(e) {
+  dragSrcId = e.currentTarget.dataset.id;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  const targetId = e.currentTarget.dataset.id;
+  if (!dragSrcId || dragSrcId === targetId) return;
+  const ordered = getFiltered();
+  const ids = ordered.map(a => a.id);
+  const fromIdx = ids.indexOf(dragSrcId);
+  const toIdx   = ids.indexOf(targetId);
+  if (fromIdx === -1 || toIdx === -1) return;
+  ids.splice(fromIdx, 1);
+  ids.splice(toIdx, 0, dragSrcId);
+  saveOrder(ids);
+  const map = new Map(allApps.map(a => [a.id, a]));
+  allApps = [...ids.map(id => map.get(id)).filter(Boolean), ...allApps.filter(a => !ids.includes(a.id))];
+  renderGrid();
+}
+
+function onDragEnd(e) {
+  document.querySelectorAll('.app-card').forEach(c => {
+    c.classList.remove('dragging', 'drag-over');
+  });
+  dragSrcId = null;
+}
 function setCat(cat) { currentCat = cat; renderCatPills(); renderGrid(); }
 
 function isVisible(a) {
@@ -806,11 +873,12 @@ function isVisible(a) {
 
 function getFiltered() {
   const s = currentSearch.toLowerCase();
-  return allApps.filter(a =>
+  const filtered = allApps.filter(a =>
     isVisible(a) &&
     (currentCat === 'All' || a.category === currentCat) &&
     (!s || a.name.toLowerCase().includes(s) || a.description.toLowerCase().includes(s))
   );
+  return applyOrder(filtered);
 }
 
 function renderCatPills() {
@@ -824,7 +892,9 @@ function renderGrid() {
   renderCatPills();
   const apps = getFiltered();
   const grid = document.getElementById('app-grid');
+  const hint = document.getElementById('drag-hint');
   if (!apps.length) {
+    if (hint) hint.style.display = 'none';
     grid.innerHTML = `<div class="empty">${
       allApps.length === 0
         ? 'No apps yet.<br>Click "+ Add app" to add your first one.'
@@ -832,8 +902,14 @@ function renderGrid() {
     }</div>`;
     return;
   }
+  if (hint) hint.style.display = apps.length > 1 ? 'block' : 'none';
   grid.innerHTML = apps.map(a => `
-    <div class="app-card">
+    <div class="app-card" draggable="true" data-id="${a.id}"
+      ondragstart="onDragStart(event)"
+      ondragover="onDragOver(event)"
+      ondragleave="onDragLeave(event)"
+      ondrop="onDrop(event)"
+      ondragend="onDragEnd(event)">
       <div class="card-top">
         <span class="card-emoji">${a.emoji}</span>
         <span class="card-cat">${esc(a.category)}</span>
