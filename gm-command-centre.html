@@ -633,7 +633,7 @@
   <div class="login-card">
     <h2>GM Command Centre</h2>
     <p>Sign in with your Microsoft account to continue.</p>
-    <button class="btn-ms" onclick="signIn()" disabled style="opacity:0.6;cursor:not-allowed;">
+    <button class="btn-ms" onclick="signIn()">
       <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
         <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
@@ -754,10 +754,10 @@
 // CONFIG — replace these values with your own before deploying
 // ─────────────────────────────────────────────────────────────────────────────
 const CONFIG = {
-  clientId:       'REPLACE_WITH_CLIENT_ID',
-  tenantId:       'REPLACE_WITH_TENANT_ID',
+  clientId:       'c6595fee-5861-474a-b604-4487ac361580',
+  tenantId:       '8c8bc073-973e-4ddf-9384-38498e8aa324',
   redirectUri:    'https://unicrestgroup.github.io/unicrest-portal/gm-command-centre.html',
-  anthropicKey:   'REPLACE_WITH_ANTHROPIC_API_KEY'   // sk-ant-...
+  anthropicKey:   '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'   // sk-ant-...
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -799,9 +799,14 @@ async function init() {
 
 async function signIn() {
   try {
+    if (!msalInstance) {
+      msalInstance = new msal.PublicClientApplication(msalConfig);
+      await msalInstance.initialize();
+    }
     await msalInstance.loginRedirect({ scopes: SCOPES });
   } catch (e) {
     console.error(e);
+    alert('Sign in error: ' + e.message);
   }
 }
 
