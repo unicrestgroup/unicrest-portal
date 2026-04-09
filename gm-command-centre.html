@@ -225,7 +225,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ep-btn-g{background:var(--green);border-color:var(--green);color:#0a2e1a;}
 .ep-btn-r{background:var(--red);border-color:var(--red);color:#fff;}
 .ep-btn-p{background:#378ADD;border-color:#378ADD;color:#fff;}
-.ep-body-wrap{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:20px 24px;}
+.ep-body-wrap{background:transparent;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
 #ep-body{font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;}
 
 /* SCHEDULE MODAL */
@@ -418,7 +418,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="ep-btn ep-btn-p" onclick="openScheduleModal()">📅 Schedule to Calendar</button>
       <button class="ep-btn" onclick="epReply()">↩ Reply</button>
     </div>
-    <div class="ep-body-wrap"><div id="ep-body"></div></div>
+    <div class="ep-body-wrap"><div id="ep-body" style="background:#fff;color:#1A1A1A;border-radius:8px;padding:24px;"></div></div>
   </div>
 </div>
 
@@ -670,7 +670,35 @@ function openEmailPanel(i){
   document.body.style.overflow='hidden';
   loadFullEmailBody(e.id);
 }
-async function loadFullEmailBody(id){try{const data=await graphGet(`https://graph.microsoft.com/v1.0/me/messages/${id}?$select=body`);const el=document.getElementById('ep-body');if(data.body?.contentType==='html'){el.innerHTML=data.body.content;el.style.whiteSpace='normal';}else{el.textContent=data.body?.content||'';}}catch(e){console.error(e);}}
+async function loadFullEmailBody(id){
+  try{
+    const data=await graphGet(`https://graph.microsoft.com/v1.0/me/messages/${id}?$select=body`);
+    const el=document.getElementById('ep-body');
+    if(data.body?.contentType==='html'){
+      // Use iframe for proper rendering with images
+      el.innerHTML='';
+      el.style.padding='0';
+      el.style.background='transparent';
+      const iframe=document.createElement('iframe');
+      iframe.style.cssText='width:100%;border:none;border-radius:8px;background:#fff;min-height:400px;';
+      iframe.sandbox='allow-same-origin allow-popups';
+      el.appendChild(iframe);
+      const doc=iframe.contentDocument||iframe.contentWindow.document;
+      doc.open();
+      doc.write(`<html><head><style>body{font-family:Arial,sans-serif;font-size:14px;color:#1A1A1A;margin:20px;line-height:1.6;}a{color:#1c203d;}img{max-width:100%;height:auto;}</style></head><body>${data.body.content}</body></html>`);
+      doc.close();
+      // Auto-resize iframe to content
+      setTimeout(()=>{
+        try{iframe.style.height=doc.body.scrollHeight+40+'px';}catch(e){}
+      },300);
+    } else {
+      el.style.background='#fff';
+      el.style.color='#1A1A1A';
+      el.style.padding='24px';
+      el.textContent=data.body?.content||'';
+    }
+  }catch(e){console.error(e);}
+}
 function closeEmailPanel(){document.getElementById('email-panel').style.display='none';document.body.style.overflow='';}
 async function epMoveToDone(){if(currentEmailIndex!==null){await moveToDone(currentEmailIndex);closeEmailPanel();}}
 async function epMoveToJunk(){if(currentEmailIndex!==null){await moveToJunk(currentEmailIndex);closeEmailPanel();}}
