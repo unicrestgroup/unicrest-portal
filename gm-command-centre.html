@@ -816,7 +816,7 @@ const msalConfig = {
 
 var msalInstance = null;
 
-var SCOPES = ['User.Read','Mail.Read','Calendars.Read'];
+var SCOPES = ['User.Read','Mail.Read','Mail.ReadWrite','Calendars.Read'];
 
 var currentAccount = null;
 
@@ -1083,18 +1083,75 @@ function renderEmailList(emails, folderLabel) {
   const label = folderLabel || 'Inbox';
   body.innerHTML = `
     <div class="digest-status">${emails.length} email${emails.length !== 1 ? 's' : ''} in ${label}. Press "AI Summarise" to analyse.</div>
-    ${emails.slice(0,12).map(e => `
-      <div class="digest-item">
+    ${emails.slice(0,12).map((e, i) => `
+      <div class="digest-item" id="email-item-${i}">
         <div style="display:flex;justify-content:space-between;align-items:baseline;">
           <div class="digest-from">${e.from?.emailAddress?.name || e.from?.emailAddress?.address || 'Unknown'}</div>
           ${e._folder ? `<span style="font-size:10px;color:var(--muted);font-style:italic;">${e._folder}</span>` : ''}
         </div>
         <div class="digest-subject">${e.subject}</div>
+        <div style="display:flex;gap:6px;margin-top:7px;">
+          <button class="btn-sm" style="font-size:10px;padding:3px 8px;background:var(--green);border-color:var(--green);color:#fff;" onclick="moveToDone(${i})">✓ Done</button>
+          <button class="btn-sm" style="font-size:10px;padding:3px 8px;background:var(--red);border-color:var(--red);color:#fff;" onclick="moveToJunk(${i})">✕ Junk</button>
+        </div>
       </div>`).join('')}
   `;
 }
 
-async function summariseEmails() {
+async function getChildFolderId(name) {
+  const data = await graphGet(`https://graph.microsoft.com/v1.0/me/mailFolders/inbox/childFolders?$top=50`);
+  const folder = (data.value || []).find(f => f.displayName.toLowerCase() === name.toLowerCase());
+  return folder ? folder.id : null;
+}
+
+async function moveToDone(i) {
+  const email = rawEmails[i];
+  if (!email) return;
+  const item = document.getElementById(`email-item-${i}`);
+  if (item) item.style.opacity = '0.4';
+
+  try {
+    const doneId = await getChildFolderId('Done');
+    if (!doneId) { alert('"Done" folder not found in your Inbox subfolders.'); return; }
+
+    const token = await getToken();
+    await fetch(`https://graph.microsoft.com/v1.0/me/messages/${email.id}/move`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ destinationId: doneId })
+    });
+
+    rawEmails.splice(i, 1);
+    renderEmailList(rawEmails, 'Selected folders');
+  } catch (err) {
+    console.error(err);
+    if (item) item.style.opacity = '1';
+    alert('Could not move email: ' + err.message);
+  }
+}
+
+async function moveToJunk(i) {
+  const email = rawEmails[i];
+  if (!email) return;
+  const item = document.getElementById(`email-item-${i}`);
+  if (item) item.style.opacity = '0.4';
+
+  try {
+    const token = await getToken();
+    await fetch(`https://graph.microsoft.com/v1.0/me/messages/${email.id}/move`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ destinationId: 'junkemail' })
+    });
+
+    rawEmails.splice(i, 1);
+    renderEmailList(rawEmails, 'Selected folders');
+  } catch (err) {
+    console.error(err);
+    if (item) item.style.opacity = '1';
+    alert('Could not move email: ' + err.message);
+  }
+}
   if (!rawEmails.length) return;
 
   const apiKey = getApiKey();
