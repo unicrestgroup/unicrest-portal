@@ -507,11 +507,23 @@ async function loadCal(){
 
   const sids=new Set();
   d.value.forEach(ev=>{if(ev.seriesMasterId)sids.add(ev.seriesMasterId);});
-  const pats={};
-  await Promise.all([...sids].map(async sid=>{
-    try{const m=await gGet('/me/events/'+sid+'?$select=recurrence');if(m&&m.recurrence)pats[sid]=m.recurrence;}catch{}
-  }));
-  console.log('Recurrence patterns fetched:', Object.keys(pats).length, 'of', sids.size);
+
+  // Load cached patterns
+  let pats={};
+  try{pats=JSON.parse(localStorage.getItem('mr_patterns')||'{}');}catch{}
+
+  // Only fetch patterns we don't have cached
+  const toFetch=[...sids].filter(sid=>!pats[sid]);
+  for(let i=0;i<toFetch.length;i+=4){
+    const batch=toFetch.slice(i,i+4);
+    await Promise.all(batch.map(async sid=>{
+      try{const m=await gGet('/me/events/'+sid+'?$select=recurrence');if(m&&m.recurrence)pats[sid]=m.recurrence;}catch{}
+    }));
+    if(i+4<toFetch.length) await new Promise(r=>setTimeout(r,500));
+  }
+  // Cache for next time
+  try{localStorage.setItem('mr_patterns',JSON.stringify(pats));}catch{}
+  console.log('Patterns:', Object.keys(pats).length, 'total,', toFetch.length, 'fetched fresh');
 
   S.allMeetings=d.value.map(ev=>{
     const rec=ev.type==='occurrence'||ev.type==='exception'||!!ev.seriesMasterId;
