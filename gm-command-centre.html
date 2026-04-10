@@ -100,6 +100,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 .cal-item{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;transition:background 0.1s;}
 .cal-item:hover{background:var(--soft);}
+.cal-item.past{opacity:0.45;}
+.cal-item.past .cal-name{text-decoration:line-through;color:var(--mid);}
+.cal-item.past .cal-time{color:var(--mid);}
 .cal-item.now{background:#FEF5F5;border-left:3px solid var(--red);padding-left:21px;}
 .cal-time-col{min-width:60px;flex-shrink:0;}
 .cal-time{font-size:12px;font-weight:700;color:var(--red);display:block;}
@@ -339,8 +342,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="col">
       <div class="col-hdr">
         <div class="col-hdr-row">
-          <div class="col-title">Today's schedule</div>
-          <div class="col-action" onclick="loadCalendar()">↻ Refresh</div>
+          <div class="col-title" id="cal-col-title">Today's schedule</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button onclick="navCalDay(-1)" style="background:var(--soft);border:1px solid var(--border);color:var(--mid);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:13px;font-family:var(--font);">‹</button>
+            <button onclick="navCalDay(0)"  style="background:var(--soft);border:1px solid var(--border);color:var(--mid);padding:0 8px;height:26px;border-radius:6px;cursor:pointer;font-size:10px;font-family:var(--font);font-weight:700;">Today</button>
+            <button onclick="navCalDay(1)"  style="background:var(--soft);border:1px solid var(--border);color:var(--mid);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:13px;font-family:var(--font);">›</button>
+          </div>
         </div>
       </div>
       <div class="cal-body" id="cal-body">
@@ -538,27 +545,64 @@ function showApp(){
   loadCalendar();loadEmails();loadLocalData();setInterval(updateCaptureTs,30000);updateCaptureTs();
 }
 
+var calDayOffset=0;
+
+function navCalDay(dir){
+  if(dir===0){calDayOffset=0;}else{calDayOffset+=dir;}
+  loadCalendar();
+}
+
 async function loadCalendar(){
   const body=document.getElementById('cal-body');
   body.innerHTML='<div class="loading"><div class="spinner"></div>Loading...</div>';
   try{
-    const now=new Date();
-    const s=new Date(now);s.setHours(0,0,0,0);
-    const e=new Date(now);e.setHours(23,59,59,999);
+    const base=new Date();
+    base.setDate(base.getDate()+calDayOffset);
+    const s=new Date(base);s.setHours(0,0,0,0);
+    const e=new Date(base);e.setHours(23,59,59,999);
+
+    const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const isToday=calDayOffset===0;
+    const titleEl=document.getElementById('cal-col-title');
+    if(isToday){
+      titleEl.textContent="Today's schedule";
+    } else if(calDayOffset===1){
+      titleEl.textContent="Tomorrow's schedule";
+    } else if(calDayOffset===-1){
+      titleEl.textContent="Yesterday's schedule";
+    } else {
+      titleEl.textContent=`${days[base.getDay()]} ${base.getDate()} ${months[base.getMonth()]}`;
+    }
+
     const data=await calGet(`https://graph.microsoft.com/v1.0/me/calendarView?startDateTime=${s.toISOString()}&endDateTime=${e.toISOString()}&$orderby=start/dateTime&$select=subject,start,end,location,isAllDay&$top=20`);
     const evs=(data.value||[]).filter(e=>!e.isAllDay);
-    document.getElementById('metric-meetings').textContent=evs.length||'0';
-    if(!evs.length){body.innerHTML='<div class="cal-empty">No meetings scheduled today.</div>';return;}
+    if(isToday) document.getElementById('metric-meetings').textContent=evs.length||'0';
+    if(!evs.length){body.innerHTML=`<div class="cal-empty">No meetings ${isToday?'today':titleEl.textContent.toLowerCase()}.</div>`;return;}
+
+    const now=new Date();
     const nowH=now.getHours()+now.getMinutes()/60;
     const fmtT=str=>{const[,t]=str.split('T');const[h,m]=t.split(':').map(Number);const ap=h<12?'am':'pm';return(h%12||12)+':'+String(m).padStart(2,'0')+ap;};
+
     body.innerHTML=evs.map(ev=>{
       const[,st]=ev.start.dateTime.split('T');const[sh,sm]=st.split(':').map(Number);
       const[,et]=ev.end.dateTime.split('T');const[eh,em]=et.split(':').map(Number);
-      const isNow=nowH>=(sh+sm/60)&&nowH<=(eh+em/60);
+      const startFrac=sh+sm/60, endFrac=eh+em/60;
+      const isNow=isToday&&nowH>=startFrac&&nowH<=endFrac;
+      const isPast=isToday&&nowH>endFrac;
       const loc=ev.location?.displayName?`<div class="cal-loc">${ev.location.displayName}</div>`:'';
-      return `<div class="cal-item${isNow?' now':''}">
-        <div class="cal-time-col"><span class="cal-time">${fmtT(ev.start.dateTime)}</span><span class="cal-end">${fmtT(ev.end.dateTime)}</span></div>
-        <div><div class="cal-name">${ev.subject}${isNow?'<span class="now-chip">now</span>':''}</div>${loc}</div>
+      let cls='cal-item';
+      if(isNow) cls+=' now';
+      else if(isPast) cls+=' past';
+      return `<div class="${cls}">
+        <div class="cal-time-col">
+          <span class="cal-time">${fmtT(ev.start.dateTime)}</span>
+          <span class="cal-end">${fmtT(ev.end.dateTime)}</span>
+        </div>
+        <div>
+          <div class="cal-name">${ev.subject}${isNow?'<span class="now-chip">now</span>':''}</div>
+          ${loc}
+        </div>
       </div>`;
     }).join('');
   }catch(err){body.innerHTML='<div class="cal-empty">Could not load calendar.</div>';console.error(err);}
