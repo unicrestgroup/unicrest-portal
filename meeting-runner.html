@@ -417,12 +417,19 @@ async function addHeadline(text){
   render();
 }
 
+let _hlDebounce={};
 async function updateHeadline(id, fields){
   const hl = S.headlines.find(h=>h.id===id);
   if(!hl) return;
   const spFields = {};
   if(fields.status !== undefined){hl.status=fields.status; spFields.Status=fields.status;}
-  if(fields.notes !== undefined){hl.notes=fields.notes; spFields.Notes=fields.notes;}
+  if(fields.notes !== undefined){
+    hl.notes=fields.notes;
+    // Debounce notes saves to avoid 409 conflicts
+    clearTimeout(_hlDebounce[id]);
+    _hlDebounce[id]=setTimeout(()=>{spUpdateItem('headlines', id, {Notes:fields.notes});},800);
+    return;
+  }
   await spUpdateItem('headlines', id, spFields);
 }
 
