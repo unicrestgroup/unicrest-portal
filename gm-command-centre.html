@@ -548,18 +548,9 @@ function showApp(){
 
 var calDayOffset=0;
 
-function refreshAll(){
-  calDayOffset=0;
-  loadCalendar();
-  loadEmails();
-}
+function refreshAll(){calDayOffset=0;loadCalendar();loadEmails();}
 
-async function loadCalendar(){
-
-function navCalDay(dir){
-  if(dir===0){calDayOffset=0;}else{calDayOffset+=dir;}
-  loadCalendar();
-}
+function navCalDay(dir){if(dir===0){calDayOffset=0;}else{calDayOffset+=dir;}loadCalendar();}
 
 async function loadCalendar(){
   const body=document.getElementById('cal-body');
