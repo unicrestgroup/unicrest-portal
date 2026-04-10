@@ -723,7 +723,9 @@ function rCalendar(){
     const dayEvents=S.calEvents.filter(ev=>{
       const dayStart=new Date(day);dayStart.setHours(0,0,0,0);
       const dayEnd=new Date(day);dayEnd.setHours(23,59,59,999);
-      return ev.start<=dayEnd && ev.end>=dayStart;
+      // All-day events end at midnight next day, adjust to avoid spill
+      const evEnd=ev.allDay||ev.end.getHours()===0&&ev.end.getMinutes()===0?new Date(ev.end.getTime()-1):ev.end;
+      return ev.start<=dayEnd && evEnd>=dayStart;
     });
     const dayLabel=day.toLocaleDateString('en-NZ',{weekday:'short',day:'2-digit',month:'short'});
 
