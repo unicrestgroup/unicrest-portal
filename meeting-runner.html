@@ -1065,7 +1065,6 @@ function rScheduler(){
       <div class="tl-blocks" style="width:${totalMin*pxPerMin}px" onclick="schedSelectTime(Math.floor(event.offsetX/${pxPerMin}))">${blocks}${selBlock}</div></div>`;
   });
 
-  let selDisplay='';
   let meetStartTime=S.schedSelTime||'';
   let meetEndTime='';
   if(meetStartTime){
@@ -1073,13 +1072,6 @@ function rScheduler(){
     const em2=(sm+S.schedDuration)%60,eh2=sh+Math.floor((sm+S.schedDuration)/60);
     meetEndTime=String(eh2).padStart(2,'0')+':'+String(em2).padStart(2,'0');
   }
-  selDisplay=`<div style="background:${meetStartTime?'var(--lg)':'var(--bg)'};padding:10px 14px;border-radius:6px;margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <span style="font-size:12px;font-weight:700;color:var(--mid)">Meeting time:</span>
-    <input type="time" value="${meetStartTime}" onchange="S.schedSelTime=this.value;render();" style="padding:6px 8px;border:1px solid var(--bdr);border-radius:4px;font-size:13px;font-family:'Arvo',serif">
-    <span style="font-size:12px;color:var(--mid)">\u2013</span>
-    <span style="font-size:13px;font-weight:700">${meetEndTime||'--:--'}</span>
-    <span style="font-size:11px;color:var(--mid)">(${S.schedDuration} min)</span>
-  </div>`;
 
   return `<div class="sched-overlay" onclick="if(event.target===this)closeScheduler()">
     <div class="sched-panel">
@@ -1095,8 +1087,8 @@ function rScheduler(){
         <div class="sched-people">${S.schedPeople.map(p=>`<span class="sched-chip">${e(p.name)}<button onclick="schedRemovePerson('${e(p.email)}')">&times;</button></span>`).join('')}</div>
         <div style="display:flex;gap:8px;margin:14px 0">
           <div class="sched-field" style="flex:1"><label>Date</label><input type="date" value="${S.schedDate}" onchange="schedSetDate(this.value)"></div>
-          <div class="sched-field" style="width:80px"><label>From</label><select onchange="schedSetStartHr(this.value)">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i===S.schedStartHr?'selected':''}>${String(i).padStart(2,'0')}:00</option>`).join('')}</select></div>
-          <div class="sched-field" style="width:80px"><label>To</label><select onchange="schedSetEndHr(this.value)">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i===S.schedEndHr?'selected':''}>${String(i).padStart(2,'0')}:00</option>`).join('')}</select></div>
+          <div class="sched-field" style="width:90px"><label>From</label><input type="time" value="${meetStartTime}" onchange="S.schedSelTime=this.value;render();" style="font-size:13px"></div>
+          <div class="sched-field" style="width:90px"><label>To</label><input type="time" value="${meetEndTime}" readonly style="font-size:13px;background:var(--bg);color:var(--mid)"></div>
           <div class="sched-field" style="width:90px"><label>Duration</label><select onchange="S.schedDuration=parseInt(this.value);render()">
             ${[15,30,45,60,90,120].map(d=>`<option value="${d}" ${d===S.schedDuration?'selected':''}>${d} min</option>`).join('')}</select></div>
         </div>
@@ -1109,9 +1101,8 @@ function rScheduler(){
               <span><span style="display:inline-block;width:12px;height:10px;background:#e57373;border-radius:2px;vertical-align:middle"></span> Busy</span>
               <span><span style="display:inline-block;width:12px;height:10px;background:#ffb74d;border-radius:2px;vertical-align:middle"></span> Tentative</span>
               <span><span style="display:inline-block;width:12px;height:10px;background:var(--bg);border-radius:2px;vertical-align:middle;border:1px solid var(--bdr)"></span> Free</span>
-            </div>${selDisplay}`:'<div style="font-size:13px;color:var(--mid);padding:16px 0">Add people to see their availability.</div>'}
+            </div>`:'<div style="font-size:13px;color:var(--mid);padding:16px 0">Add people to see their availability.</div>'}
         `}
-        ${!S.schedPeople.length?selDisplay:''}
       </div>
       <div class="sched-foot"><button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeScheduler()">Cancel</button>
         <button class="add-btn" style="flex:1" onclick="schedBook()">Send invite</button></div>
