@@ -1213,6 +1213,7 @@ function initDashboard(){
   if(cached&&cachedTs){
     try{
       var rows=JSON.parse(cached);
+      rows.forEach(function(r){if(r.received&&r.replied)r.wMins=workMinsBetween(r.received,r.replied);});
       renderDashResults(rows);
       document.getElementById('dash-last-scan').textContent='Last scanned: '+new Date(parseInt(cachedTs)).toLocaleString('en-NZ',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true});
     }catch(e){}
@@ -1231,26 +1232,40 @@ function saveWorkSettings(){
   workStart=parseInt(document.getElementById('wh-start').value);
   workEnd=parseInt(document.getElementById('wh-end').value);
   localStorage.setItem('gm_work_settings',JSON.stringify({days:workDays,start:workStart,end:workEnd}));
+  var cached=localStorage.getItem('gm_dash_results');
+  if(cached){try{var rows=JSON.parse(cached);rows.forEach(function(r){if(r.received&&r.replied)r.wMins=workMinsBetween(r.received,r.replied);});renderDashResults(rows);}catch(e){}}
 }
 
 function workMinsBetween(startMs, endMs){
+  // Calculate working minutes between two timestamps.
+  // Clamp start to next working period if it falls outside hours.
   if(endMs<=startMs)return 0;
   var mins=0;
   var cur=new Date(startMs);
-  // Snap to next working moment if outside hours
+
+  // Advance cur to the next working moment if currently outside
+  function snapToWork(d){
+    var safety=0;
+    while(safety++<14){
+      var dow=d.getDay();
+      if(workDays.indexOf(dow)<0){d.setDate(d.getDate()+1);d.setHours(workStart,0,0,0);continue;}
+      var h=d.getHours()+d.getMinutes()/60;
+      if(h<workStart){d.setHours(workStart,0,0,0);return;}
+      if(h>=workEnd){d.setDate(d.getDate()+1);d.setHours(workStart,0,0,0);continue;}
+      return; // already in working hours
+    }
+  }
+  snapToWork(cur);
+  if(cur.getTime()>=endMs)return 0; // reply also outside working hours - count as 0 not filtered
+
   while(cur.getTime()<endMs){
     var dow=cur.getDay();
-    if(workDays.indexOf(dow)<0){
-      // skip to next day at workStart
-      cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);continue;
-    }
-    var dayS=new Date(cur);dayS.setHours(workStart,0,0,0);
+    if(workDays.indexOf(dow)<0){cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);continue;}
     var dayE=new Date(cur);dayE.setHours(workEnd,0,0,0);
-    if(cur<dayS){cur=dayS;continue;}
-    if(cur>=dayE){cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);continue;}
-    var periodEnd=new Date(Math.min(endMs,dayE.getTime()));
-    mins+=(periodEnd.getTime()-cur.getTime())/60000;
-    cur=new Date(dayE.getTime());
+    if(cur.getTime()>=dayE.getTime()){cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);continue;}
+    var sliceEnd=Math.min(endMs,dayE.getTime());
+    mins+=(sliceEnd-cur.getTime())/60000;
+    cur.setTime(dayE.getTime());
     cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);
   }
   return Math.round(mins);
@@ -1311,44 +1326,39 @@ async function scanResponseTimes(){
     // Step 2: for each conversation, find the received message before the reply
     // Batch in groups of 10 parallel requests
     var results=[];
-    var batchSz=10;
-    for(var i=0;i<convIds.length;i+=batchSz){
-      var batch=convIds.slice(i,i+batchSz);
-      setProgress('Looking up originals: '+(i+1)+' to '+Math.min(i+batchSz,convIds.length)+' of '+convIds.length);
-      var batchRes=await Promise.all(batch.map(async function(cid){
-        try{
-          var reply=convMap[cid];
-          var replySent=new Date(reply.sentDateTime).getTime();
-          // Search this conversation for received messages
-          var url='https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,from&$top=20&$orderby=receivedDateTime asc';
-          var msgs=await gGet(url);
-          var items=msgs.value||[];
-          // Find the last inbound (not from me) message before I replied
-          var inbound=null;
-          for(var j=0;j<items.length;j++){
-            var m=items[j];
-            var mAddr=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
-            var mTime=new Date(m.receivedDateTime).getTime();
-            if(mAddr===myEmail)continue;         // skip my own
-            if(mTime>=replySent)break;           // stop if after reply
-            inbound=m;                           // keep updating for last-before-reply
-          }
-          if(!inbound)return null;
-          var receivedMs=new Date(inbound.receivedDateTime).getTime();
-          var wMins=workMinsBetween(receivedMs,replySent);
-          if(wMins<1||wMins>43200)return null;
-          var subj=reply.subject.replace(/^\s*((re|fwd|fw)\s*:\s*)+/i,'').trim();
-          return{
-            subject:subj||'(no subject)',
-            from:(inbound.from&&inbound.from.emailAddress)?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
-            received:receivedMs,replied:replySent,wMins:wMins
-          };
-        }catch(e){return null;}
-      }));
-      results=results.concat(batchRes.filter(function(r){return r!==null;}));
+    var noInbound=0,calcZero=0,errors=0;
+    // Process sequentially to avoid rate limits (50ms gap between calls)
+    for(var i=0;i<convIds.length;i++){
+      setProgress('Checking conversation '+(i+1)+' of '+convIds.length+' ('+results.length+' matched so far)...');
+      try{
+        var cid=convIds[i];
+        var reply=convMap[cid];
+        var replySent=new Date(reply.sentDateTime).getTime();
+        var url='https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,from&$top=25';
+        var msgs=await gGet(url);
+        var items=(msgs.value||[]).filter(function(m){
+          var a=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
+          return a!==myEmail && new Date(m.receivedDateTime).getTime()<replySent;
+        });
+        // Sort by receivedDateTime asc, take the last one = most recent before reply
+        items.sort(function(a,b){return new Date(a.receivedDateTime)-new Date(b.receivedDateTime);});
+        var inbound=items.length?items[items.length-1]:null;
+        if(!inbound){noInbound++;continue;}
+        var receivedMs=new Date(inbound.receivedDateTime).getTime();
+        var wMins=workMinsBetween(receivedMs,replySent);
+        if(wMins>43200){continue;} // skip >30 working days (likely bad data)
+        var subj=(reply.subject||'').replace(/^\s*(re|fwd|fw)\s*:\s*/i,'').replace(/^\s*(re|fwd|fw)\s*:\s*/i,'').trim();
+        results.push({
+          subject:subj||'(no subject)',
+          from:(inbound.from&&inbound.from.emailAddress)?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
+          received:receivedMs,replied:replySent,wMins:wMins
+        });
+      }catch(e){errors++;console.warn('Conversation lookup error:',e.message);}
+      // Small delay to respect rate limits
+      if(i%5===4)await new Promise(function(r){setTimeout(r,200);});
     }
-
-    setProgress('Complete. '+results.length+' replies tracked.');
+    console.log('Scan complete. Matched:'+results.length+' NoInbound:'+noInbound+' Errors:'+errors);
+    setProgress('Complete. '+results.length+' of '+convIds.length+' conversations matched.');
 
     if(!results.length){
       document.getElementById('dash-progress').style.display='none';
