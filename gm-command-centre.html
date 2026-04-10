@@ -1298,7 +1298,7 @@ async function scanResponseTimes(){
         try{
           var reply=convMap[cid];
           // Find the received message in this conversation (not sent by me)
-          var convMsgs=await gGet('https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq ''+cid+'' and isDraft eq false&$select=subject,receivedDateTime,sentDateTime,from,isDraft&$top=10&$orderby=receivedDateTime asc');
+          var convMsgs=await gGet('https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,sentDateTime,from,isDraft&$top=10&$orderby=receivedDateTime asc');
           var msgs=convMsgs.value||[];
           // Find the first received (inbound) message before the reply
           var replySent=new Date(reply.sentDateTime).getTime();
