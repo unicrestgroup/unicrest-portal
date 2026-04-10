@@ -217,6 +217,7 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 <div class="hdr">
   <h1>MEETING <span>RUNNER</span></h1>
   <div class="hdr-r">
+    <button class="hdr-btn" id="bookBtn" style="display:none;background:var(--red)" onclick="openScheduler()">Book a meeting</button>
     <span id="clockEl" style="color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums"></span>
     <span id="userEl" style="color:rgba(255,255,255,.5)"></span>
     <button class="hdr-btn" id="hdrBtn" style="display:none"></button>
@@ -940,7 +941,7 @@ async function edSave(){
 function openScheduler(){
   const today=new Date();
   S.schedDate=today.toISOString().slice(0,10);
-  S.schedSubject=curSecName()||'';
+  try{S.schedSubject=curSecName()||'';}catch{S.schedSubject='';}
   S.schedPeople=[];S.schedSearchResults=[];S.schedSearchQuery='';
   S.schedAvailability=[];S.schedSelTime=null;S.schedLoading=false;
   S.schedDuration=30;S.schedTeams=true;S.schedStartHr=8;S.schedEndHr=18;
@@ -992,18 +993,21 @@ async function schedLoadAvail(){
     availabilityViewInterval:15
   };
   const d=await gPost('/me/calendar/getSchedule',body);
+  console.log('getSchedule response:', JSON.stringify(d,null,2));
   if(d&&d.value){
-    S.schedAvailability=d.value.map(s=>({
+    S.schedAvailability=d.value.map(s=>{
+      console.log('Schedule for', s.scheduleId, 'items:', s.scheduleItems?.length, s.scheduleItems);
+      return {
       email:s.scheduleId,
       name:S.schedPeople.find(p=>p.email===s.scheduleId)?.name||s.scheduleId,
       items:(s.scheduleItems||[]).map(it=>{
-        // Parse hours/minutes directly from the datetime string (already in NZ timezone)
         const sdt=it.start.dateTime, edt=it.end.dateTime;
+        console.log('  Item:', it.status, sdt, '->', edt);
         const sH=parseInt(sdt.substr(11,2)), sM=parseInt(sdt.substr(14,2));
         const eH=parseInt(edt.substr(11,2)), eM=parseInt(edt.substr(14,2));
         return {startMin:sH*60+sM, endMin:eH*60+eM, status:it.status||'busy', subject:it.subject||''};
       })
-    }));
+    }});
   }
   S.schedLoading=false;render();
 }
@@ -1119,22 +1123,22 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
    RENDER
    ═══════════════════════════════ */
 function render(){
-  const app=document.getElementById('app'),btn=document.getElementById('hdrBtn');
-  if(S.screen==='login'){btn.style.display='none';app.innerHTML='<div class="wrap">'+rLogin()+'</div>';}
-  else if(S.screen==='dash'){btn.style.display='';btn.textContent='Sign out';btn.className='hdr-btn';btn.onclick=logout;app.innerHTML='<div class="wrap">'+rDash()+'</div>';}
+  const app=document.getElementById('app'),btn=document.getElementById('hdrBtn'),bookBtn=document.getElementById('bookBtn');
+  if(S.screen==='login'){btn.style.display='none';bookBtn.style.display='none';app.innerHTML='<div class="wrap">'+rLogin()+'</div>';}
+  else if(S.screen==='dash'){btn.style.display='';btn.textContent='Sign out';btn.className='hdr-btn';btn.onclick=logout;bookBtn.style.display='';app.innerHTML='<div class="wrap">'+rDash()+'</div>'+(S.showScheduler?rScheduler():'');}
   else if(S.screen==='runner'){
-    btn.style.display='';btn.textContent='End meeting';btn.className='hdr-btn red';btn.onclick=hdrAction;
+    btn.style.display='';btn.textContent='End meeting';btn.className='hdr-btn red';btn.onclick=hdrAction;bookBtn.style.display='none';
     app.innerHTML=rRunner()+(S.showAgendaEditor?rAgendaEditor():'')+(S.showScheduler?rScheduler():'');
     const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
     timerUI();
   }
   else if(S.screen==='prep'){
-    btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;
+    btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;bookBtn.style.display='none';
     document.getElementById('clockEl').textContent='';
     app.innerHTML=rPrep()+(S.showAgendaEditor?rAgendaEditor():'')+(S.showScheduler?rScheduler():'');
     const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
   }
-  else if(S.screen==='summary'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;document.getElementById('clockEl').textContent='';app.innerHTML='<div class="wrap">'+rSummary()+'</div>';}
+  else if(S.screen==='summary'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;bookBtn.style.display='none';document.getElementById('clockEl').textContent='';app.innerHTML='<div class="wrap">'+rSummary()+'</div>';}
 }
 
 function rLogin(){
