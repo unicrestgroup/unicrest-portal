@@ -221,7 +221,7 @@ let msalApp, accessToken, currentUser, siteId;
    ═══════════════════════════════ */
 let S = {
   screen:'login',
-  meetings:[], allMeetings:[], loadingCal:false,
+  meetings:[], allMeetings:[], loadingCal:false, enabledSeries:new Set(),
   viewDate: new Date(), // current day being viewed on dashboard
   // prep (pre-meeting view)
   prepMeeting:null, prepSeriesId:null, prepAgenda:[],
@@ -548,7 +548,32 @@ async function loadCal(){
     };
   });
   filterMeetingsByDate();
+  // Load which meetings have agendas enabled
+  await loadEnabledSeries();
   S.loadingCal=false;render();
+}
+
+async function loadEnabledSeries(){
+  if(!LISTS.config.id) return;
+  const items = await spGetItems('config');
+  S.enabledSeries=new Set(items.filter(it=>it.fields&&it.fields.SeriesId).map(it=>it.fields.SeriesId));
+}
+
+async function toggleAgenda(seriesId){
+  if(!seriesId||!LISTS.config.id) return;
+  if(S.enabledSeries.has(seriesId)){
+    // Disable: delete the config entry
+    const items = await spGetItems('config','SeriesId',seriesId);
+    if(items.length) await spDeleteItem('config', items[0].id);
+    S.enabledSeries.delete(seriesId);
+    toast('Agenda disabled');
+  } else {
+    // Enable: create config entry with default agenda
+    await spAddItem('config', {Title:seriesId, SeriesId:seriesId, AgendaJSON:JSON.stringify(DEFAULT_AGENDA)});
+    S.enabledSeries.add(seriesId);
+    toast('Agenda enabled');
+  }
+  render();
 }
 
 function filterMeetingsByDate(){
@@ -761,14 +786,25 @@ function rDash(){
     g.meetings.forEach(m=>{
       const time=m.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
       const n=m.attendees.length;
+      const hasAgenda=m.isRec && m.seriesId && S.enabledSeries.has(m.seriesId);
       html+=`<div class="card click">
         <div style="display:flex;align-items:flex-start;justify-content:space-between">
           <div><div style="font-size:14px;font-weight:700">${e(m.subject)}</div>
           <div style="font-size:12px;color:var(--mid);margin-top:2px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div></div>
           <span class="badge ${m.isRec?'rec':'one'}">${m.isRec?g.label:'One-off'}</span>
         </div>
-        ${isToday?'<button class="start-btn" onclick="startMtg('+m.idx+')">Start meeting</button>':''}
-        ${m.isRec?'<button class="start-btn" onclick="prepMtg('+m.idx+')" style="background:var(--dark);margin-top:6px">Prepare / View agenda</button>':''}
+        ${m.isRec&&m.seriesId?`
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bg)">
+            <div onclick="toggleAgenda('${e(m.seriesId)}')" style="cursor:pointer;width:40px;height:22px;border-radius:11px;background:${hasAgenda?'var(--green)':'var(--bdr)'};position:relative;transition:background .2s;flex-shrink:0">
+              <div style="width:18px;height:18px;border-radius:50%;background:var(--white);position:absolute;top:2px;${hasAgenda?'right:2px':'left:2px'};transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+            </div>
+            <span style="font-size:12px;color:${hasAgenda?'var(--green)':'var(--mid)'}">${hasAgenda?'Agenda enabled':'Enable agenda for this meeting'}</span>
+          </div>
+        `:''}
+        ${hasAgenda?`
+          ${isToday?'<button class="start-btn" onclick="startMtg('+m.idx+')">Start meeting</button>':''}
+          <button class="start-btn" onclick="prepMtg(${m.idx})" style="background:var(--dark);margin-top:6px">Prepare / View agenda</button>
+        `:''}
       </div>`;
     });
   });
