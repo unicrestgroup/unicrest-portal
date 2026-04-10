@@ -847,9 +847,9 @@ function timerUI(){
 /* ═══════════════════════════════
    MEETING LIFECYCLE
    ═══════════════════════════════ */
-function goSec(i){if(i<0||i>=curSections().length)return;if(S.screen==='runner')timerStop();S.curSec=i;render();if(S.screen==='runner')timerUI();}
-function nextSec(){S.sections[S.curSec].done=true;timerStop();if(S.curSec<S.sections.length-1){S.curSec++;render();}else endMeeting();}
-function prevSec(){if(S.curSec>0){timerStop();S.curSec--;render();}}
+function goSec(i){if(i<0||i>=curSections().length)return;if(S.screen==='runner')timerStop();S.curSec=i;render();if(S.screen==='runner'){timerUI();timerStart();}}
+function nextSec(){S.sections[S.curSec].done=true;timerStop();if(S.curSec<S.sections.length-1){S.curSec++;render();timerStart();}else endMeeting();}
+function prevSec(){if(S.curSec>0){timerStop();S.curSec--;render();timerStart();}}
 
 async function prepMtg(idx){
   const m=S.meetings[idx];
@@ -875,7 +875,7 @@ function startFromPrep(){
   S.startTime=new Date();
   S.timerOn=false;
   // headlines and actions are already in S.headlines and S.actions from prep
-  S.screen='runner';render();
+  S.screen='runner';render();timerStart();
 }
 
 async function startMtg(idx){
@@ -894,7 +894,7 @@ async function startMtg(idx){
   await loadRatings(S.seriesId);
   await loadManagedAttendees(S.seriesId, m);
 
-  S.screen='runner';render();
+  S.screen='runner';render();timerStart();
 }
 function startAdhoc(){S.activeMeeting=null;S.seriesId=null;startMtg();}
 
@@ -996,11 +996,13 @@ async function schedLoadAvail(){
     S.schedAvailability=d.value.map(s=>({
       email:s.scheduleId,
       name:S.schedPeople.find(p=>p.email===s.scheduleId)?.name||s.scheduleId,
-      items:(s.scheduleItems||[]).map(it=>({
-        start:new Date(it.start.dateTime+(it.start.dateTime.endsWith('Z')?'':'Z')),
-        end:new Date(it.end.dateTime+(it.end.dateTime.endsWith('Z')?'':'Z')),
-        status:it.status||'busy',subject:it.subject||''
-      }))
+      items:(s.scheduleItems||[]).map(it=>{
+        // Parse hours/minutes directly from the datetime string (already in NZ timezone)
+        const sdt=it.start.dateTime, edt=it.end.dateTime;
+        const sH=parseInt(sdt.substr(11,2)), sM=parseInt(sdt.substr(14,2));
+        const eH=parseInt(edt.substr(11,2)), eM=parseInt(edt.substr(14,2));
+        return {startMin:sH*60+sM, endMin:eH*60+eM, status:it.status||'busy', subject:it.subject||''};
+      })
     }));
   }
   S.schedLoading=false;render();
@@ -1043,13 +1045,12 @@ function rScheduler(){
   for(let h=S.schedStartHr;h<S.schedEndHr;h++) headerHtml+=`<div class="tl-hour" style="width:${60*pxPerMin}px;padding:2px 4px">${String(h).padStart(2,'0')}:00</div>`;
 
   let rowsHtml='';
-  const dayStartStr=S.schedDate+'T'+String(S.schedStartHr).padStart(2,'0')+':00:00';
-  const dayStartMs=new Date(dayStartStr).getTime();
+  const viewStartMin=S.schedStartHr*60;
   S.schedAvailability.forEach(person=>{
     let blocks='';
     person.items.forEach(it=>{
-      const sMin=Math.max(0,(it.start.getTime()-dayStartMs)/60000);
-      const eMin=Math.min(totalMin,(it.end.getTime()-dayStartMs)/60000);
+      const sMin=Math.max(0,it.startMin-viewStartMin);
+      const eMin=Math.min(totalMin,it.endMin-viewStartMin);
       if(eMin>0&&sMin<totalMin){
         const cls=it.status==='tentative'?'tl-tent':'tl-busy';
         blocks+=`<div class="${cls}" style="left:${sMin*pxPerMin}px;width:${Math.max(2,(eMin-sMin)*pxPerMin)}px" title="${e(it.subject||it.status)}"></div>`;
@@ -1640,11 +1641,85 @@ function rSummary(){
   <div class="card"><div class="sum-sec"><h3>Open actions</h3>${aH}</div>${doneA.length?'<div class="sum-sec"><h3>Completed</h3>'+doneA.map(a=>'<div class="sum-act"><div class="sum-dot" style="background:var(--green)"></div><div style="text-decoration:line-through;opacity:.5">'+e(a.text)+'</div></div>').join('')+'</div>':''}</div>
   ${hlH?'<div class="card"><div class="sum-sec"><h3>Headlines</h3>'+hlH+'</div></div>':''}
   ${S.ratings.length?'<div class="card"><div class="sum-sec"><h3>Meeting rating</h3><div style="font-size:20px;font-weight:700;color:'+(getAverageRating()>=7?'var(--green)':getAverageRating()>=5?'var(--amber)':'var(--red)')+'">'+getAverageRating()+'/10</div><div style="font-size:12px;color:var(--mid);margin-top:4px">'+S.ratings.map(r=>e(r.by)+': '+r.rating).join(' \u00B7 ')+'</div></div></div>':''}
-  <div style="display:flex;gap:8px;margin-top:12px" id="sT" data-plain="${e(plain)}">
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap" id="sT" data-plain="${e(plain)}">
     <button class="add-btn" id="cBtn" onclick="copySummary()" style="flex:1">Copy summary</button>
+    <button class="add-btn" id="emailBtn" onclick="emailSummary()" style="flex:1;background:var(--blue)">Email to attendees</button>
     <button class="add-btn" onclick="window.print()" style="flex:1;background:var(--dark)">Print</button>
     <button class="add-btn" onclick="backToDash()" style="flex:1;background:var(--mid)">\u2190 Dashboard</button>
   </div>`;
+}
+
+async function emailSummary(){
+  const att=S.activeMeeting?S.activeMeeting.attendees:S.attendees;
+  if(!att||!att.length){toast('No attendees to email');return;}
+  const mt=S.activeMeeting?S.activeMeeting.subject:'Meeting';
+  const ds=S.startTime?S.startTime.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}):'';
+  const tm=Math.floor(S.elapsed/60);
+
+  // Build HTML email
+  let body='<div style="font-family:Arial,sans-serif;max-width:600px">';
+  body+=`<h2 style="color:#EF3E42;margin-bottom:4px">${e(mt)}</h2>`;
+  body+=`<p style="color:#666;font-size:14px">${ds} \u00B7 ${tm} minutes</p>`;
+
+  // Section notes
+  const secs=S.sections||curSections();
+  const noted=secs.filter(s=>s.notes);
+  if(noted.length){
+    noted.forEach(s=>{
+      body+=`<h3 style="color:#231F20;margin-top:16px;margin-bottom:4px">${e(s.name)}</h3>`;
+      body+=`<p style="color:#666;font-size:14px;white-space:pre-wrap">${e(s.notes)}</p>`;
+    });
+  }
+
+  // Actions
+  const openA=S.actions.filter(a=>!a.done);
+  if(openA.length){
+    body+=`<h3 style="color:#EF3E42;margin-top:16px;margin-bottom:8px">Open Actions</h3><ul style="color:#333;font-size:14px">`;
+    openA.forEach(a=>{body+=`<li style="margin-bottom:4px">${e(a.text)}${a.owner?' \u2014 <strong>'+e(a.owner)+'</strong>':''}${a.due?' (due '+a.due+')':''}</li>`;});
+    body+=`</ul>`;
+  }
+
+  // Headlines
+  if(S.headlines.length){
+    body+=`<h3 style="color:#231F20;margin-top:16px;margin-bottom:8px">Headlines</h3><ul style="color:#333;font-size:14px">`;
+    S.headlines.forEach(h=>{body+=`<li style="margin-bottom:4px">[${h.status}] ${e(h.text)}${h.notes?' \u2014 '+e(h.notes):''}</li>`;});
+    body+=`</ul>`;
+  }
+
+  // Rating
+  if(S.ratings.length){
+    body+=`<h3 style="color:#231F20;margin-top:16px;margin-bottom:4px">Meeting Rating: ${getAverageRating()}/10</h3>`;
+    body+=`<p style="color:#666;font-size:13px">${S.ratings.map(r=>e(r.by)+': '+r.rating).join(' \u00B7 ')}</p>`;
+  }
+
+  body+=`<hr style="border:none;border-top:1px solid #ddd;margin-top:20px"><p style="color:#999;font-size:12px">Sent from Meeting Runner \u00B7 Unicrest Group</p></div>`;
+
+  // Send via Graph API
+  const recipients=att.map(a=>({emailAddress:{address:a.email,name:a.name}}));
+  const mail={
+    message:{
+      subject:'Meeting Summary: '+mt+' \u2014 '+ds,
+      body:{contentType:'HTML',content:body},
+      toRecipients:recipients
+    }
+  };
+
+  const btn=document.getElementById('emailBtn');
+  if(btn){btn.textContent='Sending...';btn.disabled=true;}
+
+  const t=await getToken();
+  if(!t){toast('Auth error');return;}
+  const r=await fetch(GRAPH+'/me/sendMail',{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(mail)});
+
+  if(r.ok||r.status===202){
+    toast('Summary emailed to '+recipients.length+' attendees');
+    if(btn){btn.textContent='Sent!';setTimeout(()=>{btn.textContent='Email to attendees';btn.disabled=false;},2000);}
+  } else {
+    const err=await r.text();
+    console.error('Send mail error',r.status,err);
+    toast('Failed to send email');
+    if(btn){btn.textContent='Email to attendees';btn.disabled=false;}
+  }
 }
 
 function copySummary(){
