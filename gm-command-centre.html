@@ -1067,7 +1067,7 @@ async function createCalEvent(){
 // PAGE NAVIGATION
 function showPage(page){
   document.getElementById('home-page').style.display=page==='home'?'flex':'none';
-  document.getElementById('timelog-page').style.display=page==='timelog'?'block':'none';
+  document.getElementById('timelog-page').style.display=page==='timelog'?'flex':'none';
   document.getElementById('dashboard-page').classList.toggle('visible',page==='dashboard');
   document.getElementById('nav-home').classList.toggle('active',page==='home');
   document.getElementById('nav-tl').classList.toggle('active',page==='timelog');
@@ -1358,33 +1358,41 @@ async function scanResponseTimes(){
       btn.disabled=false;btn.textContent='&#9654; Scan emails';return;
     }
 
-    // Get sent items folder ID so we can reliably detect my own messages by folder
-    var sfData=await gGet('https://graph.microsoft.com/v1.0/me/mailFolders/sentitems?$select=id');
-    var sentFolderId=(sfData.id||'').toLowerCase();
+    // Step 2: get inbox child folder IDs (Done, Regan To Do, etc.) so we only
+    // search folders that contain RECEIVED emails - never sent items
+    setProgress('Loading folder list...');
+    var rxFolderUrls=['https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages'];
+    try{
+      var fData=await gGet('https://graph.microsoft.com/v1.0/me/mailFolders/inbox/childFolders?$top=50');
+      (fData.value||[]).forEach(function(f){
+        rxFolderUrls.push('https://graph.microsoft.com/v1.0/me/mailFolders/'+f.id+'/messages');
+      });
+    }catch(e){}
 
-    // Step 2: for each conversation, find the received message before the reply
+    // Step 3: for each reply conversation, search received-only folders for the original
     var results=[];
     var noInbound=0,errors=0;
     for(var i=0;i<convIds.length;i++){
-      setProgress('Checking '+(i+1)+' of '+convIds.length+' ... ('+results.length+' matched)');
+      setProgress('Checking '+(i+1)+' of '+convIds.length+' ('+results.length+' matched so far)');
       try{
         var cid=convIds[i];
         var reply=convMap[cid];
         var replySent=new Date(reply.sentDateTime).getTime();
-        // Fetch all messages in conversation
-        var url='https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,from,parentFolderId&$top=25';
-        var msgs=await gGet(url);
-        var allMsgs=msgs.value||[];
-        // A message is inbound if: not from me AND not in sent items folder AND received before reply
-        var inbounds=allMsgs.filter(function(m){
-          var fromAddr=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
-          var inSent=(m.parentFolderId||'').toLowerCase()===sentFolderId;
-          var isMe=fromAddr===myEmail||inSent;
-          var beforeReply=new Date(m.receivedDateTime).getTime()<replySent;
-          return !isMe&&beforeReply;
-        });
-        inbounds.sort(function(a,b){return new Date(a.receivedDateTime)-new Date(b.receivedDateTime);});
-        var inbound=inbounds.length?inbounds[inbounds.length-1]:null;
+        // Search each received folder for this conversation - stop as soon as we find one
+        var inbound=null;
+        for(var fi=0;fi<rxFolderUrls.length;fi++){
+          var url=rxFolderUrls[fi]+'?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,from&$top=10';
+          var msgs=await gGet(url);
+          var candidates=(msgs.value||[]).filter(function(m){
+            return new Date(m.receivedDateTime).getTime()<replySent;
+          });
+          if(candidates.length){
+            // Take most recent received before the reply
+            candidates.sort(function(a,b){return new Date(a.receivedDateTime)-new Date(b.receivedDateTime);});
+            inbound=candidates[candidates.length-1];
+            break;
+          }
+        }
         if(!inbound){noInbound++;continue;}
         var receivedMs=new Date(inbound.receivedDateTime).getTime();
         var wMins=workMinsBetween(receivedMs,replySent);
@@ -1395,11 +1403,11 @@ async function scanResponseTimes(){
           from:(inbound.from&&inbound.from.emailAddress)?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
           received:receivedMs,replied:replySent,wMins:wMins
         });
-      }catch(e){errors++;console.warn('Conv error',cid,e.message);}
-      if(i%5===4)await new Promise(function(resolve){setTimeout(resolve,150);});
+      }catch(e){errors++;console.warn('Conv lookup error:',e.message);}
+      if(i%5===4)await new Promise(function(resolve){setTimeout(resolve,200);});
     }
-    console.log('Scan: replies='+convIds.length+' matched='+results.length+' noInbound='+noInbound+' errors='+errors);
-    setProgress('Complete. '+results.length+' matched from '+convIds.length+' reply conversations.');
+    console.log('Scan done. Conversations='+convIds.length+' Matched='+results.length+' NoInbound='+noInbound+' Errors='+errors);
+    setProgress('Complete. '+results.length+' replies matched from '+convIds.length+' conversations.');
 
     if(!results.length){
       document.getElementById('dash-progress').style.display='none';
