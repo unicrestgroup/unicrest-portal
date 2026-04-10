@@ -31,7 +31,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;min-width:1100px;overflow-x:auto;font-size:14px;}
 
-/* ── LOGIN ────────────────────────────────────────────────────────────────── */
+/* -- LOGIN ------------------------------------------------------------------ */
 #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:32px;background:var(--dark);}
 .login-mark{width:52px;height:52px;background:var(--red);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;}
 .login-wordmark{font-size:22px;font-weight:700;color:#fff;}
@@ -43,10 +43,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-ms{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px 20px;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;}
 .btn-ms:hover{background:#d43336;}
 
-/* ── APP ──────────────────────────────────────────────────────────────────── */
+/* -- APP -------------------------------------------------------------------- */
 #app{display:none;min-height:100vh;flex-direction:column;}
 
-/* ── TOPBAR ───────────────────────────────────────────────────────────────── */
+/* -- TOPBAR ----------------------------------------------------------------- */
 .topbar{height:52px;background:var(--dark);border-bottom:3px solid var(--red);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:50;}
 .tb-left{display:flex;align-items:center;gap:16px;}
 .tb-wordmark{font-size:16px;font-weight:700;color:#fff;letter-spacing:0.02em;}
@@ -59,14 +59,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .tb-btn:hover{border-color:rgba(255,255,255,0.4);color:#fff;}
 .tb-avatar{width:30px;height:30px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;}
 
-/* ── SETTINGS PANEL ───────────────────────────────────────────────────────── */
+/* -- SETTINGS PANEL --------------------------------------------------------- */
 #settings-panel{display:none;background:var(--dark);border-bottom:1px solid rgba(255,255,255,0.08);padding:20px 32px;}
 .settings-inner{max-width:420px;display:flex;flex-direction:column;gap:8px;}
 .settings-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);}
 .settings-row{display:flex;gap:8px;}
 .settings-status{font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;}
 
-/* ── HERO ─────────────────────────────────────────────────────────────────── */
+/* -- HERO ------------------------------------------------------------------- */
 .hero{background:var(--dark);padding:28px 32px 24px;border-bottom:1px solid rgba(255,255,255,0.06);}
 .hero-date{font-size:32px;font-weight:700;color:#fff;line-height:1;}
 .hero-greet{font-size:15px;color:rgba(255,255,255,0.4);font-style:italic;margin-top:6px;}
@@ -79,21 +79,21 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .h-stat-label{font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;}
 .h-stat-divider{width:1px;background:rgba(255,255,255,0.07);align-self:stretch;}
 
-/* ── MAIN GRID ────────────────────────────────────────────────────────────── */
+/* -- MAIN GRID -------------------------------------------------------------- */
 .main-grid{display:grid;grid-template-columns:380px 1fr 320px;gap:0;flex:1;min-height:0;}
 
-/* ── COLUMN ───────────────────────────────────────────────────────────────── */
+/* -- COLUMN ----------------------------------------------------------------- */
 .col{border-right:1px solid var(--border);display:flex;flex-direction:column;}
 .col:last-child{border-right:none;}
 
-/* ── COL HEADER ───────────────────────────────────────────────────────────── */
+/* -- COL HEADER ------------------------------------------------------------- */
 .col-hdr{padding:18px 24px 14px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:10;}
 .col-hdr-row{display:flex;align-items:center;justify-content:space-between;}
 .col-title{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);}
 .col-action{font-size:11px;color:var(--red);cursor:pointer;font-weight:700;}
 .col-action:hover{opacity:0.75;}
 
-/* ── CALENDAR COLUMN ──────────────────────────────────────────────────────── */
+/* -- CALENDAR COLUMN -------------------------------------------------------- */
 .cal-body{flex:1;overflow-y:auto;background:var(--white);}
 .cal-body::-webkit-scrollbar{width:4px;}
 .cal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
@@ -112,7 +112,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .now-chip{display:inline-block;font-size:9px;background:var(--red);color:#fff;padding:2px 7px;border-radius:10px;font-weight:700;margin-left:8px;vertical-align:middle;letter-spacing:0.05em;}
 .cal-empty{padding:32px 24px;font-size:13px;color:var(--mid);font-style:italic;}
 
-/* ── EMAIL COLUMN ─────────────────────────────────────────────────────────── */
+/* -- EMAIL COLUMN ----------------------------------------------------------- */
 .email-filters{padding:10px 24px;background:var(--white);border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
 .f-chip{font-size:11px;padding:4px 12px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--mid);background:transparent;font-family:var(--font);transition:all 0.12s;}
 .f-chip:hover{border-color:var(--red);color:var(--red);}
@@ -144,10 +144,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ai-action{font-size:11px;color:var(--amber);font-weight:700;margin-top:5px;}
 .feed-note{font-size:12px;color:var(--mid);font-style:italic;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--soft);}
 
-/* ── RIGHT COLUMN ─────────────────────────────────────────────────────────── */
+/* -- RIGHT COLUMN ----------------------------------------------------------- */
 .right-col{background:var(--bg);border-right:none;display:flex;flex-direction:column;}
 
-/* ── PRIORITIES ───────────────────────────────────────────────────────────── */
+/* -- PRIORITIES ------------------------------------------------------------- */
 .section{background:var(--white);border-bottom:1px solid var(--border);}
 .section-hdr{padding:16px 22px 12px;display:flex;align-items:center;justify-content:space-between;}
 .section-title{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--mid);}
@@ -162,7 +162,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .pri-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0;margin-top:1px;transition:all 0.15s;}
 .pri-check.checked{background:var(--green);border-color:var(--green);}
 
-/* ── RAG ──────────────────────────────────────────────────────────────────── */
+/* -- RAG -------------------------------------------------------------------- */
 .rag-item{padding:10px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .rag-item:last-child{border-bottom:none;}
 .rag-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
@@ -180,7 +180,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .rag-btn.active{border-color:var(--text);}
 .rag-add{padding:12px 22px;display:flex;gap:6px;}
 
-/* ── CAPTURE ──────────────────────────────────────────────────────────────── */
+/* -- CAPTURE ---------------------------------------------------------------- */
 .capture-wrap{background:var(--white);border-bottom:1px solid var(--border);padding:16px 22px;}
 .capture-inner{display:flex;flex-direction:column;gap:8px;}
 .capture-hdr{display:flex;align-items:center;justify-content:space-between;}
@@ -197,12 +197,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .note-del{position:absolute;top:7px;right:8px;background:none;border:none;color:var(--mid);cursor:pointer;font-size:13px;opacity:0.5;}
 .note-del:hover{opacity:1;}
 
-/* ── LOADING / EMPTY ──────────────────────────────────────────────────────── */
+/* -- LOADING / EMPTY -------------------------------------------------------- */
 .loading{display:flex;align-items:center;gap:8px;color:var(--mid);font-size:12px;font-style:italic;padding:20px 24px;}
 .spinner{width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 0.7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* ── INPUTS / BUTTONS ─────────────────────────────────────────────────────── */
+/* -- INPUTS / BUTTONS ------------------------------------------------------- */
 .input-sm{background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;font-family:var(--font);color:var(--text);outline:none;}
 .input-sm:focus{border-color:var(--red);}
 .input-sm::placeholder{color:var(--mid);}
@@ -213,7 +213,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-ghost{background:none;border:1px solid var(--border);color:var(--mid);border-radius:5px;padding:4px 10px;font-size:11px;font-family:var(--font);cursor:pointer;}
 .btn-ghost:hover{border-color:var(--mid);}
 
-/* ── EMAIL PANEL ──────────────────────────────────────────────────────────── */
+/* -- EMAIL PANEL ------------------------------------------------------------ */
 #email-panel{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;}
 .ep-inner{max-width:900px;margin:0 auto;padding:32px 40px 80px;}
 .ep-back{background:none;border:none;color:var(--mid);font-size:13px;cursor:pointer;font-family:var(--font);margin-bottom:20px;display:flex;align-items:center;gap:6px;font-weight:700;}
@@ -233,7 +233,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ep-body-wrap{background:transparent;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 #ep-body{font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap;}
 
-/* ── SCHEDULE MODAL ───────────────────────────────────────────────────────── */
+/* -- SCHEDULE MODAL --------------------------------------------------------- */
 #schedule-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:20px;}
 .sched-modal{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:flex;width:940px;max-width:95vw;max-height:90vh;box-shadow:0 24px 80px rgba(0,0,0,0.15);}
 .sched-left{width:320px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--white);}
@@ -270,7 +270,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sched-timeline::-webkit-scrollbar{width:4px;}
 .sched-timeline::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
-/* ── SIDEBAR ─────────────────────────────────────────────────────────────── */
+/* -- SIDEBAR --------------------------------------------------------------- */
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:52px;background:var(--dark);z-index:100;display:flex;flex-direction:column;align-items:flex-start;padding:0;overflow:hidden;transition:width 0.2s ease;border-right:1px solid rgba(255,255,255,0.08);}
 .sidebar:hover{width:200px;}
 .sb-top{height:52px;display:flex;align-items:center;padding:0 14px;border-bottom:3px solid var(--red);flex-shrink:0;width:200px;}
@@ -287,10 +287,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sidebar:hover .sb-item-label{opacity:1;}
 .sb-item.active .sb-item-label{color:rgba(255,255,255,0.85);}
 
-/* ── MAIN WRAPPER (offset for sidebar) ───────────────────────────────────── */
+/* -- MAIN WRAPPER (offset for sidebar) ------------------------------------- */
 .app-body{margin-left:52px;display:flex;flex-direction:column;min-height:100vh;}
 
-/* ── TIMER BAR ───────────────────────────────────────────────────────────── */
+/* -- TIMER BAR ------------------------------------------------------------- */
 .timer-bar{background:var(--dark);border-bottom:1px solid rgba(255,255,255,0.08);padding:0 32px;height:48px;display:flex;align-items:center;gap:16px;}
 .timer-task-input{flex:1;max-width:520px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:8px 14px;font-size:13px;font-family:var(--font);color:#fff;outline:none;transition:border-color 0.15s;}
 .timer-task-input:focus{border-color:rgba(239,62,66,0.6);}
@@ -304,7 +304,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .timer-stop:hover{background:rgba(255,255,255,0.18);}
 .timer-label{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.08em;text-transform:uppercase;font-weight:700;}
 
-/* ── TIMELOG PAGE ────────────────────────────────────────────────────────── */
+/* -- TIMELOG PAGE ---------------------------------------------------------- */
 #timelog-page{display:none;flex:1;overflow-y:auto;background:var(--bg);}
 .tl-page-hdr{background:var(--dark);padding:24px 36px 20px;border-bottom:3px solid var(--red);}
 .tl-page-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;}
@@ -432,15 +432,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="hero-date" id="date-today"></div>
     <div class="hero-greet" id="date-greeting"></div>
     <div class="hero-stats">
-      <div class="h-stat"><div class="h-stat-val" id="metric-meetings">—</div><div class="h-stat-label">Meetings today</div></div>
+      <div class="h-stat"><div class="h-stat-val" id="metric-meetings">-</div><div class="h-stat-label">Meetings today</div></div>
       <div class="h-stat-divider"></div>
-      <div class="h-stat"><div class="h-stat-val" id="metric-emails">—</div><div class="h-stat-label">Emails to action</div></div>
+      <div class="h-stat"><div class="h-stat-val" id="metric-emails">-</div><div class="h-stat-label">Emails to action</div></div>
       <div class="h-stat-divider"></div>
-      <div class="h-stat"><div class="h-stat-val g" id="metric-green">—</div><div class="h-stat-label">Projects on track</div></div>
+      <div class="h-stat"><div class="h-stat-val g" id="metric-green">-</div><div class="h-stat-label">Projects on track</div></div>
       <div class="h-stat-divider"></div>
-      <div class="h-stat"><div class="h-stat-val a" id="metric-amber">—</div><div class="h-stat-label">At risk</div></div>
+      <div class="h-stat"><div class="h-stat-val a" id="metric-amber">-</div><div class="h-stat-label">At risk</div></div>
       <div class="h-stat-divider"></div>
-      <div class="h-stat"><div class="h-stat-val r" id="metric-red">—</div><div class="h-stat-label">Blocked</div></div>
+      <div class="h-stat"><div class="h-stat-val r" id="metric-red">-</div><div class="h-stat-label">Blocked</div></div>
     </div>
   </div>
 
@@ -655,20 +655,20 @@ function toggleSettings(){
   p.style.display=p.style.display==='none'||!p.style.display?'block':'none';
   if(p.style.display==='block'){
     const k=getApiKey();
-    document.getElementById('api-key-input').value=k?'••••••••••••••••':'';
+    document.getElementById('api-key-input').value=k?'****************':'';
     document.getElementById('api-key-status').textContent=k?'API key is set.':'No API key saved.';
     const g=getGhToken();
-    document.getElementById('gh-token-input').value=g?'••••••••••••••••':'';
-    document.getElementById('gh-token-status').textContent=g?'GitHub token is set. Timelog will sync to repo.':'No token — timelog stored in browser only.';
+    document.getElementById('gh-token-input').value=g?'****************':'';
+    document.getElementById('gh-token-status').textContent=g?'GitHub token is set. Timelog will sync to repo.':'No token - timelog stored in browser only.';
   }
 }
 
-function saveApiKey(){const v=document.getElementById('api-key-input').value.trim();if(!v||v.startsWith('•')){document.getElementById('api-key-status').textContent='No changes made.';return;}localStorage.setItem('gm_anthropic_key',v);document.getElementById('api-key-status').textContent='Saved.';document.getElementById('api-key-input').value='••••••••••••••••';}
+function saveApiKey(){const v=document.getElementById('api-key-input').value.trim();if(!v||v==='****************'){document.getElementById('api-key-status').textContent='No changes made.';return;}localStorage.setItem('gm_anthropic_key',v);document.getElementById('api-key-status').textContent='Saved.';document.getElementById('api-key-input').value='****************';}
 function clearApiKey(){localStorage.removeItem('gm_anthropic_key');document.getElementById('api-key-input').value='';document.getElementById('api-key-status').textContent='Cleared.';}
-function saveGhToken(){const v=document.getElementById('gh-token-input').value.trim();if(!v||v.startsWith('•')){document.getElementById('gh-token-status').textContent='No changes made.';return;}localStorage.setItem('gm_gh_token',v);document.getElementById('gh-token-status').textContent='Saved. Timelog will sync to repo.';document.getElementById('gh-token-input').value='••••••••••••••••';}
+function saveGhToken(){const v=document.getElementById('gh-token-input').value.trim();if(!v||v==='****************'){document.getElementById('gh-token-status').textContent='No changes made.';return;}localStorage.setItem('gm_gh_token',v);document.getElementById('gh-token-status').textContent='Saved. Timelog will sync to repo.';document.getElementById('gh-token-input').value='****************';}
 function clearGhToken(){localStorage.removeItem('gm_gh_token');document.getElementById('gh-token-input').value='';document.getElementById('gh-token-status').textContent='Cleared. Timelog stored in browser only.';}
 
-// ── GITHUB TIMELOG STORAGE ─────────────────────────────────────────────────
+// -- GITHUB TIMELOG STORAGE -------------------------------------------------
 const GH_REPO='unicrestgroup/unicrest-portal';
 const GH_FILE='data/timelog.json';
 const GH_API=`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
@@ -807,7 +807,7 @@ async function loadEmails(){
 function renderEmailList(emails){
   const body=document.getElementById('email-body');
   const fmtT=dt=>{const d=new Date(dt),now=new Date(),diff=now-d;if(diff<86400000)return d.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});if(diff<172800000)return 'Yesterday';return d.toLocaleDateString('en-NZ',{day:'2-digit',month:'short',year:'numeric'});};
-  body.innerHTML=`<div class="feed-note">${emails.length} email${emails.length!==1?'s':''} — ${emails.filter(e=>!e.isRead).length} unread</div>`
+  body.innerHTML=`<div class="feed-note">${emails.length} email${emails.length!==1?'s':''} - ${emails.filter(e=>!e.isRead).length} unread</div>`
     +emails.slice(0,20).map((e,i)=>`
     <div class="email-item" id="email-item-${i}">
       <div class="email-row1">
@@ -816,10 +816,10 @@ function renderEmailList(emails){
       </div>
       <div class="email-subj">${e.subject||'(no subject)'}</div>
       <div class="email-btns">
-        <button class="e-btn e-g" onclick="moveToDone(${i})">✓ Done</button>
-        <button class="e-btn e-r" onclick="moveToJunk(${i})">✕ Junk</button>
-        <button class="e-btn e-p" onclick="currentEmailIndex=${i};openScheduleModal()">📅 Schedule</button>
-        <button class="e-btn e-ghost" onclick="openEmailPanel(${i})">Open →</button>
+        <button class="e-btn e-g" onclick="moveToDone(${i})">? Done</button>
+        <button class="e-btn e-r" onclick="moveToJunk(${i})">? Junk</button>
+        <button class="e-btn e-p" onclick="currentEmailIndex=${i};openScheduleModal()">? Schedule</button>
+        <button class="e-btn e-ghost" onclick="openEmailPanel(${i})">Open ?</button>
       </div>
     </div>`).join('');
 }
@@ -840,7 +840,7 @@ async function summariseEmails(){
     if(result.error)throw new Error(result.error.message);
     const items=JSON.parse(result.content?.[0]?.text?.replace(/```json|```/g,'').trim()||'[]');
     body.innerHTML=`<div class="feed-note">${items.length} email${items.length!==1?'s':''} summarised by AI</div>`
-      +items.map(item=>`<div class="ai-item"><div class="ai-from">${item.from}</div><div class="ai-subj">${item.subject}</div><div class="ai-summary">${item.summary}</div>${item.action?`<div class="ai-action">▶ ${item.action}</div>`:''}</div>`).join('');
+      +items.map(item=>`<div class="ai-item"><div class="ai-from">${item.from}</div><div class="ai-subj">${item.subject}</div><div class="ai-summary">${item.summary}</div>${item.action?`<div class="ai-action">? ${item.action}</div>`:''}</div>`).join('');
   }catch(err){console.error(err);renderEmailList(rawEmails);document.getElementById('email-body').insertAdjacentHTML('afterbegin',`<div class="feed-note" style="color:var(--red-text);">AI failed: ${err.message}</div>`);}
 }
 
@@ -853,10 +853,10 @@ let projects=[];
 function renderProjects(){
   const list=document.getElementById('rag-list');
   if(!projects.length){list.innerHTML='<div style="padding:12px 22px;font-size:12px;color:var(--mid);font-style:italic;">No projects yet.</div>';updateMetrics();return;}
-  list.innerHTML=projects.map((p,i)=>`<div class="rag-item"><div class="rag-dot ${p.rag}"></div><div class="rag-name">${p.name}</div><div class="rag-btns"><div class="rag-btn g ${p.rag==='green'?'active':''}" onclick="setRag(${i},'green')"></div><div class="rag-btn a ${p.rag==='amber'?'active':''}" onclick="setRag(${i},'amber')"></div><div class="rag-btn r ${p.rag==='red'?'active':''}" onclick="setRag(${i},'red')"></div><button class="btn-ghost" style="padding:1px 7px;font-size:11px;" onclick="removeProject(${i})">×</button></div></div>`).join('');
+  list.innerHTML=projects.map((p,i)=>`<div class="rag-item"><div class="rag-dot ${p.rag}"></div><div class="rag-name">${p.name}</div><div class="rag-btns"><div class="rag-btn g ${p.rag==='green'?'active':''}" onclick="setRag(${i},'green')"></div><div class="rag-btn a ${p.rag==='amber'?'active':''}" onclick="setRag(${i},'amber')"></div><div class="rag-btn r ${p.rag==='red'?'active':''}" onclick="setRag(${i},'red')"></div><button class="btn-ghost" style="padding:1px 7px;font-size:11px;" onclick="removeProject(${i})">?</button></div></div>`).join('');
   updateMetrics();
 }
-function updateMetrics(){const g=projects.filter(p=>p.rag==='green').length,a=projects.filter(p=>p.rag==='amber').length,r=projects.filter(p=>p.rag==='red').length;document.getElementById('metric-green').textContent=g||'—';document.getElementById('metric-amber').textContent=a||'—';document.getElementById('metric-red').textContent=r||'—';}
+function updateMetrics(){const g=projects.filter(p=>p.rag==='green').length,a=projects.filter(p=>p.rag==='amber').length,r=projects.filter(p=>p.rag==='red').length;document.getElementById('metric-green').textContent=g||'-';document.getElementById('metric-amber').textContent=a||'-';document.getElementById('metric-red').textContent=r||'-';}
 function setRag(i,rag){projects[i].rag=rag;renderProjects();saveProjects();}
 function addProject(){const inp=document.getElementById('new-project-name'),name=inp.value.trim();if(!name)return;projects.push({name,rag:'green',note:''});inp.value='';renderProjects();saveProjects();}
 function removeProject(i){projects.splice(i,1);renderProjects();saveProjects();}
@@ -867,7 +867,7 @@ function updateCaptureTs(){document.getElementById('capture-ts').textContent=new
 function saveNote(){const input=document.getElementById('capture-input'),text=input.value.trim();if(!text)return;const notes=loadNotes();notes.unshift({text,ts:new Date().toLocaleString('en-NZ',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true})});localStorage.setItem('gm_notes',JSON.stringify(notes));input.value='';renderNotes();}
 function loadNotes(){try{return JSON.parse(localStorage.getItem('gm_notes')||'[]');}catch(e){return[];}}
 function deleteNote(i){const n=loadNotes();n.splice(i,1);localStorage.setItem('gm_notes',JSON.stringify(n));renderNotes();}
-function renderNotes(){const notes=loadNotes();document.getElementById('notes-count').textContent=notes.length;document.getElementById('notes-list').innerHTML=notes.map((n,i)=>`<div class="note-item">${n.text}<div class="note-ts">${n.ts}</div><button class="note-del" onclick="deleteNote(${i})">×</button></div>`).join('');}
+function renderNotes(){const notes=loadNotes();document.getElementById('notes-count').textContent=notes.length;document.getElementById('notes-list').innerHTML=notes.map((n,i)=>`<div class="note-item">${n.text}<div class="note-ts">${n.ts}</div><button class="note-del" onclick="deleteNote(${i})">?</button></div>`).join('');}
 function loadLocalData(){loadPriorities();loadProjects();renderNotes();}
 
 var currentEmailIndex=null;
@@ -984,14 +984,14 @@ function schedRenderTimeline(){
     for(let s=0;s<slotsPerHour;s++){
       const isHour=s===0;
       const ap=h<12?'am':'pm';
-      const tl=isHour?`<div style="width:52px;flex-shrink:0;font-size:11px;color:var(--mid);text-align:right;padding:4px 10px 0 0;font-weight:700;">${(h%12||12)+ap}</div>`:`<div style="width:52px;flex-shrink:0;font-size:9px;color:var(--border);text-align:right;padding:2px 10px 0 0;">${s*schedIncrement===30?'30':'·'}</div>`;
+      const tl=isHour?`<div style="width:52px;flex-shrink:0;font-size:11px;color:var(--mid);text-align:right;padding:4px 10px 0 0;font-weight:700;">${(h%12||12)+ap}</div>`:`<div style="width:52px;flex-shrink:0;font-size:9px;color:var(--border);text-align:right;padding:2px 10px 0 0;">${s*schedIncrement===30?'30':'?'}</div>`;
       rows+=`<div onclick="schedClickSlot(${h},${s*schedIncrement})" style="display:flex;min-height:${slotH}px;cursor:pointer;transition:background 0.08s;border-top:${isHour?'1px solid var(--border)':'1px solid rgba(0,0,0,0.04)'};" onmouseover="this.style.background='rgba(239,62,66,0.04)'" onmouseout="this.style.background='transparent'">${tl}<div style="flex:1;position:relative;height:${slotH}px;padding-right:12px;"></div></div>`;
     }
   }
   body.innerHTML=`<div style="position:relative;background:var(--white);">${rows}</div>`;
   const container=body.querySelector('div');
   schedDayEvs.forEach(ev=>{const top=(ev.start-TL_START)*TL_HOUR_H,h=Math.max(ev.dur*TL_HOUR_H-2,20);const el=document.createElement('div');el.style.cssText=`position:absolute;top:${top}px;height:${h}px;left:52px;right:8px;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:2;background:#EFF5FF;border-left:3px solid #378ADD;color:#1A5FAA;pointer-events:none;`;el.textContent=ev.label;container.appendChild(el);});
-  if(selStart>=TL_START&&selStart<TL_END){const top=(selStart-TL_START)*TL_HOUR_H,h=Math.max((schedDuration/60)*TL_HOUR_H-2,22);const hr=schedHour%12||12,mn=String(schedMin).padStart(2,'0'),ap=schedHour<12?'am':'pm';const el=document.createElement('div');el.style.cssText=`position:absolute;top:${top}px;height:${h}px;left:52px;right:8px;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:3;background:var(--red-bg);border-left:3px solid var(--red);color:var(--red-text);pointer-events:none;`;el.textContent=`${hr}:${mn}${ap} — ${title}`;container.appendChild(el);}
+  if(selStart>=TL_START&&selStart<TL_END){const top=(selStart-TL_START)*TL_HOUR_H,h=Math.max((schedDuration/60)*TL_HOUR_H-2,22);const hr=schedHour%12||12,mn=String(schedMin).padStart(2,'0'),ap=schedHour<12?'am':'pm';const el=document.createElement('div');el.style.cssText=`position:absolute;top:${top}px;height:${h}px;left:52px;right:8px;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:3;background:var(--red-bg);border-left:3px solid var(--red);color:var(--red-text);pointer-events:none;`;el.textContent=`${hr}:${mn}${ap} - ${title}`;container.appendChild(el);}
   if(showNow){const top=(nowFrac-TL_START)*TL_HOUR_H;const nl=document.createElement('div');nl.style.cssText=`position:absolute;left:52px;right:0;height:2px;background:var(--red);z-index:5;top:${top}px;pointer-events:none;`;const dot=document.createElement('div');dot.style.cssText=`position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:var(--red);`;nl.appendChild(dot);container.appendChild(nl);}
   body.scrollTop=Math.max(0,(selStart-TL_START-1.5))*TL_HOUR_H;
 }
@@ -1005,7 +1005,7 @@ async function createCalendarEvent(){
   try{const t=await getToken();const resp=await fetch('https://graph.microsoft.com/v1.0/me/events',{method:'POST',headers:{'Authorization':`Bearer ${t}`,'Content-Type':'application/json'},body:JSON.stringify({subject:title,start:{dateTime:start.toISOString(),timeZone:'New Zealand Standard Time'},end:{dateTime:end.toISOString(),timeZone:'New Zealand Standard Time'}})});if(!resp.ok)throw new Error('Calendar API error '+resp.status);closeScheduleModal();loadCalendar();alert('Added to calendar: '+title);}catch(err){alert('Could not create event: '+err.message);console.error(err);}
 }
 
-// ── PAGE NAVIGATION ────────────────────────────────────────────────────────
+// -- PAGE NAVIGATION --------------------------------------------------------
 function showPage(page){
   document.getElementById('home-page').style.display=page==='home'?'block':'none';
   document.getElementById('timelog-page').style.display=page==='timelog'?'block':'none';
@@ -1017,7 +1017,7 @@ function showPage(page){
   }
 }
 
-// ── TASK TIMER ─────────────────────────────────────────────────────────────
+// -- TASK TIMER -------------------------------------------------------------
 var timerRunning=false, timerStart=null, timerInterval=null, timerElapsed=0;
 
 function timerToggle(){
@@ -1027,7 +1027,7 @@ function timerToggle(){
     timerRunning=true;
     timerStart=Date.now()-timerElapsed;
     timerInterval=setInterval(timerTick,1000);
-    document.getElementById('timer-btn').textContent='⏸ Pause';
+    document.getElementById('timer-btn').textContent='? Pause';
     document.getElementById('timer-btn').style.background='#F5A623';
     document.getElementById('timer-reset-btn').style.display='inline-block';
     document.getElementById('timer-display').classList.add('running');
@@ -1036,7 +1036,7 @@ function timerToggle(){
     timerRunning=false;
     timerElapsed=Date.now()-timerStart;
     clearInterval(timerInterval);
-    document.getElementById('timer-btn').textContent='▶ Resume';
+    document.getElementById('timer-btn').textContent='? Resume';
     document.getElementById('timer-btn').style.background='var(--red)';
     document.getElementById('timer-display').classList.remove('running');
   }
@@ -1059,7 +1059,7 @@ function timerClear(){
   clearInterval(timerInterval);
   document.getElementById('timer-display').textContent='0:00:00';
   document.getElementById('timer-display').classList.remove('running');
-  document.getElementById('timer-btn').textContent='▶ Start';
+  document.getElementById('timer-btn').textContent='? Start';
   document.getElementById('timer-btn').style.background='var(--red)';
   document.getElementById('timer-reset-btn').style.display='none';
   document.getElementById('timer-task').value='';
@@ -1074,7 +1074,7 @@ function timerTick(){
   document.getElementById('timer-display').textContent=h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
 
-// ── TIMELOG STORAGE ────────────────────────────────────────────────────────
+// -- TIMELOG STORAGE --------------------------------------------------------
 function loadTimelog(){try{return JSON.parse(localStorage.getItem('gm_timelog')||'[]');}catch(e){return[];}}
 function saveTimelog(logs){localStorage.setItem('gm_timelog',JSON.stringify(logs));}
 
@@ -1107,7 +1107,7 @@ async function loadFromGitHub(){
   }catch(err){console.warn('GitHub load failed:',err.message);}
 }
 
-// ── TIMELOG RENDER ─────────────────────────────────────────────────────────
+// -- TIMELOG RENDER ---------------------------------------------------------
 var tlDayOffset=0;
 const TL_COLORS=['#EF3E42','#378ADD','#1A7A4A','#7C109A','#B07A10','#0F6E56','#A32D2D','#185FA5'];
 
@@ -1121,7 +1121,7 @@ function renderTimelog(){
   const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const isToday=tlDayOffset===0;
-  document.getElementById('tl-date-label').textContent=isToday?'Today — '+days[base.getDay()]+', '+base.getDate()+' '+months[base.getMonth()]:days[base.getDay()]+', '+base.getDate()+' '+months[base.getMonth()]+' '+base.getFullYear();
+  document.getElementById('tl-date-label').textContent=isToday?'Today - '+days[base.getDay()]+', '+base.getDate()+' '+months[base.getMonth()]:days[base.getDay()]+', '+base.getDate()+' '+months[base.getMonth()]+' '+base.getFullYear();
 
   const all=loadTimelog();
   const entries=all.filter(e=>e.date===dateStr).sort((a,b)=>a.start-b.start);
@@ -1130,7 +1130,7 @@ function renderTimelog(){
   const totalMs=entries.reduce((s,e)=>s+e.dur,0);
   const taskMap={};
   entries.forEach(e=>{taskMap[e.task]=(taskMap[e.task]||0)+e.dur;});
-  const topTask=Object.keys(taskMap).sort((a,b)=>taskMap[b]-taskMap[a])[0]||'—';
+  const topTask=Object.keys(taskMap).sort((a,b)=>taskMap[b]-taskMap[a])[0]||'-';
   document.getElementById('tl-summary').innerHTML=`
     <div class="tl-stat"><div class="tl-stat-val">${fmtDur(totalMs)}</div><div class="tl-stat-label">Total tracked</div></div>
     <div class="tl-stat"><div class="tl-stat-val">${entries.length}</div><div class="tl-stat-label">Sessions</div></div>
@@ -1181,7 +1181,7 @@ function renderTimelog(){
     return `<div class="tl-entry">
       <div class="tl-entry-color" style="background:${col};"></div>
       <div class="tl-entry-task">${e.task}</div>
-      <div class="tl-entry-time">${startFmt} — ${endFmt}</div>
+      <div class="tl-entry-time">${startFmt} - ${endFmt}</div>
       <div class="tl-entry-dur">${fmtDur(e.dur)}</div>
     </div>`;
   }).join('');
