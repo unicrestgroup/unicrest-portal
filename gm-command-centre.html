@@ -370,7 +370,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="t-btn t-stop" onclick="timerReset()" style="display:none" id="timer-stop">&#9632; Stop &amp; Save</button>
     </div>
     <!-- HOME PAGE -->
-    <div id="home-page">
+    <div id="home-page" style="display:none;">
       <div class="hero">
         <div class="hero-date" id="date-today"></div>
         <div class="hero-greet" id="date-greet"></div>
@@ -471,7 +471,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
           <button onclick="scanResponseTimes()" id="dash-scan-btn" style="background:var(--red);border:none;color:#fff;border-radius:8px;padding:10px 20px;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;">&#9654; Scan emails</button>
         </div>
       </div>
-      <div style="max-width:960px;margin:0 auto;padding:24px 32px;">
+      <div style="padding:24px 32px;">
 
         <!-- Working hours settings -->
         <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px;">
@@ -655,7 +655,7 @@ function showApp(){
   document.getElementById('date-today').textContent=days[now.getDay()]+', '+now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear();
   var h=now.getHours();
   document.getElementById('date-greet').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', '+first+'.';
-  loadCalendar();loadEmails();loadLocalData();setInterval(updateCapTs,30000);updateCapTs();
+  showPage('home');loadCalendar();loadEmails();loadLocalData();setInterval(updateCapTs,30000);updateCapTs();
 }
 
 function refreshAll(){calDayOffset=0;loadCalendar();loadEmails();}
@@ -1289,39 +1289,38 @@ async function scanResponseTimes(){
     var convIds=Object.keys(convMap);
     setProgress('Found '+convIds.length+' reply threads. Fetching originals...');
 
+    // Get my own email address to filter out my own messages
+    var myEmail=(curAcct.username||'').toLowerCase();
+
     var results=[];
-    var batchSize=8;
+    var batchSize=6;
     for(var i=0;i<convIds.length;i+=batchSize){
       var batch=convIds.slice(i,i+batchSize);
-      setProgress('Processing '+(i+1)+' to '+Math.min(i+batchSize,convIds.length)+' of '+convIds.length+'...');
+      setProgress('Processing '+(i+1)+' - '+Math.min(i+batchSize,convIds.length)+' of '+convIds.length+'...');
       var batchResults=await Promise.all(batch.map(async function(cid){
         try{
           var reply=convMap[cid];
-          // Find the received message in this conversation (not sent by me)
-          var convMsgs=await gGet('https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,sentDateTime,from,isDraft&$top=10&$orderby=receivedDateTime asc');
-          var msgs=convMsgs.value||[];
-          // Find the first received (inbound) message before the reply
           var replySent=new Date(reply.sentDateTime).getTime();
+          // Get all messages in this conversation
+          var convMsgs=await gGet('https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27&$select=subject,receivedDateTime,from,parentFolderId&$top=20&$orderby=receivedDateTime asc');
+          var msgs=convMsgs.value||[];
+          // Find the most recent inbound message (not from me) before the reply
           var inbound=null;
           for(var j=0;j<msgs.length;j++){
             var m=msgs[j];
+            var mAddr=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
             var mTime=new Date(m.receivedDateTime).getTime();
-            if(mTime<replySent&&m.from&&m.from.emailAddress){
-              // Not sent by me - check it's not in sent items by looking at folder or sentDateTime vs receivedDateTime
-              if(Math.abs(mTime-new Date(m.sentDateTime||m.receivedDateTime).getTime())<60000*5){
-                // likely sent by me, skip
-                continue;
-              }
-              inbound=m;
-              break;
-            }
+            // Skip if from me, or if after the reply was sent
+            if(mAddr===myEmail)continue;
+            if(mTime>=replySent)break;
+            inbound=m; // keep updating - we want the LAST inbound before reply
           }
           if(!inbound)return null;
           var receivedMs=new Date(inbound.receivedDateTime).getTime();
           var wMins=workMinsBetween(receivedMs,replySent);
-          if(wMins<0)return null;
+          if(wMins<0||wMins>43200)return null; // ignore >30 working days
           return{
-            subject:reply.subject,
+            subject:reply.subject.replace(/^(re:|re :|fw:|fwd:)\s*/i,''),
             from:inbound.from&&inbound.from.emailAddress?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
             received:receivedMs,
             replied:replySent,
