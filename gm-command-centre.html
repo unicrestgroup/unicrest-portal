@@ -234,6 +234,49 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sm-tl{flex:1;overflow-y:auto;position:relative;}
 .sm-tl::-webkit-scrollbar{width:4px;}
 .sm-tl::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+/* DASHBOARD LAYOUT */
+.page-fill{display:none;flex-direction:column;flex:1;overflow:hidden;background:var(--bg);}
+.page-fill.visible{display:flex;}
+.dash-topbar{background:var(--dark);padding:18px 28px;border-bottom:3px solid var(--red);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0;}
+.dash-topbar-left{}
+.dash-page-title{font-size:20px;font-weight:700;color:#fff;line-height:1;}
+.dash-page-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:4px;}
+.dash-topbar-right{display:flex;align-items:center;gap:12px;}
+.dash-last-scan{font-size:11px;color:rgba(255,255,255,.3);font-style:italic;}
+.dash-scan-btn{background:var(--red);border:none;color:#fff;border-radius:8px;padding:9px 20px;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;white-space:nowrap;}
+.dash-scan-btn:hover{background:#d43336;}
+.dash-layout{display:flex;flex:1;overflow:hidden;gap:0;}
+.dash-sidebar{width:220px;flex-shrink:0;padding:20px;border-right:1px solid var(--border);overflow-y:auto;background:var(--white);}
+.dash-main{flex:1;padding:20px 24px;overflow-y:auto;}
+.dash-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+.dash-card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mid);margin-bottom:12px;}
+.dash-day-row{display:flex;gap:5px;}
+.wday-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--soft);color:var(--mid);font-size:11px;font-family:var(--font);font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.wday-btn.on{background:rgba(239,62,66,.1);border-color:rgba(239,62,66,.35);color:var(--red);}
+.dash-hours-row{display:flex;align-items:center;gap:8px;}
+.dash-hours-sep{font-size:12px;color:var(--mid);}
+.dash-select{background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;font-family:var(--font);color:var(--text);outline:none;cursor:pointer;}
+.dash-progress{display:flex;align-items:center;gap:10px;padding:16px;background:var(--white);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;font-size:13px;color:var(--mid);}
+.dash-stats-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.dash-stat{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 18px;flex:1;min-width:110px;}
+.dash-sv{font-size:24px;font-weight:700;color:var(--text);line-height:1;}
+.dash-sl{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:.1em;margin-top:5px;}
+.dash-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.dash-bar-lbl{font-size:10px;color:var(--mid);min-width:70px;text-align:right;}
+.dash-bar-track{flex:1;background:var(--soft);border-radius:4px;height:16px;overflow:hidden;}
+.dash-bar-fill{height:100%;border-radius:4px;background:var(--red);display:flex;align-items:center;padding-left:6px;min-width:20px;}
+.dash-bar-cnt{font-size:9px;font-weight:700;color:#fff;}
+.dash-row{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:11px 16px;display:flex;align-items:center;gap:12px;margin-bottom:7px;}
+.dash-row:hover{background:var(--soft);}
+.dash-row-from{font-size:12px;color:var(--mid);min-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dash-row-subj{font-size:13px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dash-row-date{font-size:11px;color:var(--mid);white-space:nowrap;}
+.dash-row-dur{font-size:14px;font-weight:700;min-width:60px;text-align:right;}
+.dash-row-dur.fast{color:var(--green);}
+.dash-row-dur.med{color:var(--amber);}
+.dash-row-dur.slow{color:var(--red-text);}
+.dash-list-hdr{display:flex;gap:12px;padding:0 16px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);}
+
 /* DASHBOARD */
 .wday-btn{background:var(--soft);border:1px solid var(--border);color:var(--mid);border-radius:6px;padding:5px 10px;font-size:11px;font-family:var(--font);font-weight:700;cursor:pointer;}
 .wday-btn.on{background:rgba(239,62,66,.08);border-color:rgba(239,62,66,.3);color:var(--red);}
@@ -462,65 +505,56 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   </div>
 
     <!-- DASHBOARD PAGE -->
-    <div id="dashboard-page" style="display:none;flex:1;overflow-y:auto;">
-      <div style="background:var(--dark);padding:22px 32px 18px;border-bottom:3px solid var(--red);">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-          <div>
-            <div style="font-size:22px;font-weight:700;color:#fff;margin-bottom:3px;">Email Response Time</div>
-            <div style="font-size:12px;color:rgba(255,255,255,.35);">Working hours only. Last 90 days.</div>
-          </div>
-          <button onclick="scanResponseTimes()" id="dash-scan-btn" style="background:var(--red);border:none;color:#fff;border-radius:8px;padding:10px 20px;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;">&#9654; Scan emails</button>
+    <div id="dashboard-page" class="page-fill">
+      <div class="dash-topbar">
+        <div class="dash-topbar-left">
+          <div class="dash-page-title">Email Response Times</div>
+          <div class="dash-page-sub">Working hours only &middot; Last 90 days</div>
+        </div>
+        <div class="dash-topbar-right">
+          <div id="dash-last-scan" class="dash-last-scan"></div>
+          <button onclick="scanResponseTimes()" id="dash-scan-btn" class="dash-scan-btn">&#9654; Scan</button>
         </div>
       </div>
-      <div style="padding:24px 32px;">
 
-        <!-- Working hours settings -->
-        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mid);margin-bottom:14px;">Working Hours Settings</div>
-          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
-            <div>
-              <div style="font-size:11px;color:var(--mid);font-weight:700;margin-bottom:8px;">Working days</div>
-              <div style="display:flex;gap:6px;" id="wday-btns">
-                <button onclick="toggleWDay(0)" id="wd-0" class="wday-btn">Sun</button>
-                <button onclick="toggleWDay(1)" id="wd-1" class="wday-btn on">Mon</button>
-                <button onclick="toggleWDay(2)" id="wd-2" class="wday-btn on">Tue</button>
-                <button onclick="toggleWDay(3)" id="wd-3" class="wday-btn on">Wed</button>
-                <button onclick="toggleWDay(4)" id="wd-4" class="wday-btn on">Thu</button>
-                <button onclick="toggleWDay(5)" id="wd-5" class="wday-btn on">Fri</button>
-                <button onclick="toggleWDay(6)" id="wd-6" class="wday-btn">Sat</button>
-              </div>
+      <div class="dash-layout">
+
+        <!-- Left: settings -->
+        <div class="dash-sidebar">
+          <div class="dash-card">
+            <div class="dash-card-title">Working days</div>
+            <div class="dash-day-row" id="wday-btns">
+              <button onclick="toggleWDay(1)" id="wd-1" class="wday-btn on">M</button>
+              <button onclick="toggleWDay(2)" id="wd-2" class="wday-btn on">T</button>
+              <button onclick="toggleWDay(3)" id="wd-3" class="wday-btn on">W</button>
+              <button onclick="toggleWDay(4)" id="wd-4" class="wday-btn on">T</button>
+              <button onclick="toggleWDay(5)" id="wd-5" class="wday-btn on">F</button>
+              <button onclick="toggleWDay(6)" id="wd-6" class="wday-btn">S</button>
+              <button onclick="toggleWDay(0)" id="wd-0" class="wday-btn">S</button>
             </div>
-            <div>
-              <div style="font-size:11px;color:var(--mid);font-weight:700;margin-bottom:8px;">Working hours</div>
-              <div style="display:flex;align-items:center;gap:8px;">
-                <select id="wh-start" onchange="saveWorkSettings()" style="background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--font);color:var(--text);outline:none;"></select>
-                <span style="font-size:12px;color:var(--mid);">to</span>
-                <select id="wh-end" onchange="saveWorkSettings()" style="background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--font);color:var(--text);outline:none;"></select>
-              </div>
+          </div>
+          <div class="dash-card" style="margin-top:12px;">
+            <div class="dash-card-title">Working hours</div>
+            <div class="dash-hours-row">
+              <select id="wh-start" onchange="saveWorkSettings()" class="dash-select"></select>
+              <span class="dash-hours-sep">to</span>
+              <select id="wh-end" onchange="saveWorkSettings()" class="dash-select"></select>
             </div>
-            <div style="margin-left:auto;font-size:11px;color:var(--mid);font-style:italic;padding-top:28px;" id="dash-last-scan"></div>
+          </div>
+          <div class="dash-card" style="margin-top:12px;" id="dash-chart-wrap" style="display:none;">
+            <div class="dash-card-title">Distribution</div>
+            <div id="dash-chart"></div>
           </div>
         </div>
 
-        <!-- Stats cards -->
-        <div id="dash-stats" style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;"></div>
-
-        <!-- Distribution chart -->
-        <div id="dash-chart-wrap" style="display:none;background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mid);margin-bottom:16px;">Response Time Distribution</div>
-          <div id="dash-chart"></div>
-        </div>
-
-        <!-- Results list -->
-        <div id="dash-results"></div>
-
-        <!-- Scan progress -->
-        <div id="dash-progress" style="display:none;text-align:center;padding:40px;color:var(--mid);">
-          <div style="display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;">
-            <div class="spinner"></div>
-            <span id="dash-progress-text">Scanning sent emails...</span>
+        <!-- Right: stats + results -->
+        <div class="dash-main">
+          <div id="dash-progress" class="dash-progress" style="display:none;">
+            <div class="spinner" style="width:16px;height:16px;border-width:2px;"></div>
+            <span id="dash-progress-text">Scanning...</span>
           </div>
-          <div style="margin-top:12px;font-size:12px;font-style:italic;">This may take 15-30 seconds for large mailboxes.</div>
+          <div id="dash-stats" class="dash-stats-row"></div>
+          <div id="dash-results"></div>
         </div>
 
       </div>
@@ -1033,7 +1067,7 @@ async function createCalEvent(){
 function showPage(page){
   document.getElementById('home-page').style.display=page==='home'?'flex':'none';
   document.getElementById('timelog-page').style.display=page==='timelog'?'block':'none';
-  document.getElementById('dashboard-page').style.display=page==='dashboard'?'block':'none';
+  document.getElementById('dashboard-page').classList.toggle('visible',page==='dashboard');
   document.getElementById('nav-home').classList.toggle('active',page==='home');
   document.getElementById('nav-tl').classList.toggle('active',page==='timelog');
   document.getElementById('nav-dash').classList.toggle('active',page==='dashboard');
@@ -1394,40 +1428,38 @@ function renderDashResults(results){
   var under1h=results.filter(function(r){return r.wMins<60;}).length;
   var under4h=results.filter(function(r){return r.wMins<240;}).length;
 
-  // Stats
+  // Stats bar
   document.getElementById('dash-stats').innerHTML=
-    '<div class="dash-stat"><div class="dash-sv">'+fmtMins(avg)+'</div><div class="dash-sl">Avg response time</div></div>'+
+    '<div class="dash-stat"><div class="dash-sv">'+fmtMins(avg)+'</div><div class="dash-sl">Average</div></div>'+
     '<div class="dash-stat"><div class="dash-sv" style="color:var(--green)">'+fmtMins(fastest)+'</div><div class="dash-sl">Fastest</div></div>'+
     '<div class="dash-stat"><div class="dash-sv" style="color:var(--red-text)">'+fmtMins(slowest)+'</div><div class="dash-sl">Slowest</div></div>'+
-    '<div class="dash-stat"><div class="dash-sv">'+total+'</div><div class="dash-sl">Replies tracked</div></div>'+
-    '<div class="dash-stat"><div class="dash-sv">'+Math.round(under1h/total*100)+'%</div><div class="dash-sl">Under 1 hour</div></div>';
+    '<div class="dash-stat"><div class="dash-sv">'+total+'</div><div class="dash-sl">Tracked</div></div>'+
+    '<div class="dash-stat"><div class="dash-sv">'+Math.round(under1h/total*100)+'%</div><div class="dash-sl">Under 1h</div></div>';
 
-  // Distribution chart
+  // Distribution chart (in sidebar)
   var buckets=[
-    {lbl:'Under 30m',count:results.filter(function(r){return r.wMins<30;}).length},
-    {lbl:'30m - 1h', count:results.filter(function(r){return r.wMins>=30&&r.wMins<60;}).length},
-    {lbl:'1h - 2h',  count:results.filter(function(r){return r.wMins>=60&&r.wMins<120;}).length},
-    {lbl:'2h - 4h',  count:results.filter(function(r){return r.wMins>=120&&r.wMins<240;}).length},
-    {lbl:'4h - 8h',  count:results.filter(function(r){return r.wMins>=240&&r.wMins<480;}).length},
-    {lbl:'Over 8h',  count:results.filter(function(r){return r.wMins>=480;}).length}
+    {lbl:'< 30m',  count:results.filter(function(r){return r.wMins<30;}).length},
+    {lbl:'30m-1h', count:results.filter(function(r){return r.wMins>=30&&r.wMins<60;}).length},
+    {lbl:'1h-2h',  count:results.filter(function(r){return r.wMins>=60&&r.wMins<120;}).length},
+    {lbl:'2h-4h',  count:results.filter(function(r){return r.wMins>=120&&r.wMins<240;}).length},
+    {lbl:'4h-8h',  count:results.filter(function(r){return r.wMins>=240&&r.wMins<480;}).length},
+    {lbl:'> 8h',   count:results.filter(function(r){return r.wMins>=480;}).length}
   ];
-  var maxCount=Math.max.apply(null,buckets.map(function(b){return b.count;}));
-  var chartHtml=buckets.map(function(b){
-    var pct=maxCount>0?Math.round(b.count/maxCount*100):0;
-    return '<div class="dash-bar-row"><div class="dash-bar-lbl">'+b.lbl+'</div><div class="dash-bar-track"><div class="dash-bar-fill" style="width:'+pct+'%"><span class="dash-bar-cnt">'+(b.count>0?b.count:'')+'</span></div></div></div>';
+  var maxC=Math.max.apply(null,buckets.map(function(b){return b.count;}));
+  document.getElementById('dash-chart').innerHTML=buckets.map(function(b){
+    var pct=maxC>0?Math.round(b.count/maxC*100):0;
+    return '<div class="dash-bar-row"><div class="dash-bar-lbl">'+b.lbl+'</div><div class="dash-bar-track"><div class="dash-bar-fill" style="width:'+Math.max(pct,4)+'%"><span class="dash-bar-cnt">'+(b.count>0?b.count:'')+'</span></div></div></div>';
   }).join('');
-  document.getElementById('dash-chart').innerHTML=chartHtml;
   document.getElementById('dash-chart-wrap').style.display='block';
 
-  // Results list - sorted slowest first
+  // Results list sorted slowest first
   var sorted=results.slice().sort(function(a,b){return b.wMins-a.wMins;});
-  var listTitle='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mid);margin-bottom:12px;">All Replies (slowest first)</div>';
-  var listHtml=sorted.map(function(r){
+  var hdr='<div class="dash-list-hdr"><div style="min-width:150px;">From</div><div style="flex:1;">Subject</div><div style="white-space:nowrap;">Date</div><div style="min-width:60px;text-align:right;">Time</div></div>';
+  document.getElementById('dash-results').innerHTML=hdr+sorted.map(function(r){
     var cls=r.wMins<60?'fast':r.wMins<240?'med':'slow';
     var recvd=new Date(r.received).toLocaleDateString('en-NZ',{day:'2-digit',month:'short'});
-    return '<div class="dash-row"><div class="dash-row-from">'+r.from+'</div><div class="dash-row-subj">'+r.subject+'</div><div style="font-size:11px;color:var(--mid);white-space:nowrap;">'+recvd+'</div><div class="dash-row-dur '+cls+'">'+fmtMins(r.wMins)+'</div></div>';
+    return '<div class="dash-row"><div class="dash-row-from">'+r.from+'</div><div class="dash-row-subj">'+r.subject+'</div><div class="dash-row-date">'+recvd+'</div><div class="dash-row-dur '+cls+'">'+fmtMins(r.wMins)+'</div></div>';
   }).join('');
-  document.getElementById('dash-results').innerHTML=listTitle+listHtml;
 }
 
 init();
