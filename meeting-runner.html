@@ -551,14 +551,16 @@ function timerUI(){
 /* ═══════════════════════════════
    MEETING LIFECYCLE
    ═══════════════════════════════ */
-function goSec(i){if(i<0||i>=S.sections.length)return;timerStop();S.curSec=i;render();timerUI();}
+function goSec(i){if(i<0||i>=curSections().length)return;if(S.screen==='runner')timerStop();S.curSec=i;render();if(S.screen==='runner')timerUI();}
 function nextSec(){S.sections[S.curSec].done=true;timerStop();if(S.curSec<S.sections.length-1){S.curSec++;render();}else endMeeting();}
 function prevSec(){if(S.curSec>0){timerStop();S.curSec--;render();}}
 
 async function prepMtg(idx){
   const m=S.meetings[idx];
   S.prepMeeting=m; S.prepSeriesId=m.seriesId;
-  S.prepAgenda = await getAgenda(m.seriesId);
+  S.curSec=0;
+  const agenda = await getAgenda(m.seriesId);
+  S.prepAgenda = agenda.map(a=>({...a, notes:'', elapsed:0, done:false}));
   await loadHeadlines(m.seriesId);
   await loadActions(m.seriesId);
   S.screen='prep'; render();
@@ -592,7 +594,7 @@ function endMeeting(){
 }
 function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.prepAgenda=[];document.getElementById('clockEl').textContent='';loadCal();}
 function hdrAction(){if(S.screen==='runner'){if(confirm('End this meeting?'))endMeeting();}else if(S.screen==='summary')backToDash();}
-function updNotes(v){S.sections[S.curSec].notes=v;}
+function updNotes(v){curSections()[S.curSec].notes=v;}
 
 /* ═══════════════════════════════
    AGENDA EDITOR
@@ -636,13 +638,14 @@ function render(){
   else if(S.screen==='runner'){
     btn.style.display='';btn.textContent='End meeting';btn.className='hdr-btn red';btn.onclick=hdrAction;
     app.innerHTML=rRunner()+(S.showAgendaEditor?rAgendaEditor():'');
-    const na=document.getElementById('sN');if(na)na.value=S.sections[S.curSec].notes;
+    const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
     timerUI();
   }
   else if(S.screen==='prep'){
     btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;
     document.getElementById('clockEl').textContent='';
-    app.innerHTML='<div class="wrap">'+rPrep()+'</div>'+(S.showAgendaEditor?rAgendaEditor():'');
+    app.innerHTML=rPrep()+(S.showAgendaEditor?rAgendaEditor():'');
+    const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
   }
   else if(S.screen==='summary'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;document.getElementById('clockEl').textContent='';app.innerHTML='<div class="wrap">'+rSummary()+'</div>';}
 }
@@ -695,88 +698,65 @@ function rDash(){
   return html;
 }
 
-/* ══ PREPARE (Pre-meeting view) ══ */
+/* ══ HELPERS for shared runner/prep logic ══ */
+function curSections(){return S.screen==='prep'?S.prepAgenda:S.sections;}
+function curSecName(){return curSections()[S.curSec].name;}
+function curAttendees(){
+  if(S.screen==='prep') return S.prepMeeting?S.prepMeeting.attendees:[];
+  return S.activeMeeting?S.activeMeeting.attendees:[];
+}
+
+/* ══ PREPARE (Full pre-meeting editor) ══ */
 function rPrep(){
   const m=S.prepMeeting;
   if(!m) return '<div class="empty">No meeting selected.</div>';
+  const secs=S.prepAgenda;
+  const att=m.attendees||[];
+  const sec=secs[S.curSec];
+  if(!sec) return '<div class="empty">No agenda loaded.</div>';
 
-  const time=m.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
-  const n=m.attendees.length;
-  const openHL=S.headlines.filter(h=>h.status==='open');
-  const openActions=S.actions.filter(a=>!a.done);
+  // Sidebar
+  let sb=`<div class="sidebar">
+    <div class="sb-meeting">${e(m.subject)}<small>Prepare mode</small></div>`;
 
-  let html=`
-    <div class="card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between">
-        <div>
-          <div style="font-size:17px;font-weight:700">${e(m.subject)}</div>
-          <div style="font-size:12px;color:var(--mid);margin-top:3px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div>
-        </div>
-        <span class="badge rec">Recurring</span>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="start-btn" onclick="startFromPrep()" style="flex:1">Start meeting now</button>
-        <button class="start-btn" onclick="openAgendaEditor()" style="flex:1;background:var(--dark)">Edit agenda</button>
-      </div>
-    </div>`;
-
-  // Agenda overview
-  html+=`<div class="card" style="margin-bottom:16px">
-    <div style="font-size:14px;font-weight:700;margin-bottom:10px">Agenda</div>`;
-  S.prepAgenda.forEach((s,i)=>{
-    html+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg)">
-      <div class="sn" style="width:20px;height:20px;font-size:9px">${i+1}</div>
-      <span style="font-size:13px;flex:1">${e(s.name)}</span>
-      <span style="font-size:11px;color:var(--mid)">${s.duration} min</span>
-      <span style="font-size:10px;color:var(--mid);opacity:.6">${s.type}</span>
+  secs.forEach((s,i)=>{
+    const isAct=i===S.curSec;
+    sb+=`<div class="sb-item ${isAct?'active':''}" onclick="goSec(${i})">
+      <div class="sn ${isAct?'act':''}">${i+1}</div>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e(s.name)}</span>
+      <span class="sb-time">${s.duration}m</span>
     </div>`;
   });
-  html+=`</div>`;
 
-  // Headlines
-  html+=`<div class="card" style="margin-bottom:16px">
-    <div style="font-size:14px;font-weight:700;margin-bottom:6px">Headlines</div>
-    <div style="font-size:12px;color:var(--mid);margin-bottom:10px">Add discussion points for the meeting. All attendees can add headlines.</div>
-    <div class="add-row" style="margin-bottom:12px">
-      <input type="text" id="hlT" placeholder="Add a headline..." onkeydown="if(event.key==='Enter'){addHeadline(this.value);this.value='';}">
-      <button class="add-btn" onclick="const i=document.getElementById('hlT');addHeadline(i.value);i.value='';">+ Headline</button>
-    </div>`;
+  sb+=`<div class="sb-section">
+    <div class="sb-section-label">Attendees</div>
+    <div class="sb-attendee">${att.length?att.map(a=>e(a.name)).join('<br>'):'None'}</div>
+    <button class="sb-edit-btn" onclick="openAgendaEditor()">Edit agenda sections</button>
+  </div></div>`;
 
-  if(S.headlines.length){
-    S.headlines.forEach(h=>{
-      html+=`<div class="hl-item">
-        <div class="hl-top">
-          <div style="flex:1">
-            <div class="hl-text">${e(h.text)}</div>
-            <div class="hl-meta">Added by ${e(h.by)}</div>
-          </div>
-          <span class="hl-status ${h.status}" onclick="updateHeadline('${h.id}',{status:'${h.status==='open'?'discussed':'open'}'});render();">${h.status}</span>
-          <button class="a-rm" onclick="deleteHeadline('${h.id}')">&times;</button>
-        </div>
-      </div>`;
-    });
-  } else {
-    html+=`<div style="font-size:12px;color:var(--mid)">No headlines yet. Add one above.</div>`;
-  }
-  html+=`</div>`;
+  // Main content
+  let main=`<div class="main">`;
+  main+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div class="main-title">${e(sec.name)}</div>
+    <div style="font-size:11px;color:var(--mid)">${sec.duration} min</div>
+  </div>`;
 
-  // Open actions
-  if(openActions.length){
-    html+=`<div class="card">
-      <div style="font-size:14px;font-weight:700;margin-bottom:8px">Open actions (${openActions.length})</div>`;
-    openActions.forEach(a=>{
-      html+=`<div class="a-item">
-        <div class="a-chk" onclick="toggleAction('${a.id}')"></div>
-        <div style="flex:1">
-          <div class="a-txt">${e(a.text)}</div>
-          <div class="a-meta">${a.owner?'<span>'+e(a.owner)+'</span>':''}${a.due?'<span>Due '+a.due+'</span>':''}</div>
-        </div>
-      </div>`;
-    });
-    html+=`</div>`;
-  }
+  // Section content (reuse same functions as runner)
+  if(sec.type==='headlines') main+=rHeadlinesSection(att);
+  else if(sec.type==='issues') main+=rIssuesSection(att);
+  else if(sec.type==='wrapup') main+=rWrapupSection();
+  else main+=rNotesSection(att);
 
-  return html;
+  // Nav
+  const last=S.curSec===secs.length-1;
+  main+=`<div class="main-nav">
+    ${S.curSec>0?'<button class="hdr-btn" onclick="goSec('+(S.curSec-1)+')">\u2190 '+secs[S.curSec-1].name+'</button>':''}
+    ${!last?'<button class="hdr-btn" style="background:var(--mid);color:var(--white)" onclick="goSec('+(S.curSec+1)+')">'+secs[S.curSec+1].name+' \u2192</button>':''}
+    <button class="hdr-btn red" onclick="startFromPrep()">Start meeting</button>
+  </div>`;
+
+  main+=`</div>`;
+  return `<div class="runner">${sb}${main}</div>`;
 }
 
 /* ══ RUNNER (Sidebar Layout) ══ */
@@ -838,20 +818,20 @@ function rRunner(){
 
 function rNotesSection(att){
   const oo=att.map(a=>`<option value="${e(a.name)}">${e(a.name)}</option>`).join('');
-  const secActions=S.actions.filter(a=>a.section===S.sections[S.curSec].name);
+  const secActions=S.actions.filter(a=>a.section===curSecName());
   return `
     <div class="sub-l" style="margin-top:8px">Notes</div>
     <textarea class="notes" id="sN" placeholder="Notes..." oninput="updNotes(this.value)"></textarea>
     <div class="sub-l">Actions</div>
     ${rActionsList(secActions)}
-    ${rAddAction(oo, S.sections[S.curSec].name)}`;
+    ${rAddAction(oo, curSecName())}`;
 }
 
 function rHeadlinesSection(att){
   const oo=att.map(a=>`<option value="${e(a.name)}">${e(a.name)}</option>`).join('');
   const open=S.headlines.filter(h=>h.status==='open');
   const discussed=S.headlines.filter(h=>h.status==='discussed');
-  const secActions=S.actions.filter(a=>a.section===S.sections[S.curSec].name);
+  const secActions=S.actions.filter(a=>a.section===curSecName());
 
   let html=`<div class="main-sub">Discussion points. Anyone can add a headline before or during the meeting.</div>`;
 
@@ -873,7 +853,7 @@ function rHeadlinesSection(att){
 
   html+=`<div class="sub-l" style="margin-top:20px">Actions from this section</div>`;
   html+=rActionsList(secActions);
-  html+=rAddAction(oo, S.sections[S.curSec].name);
+  html+=rAddAction(oo, curSecName());
 
   return html;
 }
@@ -919,7 +899,7 @@ function rIssuesSection(att){
   // Actions
   html+=`<div class="sub-l" style="margin-top:20px">Actions</div>`;
   html+=rActionsList(S.actions);
-  html+=rAddAction(oo, S.sections[S.curSec].name);
+  html+=rAddAction(oo, curSecName());
 
   return html;
 }
@@ -954,7 +934,7 @@ function rWrapupSection(){
   }
 
   // Section notes
-  const notedSections=S.sections.filter(s=>s.notes);
+  const notedSections=curSections().filter(s=>s.notes);
   if(notedSections.length){
     html+=`<div class="sub-l" style="margin-top:20px">Section notes</div>`;
     notedSections.forEach(s=>{
@@ -1001,7 +981,7 @@ function promptActionFromHL(hlId){
   const text=prompt('Action from "'+hl.text+'":', '');
   if(!text) return;
   const owner=prompt('Owner:','');
-  addAction(text, owner||'', '', S.sections[S.curSec].name);
+  addAction(text, owner||'', '', curSecName());
 }
 
 /* ══ AGENDA EDITOR MODAL ══ */
