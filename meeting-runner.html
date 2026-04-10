@@ -280,7 +280,8 @@ async function gDel(url){const t=await getToken();if(!t)return;await fetch(GRAPH
 const LISTS = {
   config: {name:'MR_Config', id:null},
   headlines: {name:'MR_Headlines', id:null},
-  actions: {name:'MR_Actions', id:null}
+  actions: {name:'MR_Actions', id:null},
+  issues: {name:'MR_Issues', id:null}
 };
 
 async function initSharePoint(){
@@ -323,6 +324,12 @@ async function createList(name, key){
       {name:'Status',text:{}},
       {name:'Section',text:{}},
       {name:'MeetingDate',text:{}},
+      {name:'CreatedByName',text:{}}
+    ],
+    issues: [
+      {name:'SeriesId',text:{}},
+      {name:'Status',text:{}},
+      {name:'Notes',text:{allowMultipleLines:true}},
       {name:'CreatedByName',text:{}}
     ]
   };
@@ -601,16 +608,56 @@ function goToday(){
 }
 
 /* ═══════════════════════════════
-   ISSUES (in-memory only, per session)
+   ISSUES (SharePoint)
    ═══════════════════════════════ */
-function addIssue(){
+async function loadIssues(seriesId){
+  if(!seriesId || !LISTS.issues.id){S.issues=[];return;}
+  const items = await spGetItems('issues','SeriesId',seriesId);
+  S.issues = items.map(it=>({
+    id:it.id, title:it.fields.Title||'', seriesId:it.fields.SeriesId,
+    status:it.fields.Status||'open', notes:it.fields.Notes||'',
+    by:it.fields.CreatedByName||''
+  }));
+}
+
+async function addIssue(){
   const t=document.getElementById('iT');if(!t||!t.value.trim())return;
-  S.issues.push({id:Date.now(),title:t.value.trim(),status:'open',notes:''});
+  const text=t.value.trim();
+  const sid=S.seriesId||S.prepSeriesId;
+  if(!sid||!LISTS.issues.id){
+    S.issues.push({id:Date.now(),title:text,status:'open',notes:'',by:''});
+    t.value='';render();return;
+  }
+  const userName=currentUser.name||currentUser.username;
+  const item=await spAddItem('issues',{Title:text,SeriesId:sid,Status:'open',Notes:'',CreatedByName:userName});
+  if(item){S.issues.push({id:item.id,title:text,seriesId:sid,status:'open',notes:'',by:userName});toast('Issue saved');}
+  else toast('Failed to save issue');
   t.value='';render();t.focus();
 }
-function cycleI(id){const i=S.issues.find(x=>x.id===id);if(!i)return;const o=['open','discussing','solved'];i.status=o[(o.indexOf(i.status)+1)%o.length];render();}
-function iNotes(id,v){const i=S.issues.find(x=>x.id===id);if(i)i.notes=v;}
-function rmIssue(id){S.issues=S.issues.filter(x=>x.id!==id);render();}
+
+async function cycleI(id){
+  const i=S.issues.find(x=>x.id===id);if(!i)return;
+  const o=['open','discussing','solved'];
+  i.status=o[(o.indexOf(i.status)+1)%o.length];
+  if(LISTS.issues.id && typeof id==='string') await spUpdateItem('issues',id,{Status:i.status});
+  render();
+}
+
+let _issDebounce={};
+function iNotes(id,v){
+  const i=S.issues.find(x=>x.id===id);if(!i)return;
+  i.notes=v;
+  if(LISTS.issues.id && typeof id==='string'){
+    clearTimeout(_issDebounce[id]);
+    _issDebounce[id]=setTimeout(()=>{spUpdateItem('issues',id,{Notes:v});},800);
+  }
+}
+
+async function rmIssue(id){
+  if(LISTS.issues.id && typeof id==='string') await spDeleteItem('issues',id);
+  S.issues=S.issues.filter(x=>x.id!==id);
+  render();
+}
 
 /* ═══════════════════════════════
    TIMER
@@ -646,6 +693,7 @@ async function prepMtg(idx){
   S.prepAgenda = agenda.map(a=>({...a, notes:'', elapsed:0, done:false}));
   await loadHeadlines(m.seriesId);
   await loadActions(m.seriesId);
+  await loadIssues(m.seriesId);
   S.screen='prep'; render();
 }
 
@@ -655,7 +703,6 @@ function startFromPrep(){
   S.seriesId=S.prepSeriesId;
   S.curSec=0;
   S.sections=S.prepAgenda.map(a=>({...a})); // keep notes from prep
-  S.issues=[];
   S.elapsed=0;
   S.startTime=new Date();
   S.timerOn=false;
@@ -666,15 +713,16 @@ function startFromPrep(){
 async function startMtg(idx){
   const m=idx!==undefined?S.meetings[idx]:null;
   S.activeMeeting=m;S.seriesId=m?m.seriesId:null;
-  S.curSec=0;S.issues=[];S.elapsed=0;S.startTime=new Date();S.timerOn=false;
+  S.curSec=0;S.elapsed=0;S.startTime=new Date();S.timerOn=false;
 
   // Load agenda from SharePoint (or default)
   const agenda = await getAgenda(S.seriesId);
   S.sections=agenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
 
-  // Load headlines and actions from SharePoint
+  // Load headlines, actions, and issues from SharePoint
   await loadHeadlines(S.seriesId);
   await loadActions(S.seriesId);
+  await loadIssues(S.seriesId);
 
   S.screen='runner';render();
 }
