@@ -229,7 +229,8 @@ let S={
   showAgendaEditor:false,editAgenda:[],
   showScheduler:false,schedSubject:'',schedDate:'',schedStartHr:7,schedEndHr:19,
   schedDuration:30,schedTeams:true,schedPeople:[],schedSearchResults:[],
-  schedAvail:[],schedSelTime:null,schedLoading:false
+  schedAvail:[],schedSelTime:null,schedLoading:false,
+  calEvents:[],calLoading:false,calWeekStart:null
 };
 
 /* ═══ LISTS ═══ */
@@ -447,6 +448,63 @@ function timerUI(){
   if(st){st.textContent=ts;st.className='sb-time'+(ov?' over':'');}
 }
 
+/* ═══ SHARED CALENDAR (Unicrest Leave/Events) ═══ */
+const CAL_USER='regan@unicrest.com';
+let sharedCalId=null;
+
+async function findSharedCal(){
+  if(sharedCalId)return sharedCalId;
+  const d=await gGet(`/users/${CAL_USER}/calendars?$select=id,name&$top=20`);
+  if(d&&d.value){
+    // Look for a non-default calendar (the shared leave/events one)
+    const nonDefault=d.value.filter(c=>c.name!=='Calendar');
+    if(nonDefault.length)sharedCalId=nonDefault[0].id;
+    else if(d.value.length)sharedCalId=d.value[0].id;
+    console.log('Shared calendars found:',d.value.map(c=>c.name).join(', '),'using:',sharedCalId);
+  }
+  return sharedCalId;
+}
+
+async function loadCalEvents(weekOffset){
+  S.calLoading=true;render();
+  const calId=await findSharedCal();
+  if(!calId){S.calLoading=false;toast('Shared calendar not found');render();return;}
+
+  // Calculate week start (Monday)
+  const now=new Date();
+  const day=now.getDay();
+  const mon=new Date(now);mon.setDate(now.getDate()-((day+6)%7)+(weekOffset||0)*7);
+  mon.setHours(0,0,0,0);
+  S.calWeekStart=new Date(mon);
+  const sun=new Date(mon);sun.setDate(mon.getDate()+6);sun.setHours(23,59,59,999);
+
+  const p=new URLSearchParams({
+    startDateTime:mon.toISOString(),endDateTime:sun.toISOString(),
+    $orderby:'start/dateTime',$top:'100',
+    $select:'subject,start,end,isAllDay,organizer'
+  });
+  const d=await gGet(`/users/${CAL_USER}/calendars/${calId}/calendarView?${p}`);
+  if(d&&d.value){
+    S.calEvents=d.value.map(ev=>({
+      subject:ev.subject||'',
+      start:new Date(ev.start.dateTime+'Z'),
+      end:new Date(ev.end.dateTime+'Z'),
+      allDay:ev.isAllDay||false,
+      organizer:ev.organizer?ev.organizer.emailAddress.name:''
+    }));
+  } else S.calEvents=[];
+  S.calLoading=false;render();
+}
+
+function calNavWeek(dir){
+  const current=S.calWeekStart||new Date();
+  const newStart=new Date(current);newStart.setDate(current.getDate()+dir*7);
+  const now=new Date();now.setHours(0,0,0,0);
+  const day=now.getDay();const thisMonday=new Date(now);thisMonday.setDate(now.getDate()-((day+6)%7));
+  const weekDiff=Math.round((newStart-thisMonday)/(7*86400000));
+  loadCalEvents(weekDiff);
+}
+
 /* ═══ MEETING LIFECYCLE ═══ */
 function curSec(){return(S.screen==='prep'?S.prepAgenda:S.sections);}
 function curSecName(){const s=curSec();return s&&s[S.curSec]?s[S.curSec].name:'';}
@@ -467,12 +525,14 @@ async function prepMtg(idx){
 function startFromPrep(){
   S.activeMeeting=S.prepMeeting;S.seriesId=S.prepSeriesId;S.curSec=0;
   S.sections=S.prepAgenda.map(a=>({...a}));S.elapsed=0;S.startTime=new Date();S.timerOn=false;
+  S.ratings=[];
   S.screen='runner';render();timerStart();
 }
 async function startMtg(idx){
   const m=idx!==undefined?S.meetings[idx]:null;S.activeMeeting=m;S.seriesId=m?m.seriesId:null;S.curSec=0;S.elapsed=0;S.startTime=new Date();S.timerOn=false;
   const agenda=await getConfig(S.seriesId);S.sections=agenda.agenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
   await loadHL(S.seriesId);await loadAct(S.seriesId);await loadIss(S.seriesId);await loadRat(S.seriesId);await loadAtt(S.seriesId,m);
+  S.ratings=[];
   S.screen='runner';render();timerStart();
 }
 function startAdhoc(){S.activeMeeting=null;S.seriesId=null;startMtg();}
@@ -623,6 +683,7 @@ function rSidebarLayout(mode){
 
   const oo=att.map(a=>`<option value="${esc(a.name)}">${esc(a.name)}</option>`).join('');
   if(sec.type==='checkin')main+=rCheckin();
+  else if(sec.type==='calendar')main+=rCalendar();
   else if(sec.type==='headlines')main+=rHeadlines(oo);
   else if(sec.type==='issues')main+=rIssues(oo);
   else if(sec.type==='wrapup')main+=rWrapup(oo);
@@ -637,6 +698,50 @@ function rSidebarLayout(mode){
 
 /* ═══ SECTION RENDERERS ═══ */
 function bookBtn(){return `<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;}
+
+function rCalendar(){
+  if(!S.calWeekStart)loadCalEvents(0);
+  if(S.calLoading)return `<div class="loading" style="padding:20px"><div class="spinner"></div>Loading calendar...</div>`;
+
+  const ws=S.calWeekStart||new Date();
+  const days=[];
+  for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d);}
+  const weekLabel=days[0].toLocaleDateString('en-NZ',{day:'2-digit',month:'short'})+' \u2013 '+days[6].toLocaleDateString('en-NZ',{day:'2-digit',month:'short',year:'numeric'});
+  const today=new Date().toDateString();
+
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <button class="hdr-btn" style="background:var(--dark);color:var(--white);padding:4px 10px;font-size:11px" onclick="calNavWeek(-1)">\u2190</button>
+    <div style="font-size:13px;font-weight:700">${weekLabel}</div>
+    <button class="hdr-btn" style="background:var(--dark);color:var(--white);padding:4px 10px;font-size:11px" onclick="calNavWeek(1)">\u2192</button>
+  </div>`;
+
+  days.forEach(day=>{
+    const dayStr=day.toDateString();
+    const isToday=dayStr===today;
+    const dayEvents=S.calEvents.filter(ev=>{
+      const evDay=ev.start.toDateString();
+      return evDay===dayStr;
+    });
+    const dayLabel=day.toLocaleDateString('en-NZ',{weekday:'short',day:'2-digit',month:'short'});
+
+    h+=`<div style="margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;padding:4px 8px;background:${isToday?'var(--red)':'var(--bg)'};color:${isToday?'var(--white)':'var(--dark)'};border-radius:4px;margin-bottom:4px">${dayLabel}</div>`;
+
+    if(dayEvents.length){
+      dayEvents.forEach(ev=>{
+        const timeStr=ev.allDay?'All day':ev.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true})+' \u2013 '+ev.end.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
+        h+=`<div style="display:flex;gap:8px;padding:4px 8px;font-size:12px;border-left:3px solid var(--amber);margin-left:8px;margin-bottom:3px">
+          <span style="color:var(--mid);min-width:90px">${timeStr}</span>
+          <span>${esc(ev.subject)}</span>
+        </div>`;
+      });
+    } else {
+      h+=`<div style="font-size:11px;color:var(--bdr);padding:4px 8px;margin-left:8px">No events</div>`;
+    }
+    h+=`</div>`;
+  });
+  return h;
+}
 
 function rCheckin(){
   const present=presentAtt();
@@ -697,7 +802,7 @@ function rAddAct(oo){const sec=curSecName();return `<div class="add-row"><input 
 
 /* ═══ AGENDA EDITOR ═══ */
 function rAgendaEd(){
-  const types=[{v:'checkin',l:'Check-in'},{v:'notes',l:'Notes'},{v:'headlines',l:'Headlines'},{v:'issues',l:'Issues & Actions'},{v:'wrapup',l:'Wrap-up'}];
+  const types=[{v:'checkin',l:'Check-in'},{v:'calendar',l:'Calendar'},{v:'notes',l:'Notes'},{v:'headlines',l:'Headlines'},{v:'issues',l:'Issues & Actions'},{v:'wrapup',l:'Wrap-up'}];
   let rows=S.editAgenda.map((s,i)=>{const to=types.map(t=>`<option value="${t.v}" ${s.type===t.v?'selected':''}>${t.l}</option>`).join('');
     return `<div class="modal-sec"><div style="display:flex;flex-direction:column;gap:2px;margin-right:4px"><button style="background:none;color:${i===0?'var(--bdr)':'var(--mid)'};font-size:10px;padding:0;line-height:1" onclick="edMove(${i},-1)">\u25B2</button><button style="background:none;color:${i===S.editAgenda.length-1?'var(--bdr)':'var(--mid)'};font-size:10px;padding:0;line-height:1" onclick="edMove(${i},1)">\u25BC</button></div><input type="text" value="${esc(s.name)}" oninput="edName(${i},this.value)"><input type="number" class="dur-input" value="${s.duration}" min="1" max="120" oninput="edDur(${i},this.value)"> min <select onchange="edType(${i},this.value)" style="font-size:11px;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px">${to}</select><button style="color:var(--bdr);background:none;font-size:16px;padding:2px 4px" onclick="edRm(${i})">&times;</button></div>`;}).join('');
   return `<div class="modal-bg" onclick="if(event.target===this)closeAgendaEd()"><div class="modal"><h3>Edit agenda</h3><p style="font-size:12px;color:var(--mid);margin-bottom:12px">Saved for all future meetings in this series.</p>${rows}<div style="display:flex;gap:8px;margin-top:12px"><button class="add-btn sec" onclick="edAdd()">+ Add section</button></div><div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end"><button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeAgendaEd()">Cancel</button><button class="add-btn" onclick="edSave()">Save agenda</button></div></div></div>`;
