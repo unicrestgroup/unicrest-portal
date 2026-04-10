@@ -1273,89 +1273,86 @@ async function scanResponseTimes(){
   try{
     var since=new Date();since.setDate(since.getDate()-90);
     var sinceISO=since.toISOString();
-    var myEmail=(curAcct.username||'').toLowerCase();
 
-    // Step 1: fetch sent items (up to 200)
-    setProgress('Fetching sent emails...');
-    var allSent=[];
-    var sentUrl='https://graph.microsoft.com/v1.0/me/mailFolders/sentitems/messages?$filter=sentDateTime ge '+sinceISO+'&$select=subject,sentDateTime,conversationId&$top=100&$orderby=sentDateTime desc';
-    var sd1=await gGet(sentUrl);
-    allSent=allSent.concat(sd1.value||[]);
-    if(sd1['@odata.nextLink']){
-      var sd2=await gGet(sd1['@odata.nextLink']);
-      allSent=allSent.concat(sd2.value||[]);
+    // Get actual SMTP email (UPN may differ from email address)
+    var meData=await gGet('https://graph.microsoft.com/v1.0/me?$select=mail,userPrincipalName');
+    var myEmail=((meData.mail||meData.userPrincipalName)||'').toLowerCase();
+
+    // Step 1: fetch ALL sent replies (subject starts Re:) - multiple pages
+    setProgress('Fetching sent replies...');
+    var sentReplies=[];
+    var sentUrl='https://graph.microsoft.com/v1.0/me/mailFolders/sentitems/messages?$filter=sentDateTime ge '+sinceISO+'&$select=subject,sentDateTime,conversationId&$top=100&$orderby=sentDateTime asc';
+    var page=await gGet(sentUrl);
+    sentReplies=sentReplies.concat(page.value||[]);
+    while(page['@odata.nextLink']&&sentReplies.length<500){
+      page=await gGet(page['@odata.nextLink']);
+      sentReplies=sentReplies.concat(page.value||[]);
     }
-    setProgress('Found '+allSent.length+' sent emails. Building conversation index...');
 
-    // Build map: conversationId -> earliest sent reply
+    // Filter to actual replies only (Re: prefix) and dedupe by conversationId (keep first reply)
     var convMap={};
-    allSent.forEach(function(m){
-      if(!m.conversationId)return;
-      if(!convMap[m.conversationId]||new Date(m.sentDateTime)<new Date(convMap[m.conversationId].sentDateTime)){
-        convMap[m.conversationId]=m;
+    sentReplies.forEach(function(m){
+      if(!m.conversationId||!m.subject)return;
+      var lc=m.subject.toLowerCase().trimLeft();
+      if(lc.indexOf('re:')<0&&lc.indexOf('re :')<0)return; // must be a reply
+      if(!convMap[m.conversationId]){
+        convMap[m.conversationId]=m; // earliest reply per conversation
       }
     });
     var convIds=Object.keys(convMap);
+    setProgress('Found '+convIds.length+' reply conversations. Fetching originals...');
+
     if(!convIds.length){
       document.getElementById('dash-progress').style.display='none';
-      document.getElementById('dash-results').innerHTML='<div style="text-align:center;padding:40px;color:var(--mid);font-style:italic;">No sent emails found.</div>';
+      document.getElementById('dash-results').innerHTML='<div style="text-align:center;padding:40px;color:var(--mid);font-style:italic;">No sent replies found in this period.</div>';
       btn.disabled=false;btn.textContent='&#9654; Scan emails';return;
     }
 
-    // Step 2: fetch received messages across all mail folders (inbox + subfolders)
-    setProgress('Fetching received emails...');
-    var allReceived=[];
-    var recvUrl='https://graph.microsoft.com/v1.0/me/messages?$filter=receivedDateTime ge '+sinceISO+' and isDraft eq false&$select=subject,receivedDateTime,conversationId,from&$top=200&$orderby=receivedDateTime asc';
-    var rd1=await gGet(recvUrl);
-    allReceived=allReceived.concat(rd1.value||[]);
-    if(rd1['@odata.nextLink']){
-      var rd2=await gGet(rd1['@odata.nextLink']);
-      allReceived=allReceived.concat(rd2.value||[]);
-    }
-    setProgress('Matching '+allReceived.length+' received emails to '+convIds.length+' conversations...');
-
-    // Build received index: conversationId -> array of inbound messages (not from me)
-    var recvIndex={};
-    allReceived.forEach(function(m){
-      if(!m.conversationId)return;
-      var fromAddr=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
-      if(fromAddr===myEmail)return; // skip my own messages
-      if(!recvIndex[m.conversationId])recvIndex[m.conversationId]=[];
-      recvIndex[m.conversationId].push(m);
-    });
-
-    // Step 3: match and calculate
+    // Step 2: for each conversation, find the received message before the reply
+    // Batch in groups of 10 parallel requests
     var results=[];
-    convIds.forEach(function(cid){
-      var reply=convMap[cid];
-      var replySent=new Date(reply.sentDateTime).getTime();
-      var inbounds=recvIndex[cid];
-      if(!inbounds||!inbounds.length)return;
-      // Find the most recent inbound message before the reply
-      var inbound=null;
-      for(var j=0;j<inbounds.length;j++){
-        var m=inbounds[j];
-        var mTime=new Date(m.receivedDateTime).getTime();
-        if(mTime<replySent)inbound=m;
-        else break;
-      }
-      if(!inbound)return;
-      var receivedMs=new Date(inbound.receivedDateTime).getTime();
-      var wMins=workMinsBetween(receivedMs,replySent);
-      if(wMins<0||wMins>43200)return;
-      var subj=reply.subject||'';
-      subj=subj.replace(/^((re|fwd|fw)\s*:\s*)+(.*)/i,'$3').trim();
-      results.push({
-        subject:subj||'(no subject)',
-        from:inbound.from&&inbound.from.emailAddress?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
-        received:receivedMs,replied:replySent,wMins:wMins
-      });
-    });
-    setProgress('Done. '+results.length+' replies matched.');
+    var batchSz=10;
+    for(var i=0;i<convIds.length;i+=batchSz){
+      var batch=convIds.slice(i,i+batchSz);
+      setProgress('Looking up originals: '+(i+1)+' to '+Math.min(i+batchSz,convIds.length)+' of '+convIds.length);
+      var batchRes=await Promise.all(batch.map(async function(cid){
+        try{
+          var reply=convMap[cid];
+          var replySent=new Date(reply.sentDateTime).getTime();
+          // Search this conversation for received messages
+          var url='https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,from&$top=20&$orderby=receivedDateTime asc';
+          var msgs=await gGet(url);
+          var items=msgs.value||[];
+          // Find the last inbound (not from me) message before I replied
+          var inbound=null;
+          for(var j=0;j<items.length;j++){
+            var m=items[j];
+            var mAddr=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
+            var mTime=new Date(m.receivedDateTime).getTime();
+            if(mAddr===myEmail)continue;         // skip my own
+            if(mTime>=replySent)break;           // stop if after reply
+            inbound=m;                           // keep updating for last-before-reply
+          }
+          if(!inbound)return null;
+          var receivedMs=new Date(inbound.receivedDateTime).getTime();
+          var wMins=workMinsBetween(receivedMs,replySent);
+          if(wMins<1||wMins>43200)return null;
+          var subj=reply.subject.replace(/^\s*((re|fwd|fw)\s*:\s*)+/i,'').trim();
+          return{
+            subject:subj||'(no subject)',
+            from:(inbound.from&&inbound.from.emailAddress)?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
+            received:receivedMs,replied:replySent,wMins:wMins
+          };
+        }catch(e){return null;}
+      }));
+      results=results.concat(batchRes.filter(function(r){return r!==null;}));
+    }
+
+    setProgress('Complete. '+results.length+' replies tracked.');
 
     if(!results.length){
       document.getElementById('dash-progress').style.display='none';
-      document.getElementById('dash-results').innerHTML='<div style="text-align:center;padding:40px;color:var(--mid);font-style:italic;">No matched replies found. Try a wider date range or check that your sent emails have replies in the same conversation.</div>';
+      document.getElementById('dash-results').innerHTML='<div style="text-align:center;padding:40px;color:var(--mid);font-style:italic;">No data found. This may mean your replies were to emails not in your mailbox anymore, or the conversation IDs do not match.</div>';
       btn.disabled=false;btn.textContent='&#9654; Scan emails';return;
     }
 
