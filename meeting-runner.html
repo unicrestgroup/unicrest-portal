@@ -177,6 +177,36 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 .modal-sec .rm-sec{color:var(--bdr);background:none;font-size:16px;padding:2px 4px}
 .modal-sec .rm-sec:hover{color:var(--red)}
 
+/* Scheduler overlay */
+.sched-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:250;display:flex;justify-content:flex-end}
+.sched-panel{width:min(680px,90vw);background:var(--white);height:100%;overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.sched-hdr{padding:14px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sched-hdr h3{font-size:15px;font-weight:700}
+.sched-body{padding:16px 18px;flex:1;overflow-y:auto}
+.sched-field{margin-bottom:14px}
+.sched-field label{display:block;font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.sched-field input,.sched-field select{width:100%;padding:8px 10px;border:1px solid var(--bdr);border-radius:6px;font-size:13px}
+.sched-field input:focus{outline:2px solid var(--red);border-color:transparent}
+.sched-people{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.sched-chip{background:var(--bg);padding:4px 10px;border-radius:14px;font-size:11px;display:flex;align-items:center;gap:5px}
+.sched-chip button{background:none;color:var(--mid);font-size:13px;padding:0;line-height:1}
+.sched-chip button:hover{color:var(--red)}
+.sched-results{position:absolute;background:var(--white);border:1px solid var(--bdr);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);max-height:180px;overflow-y:auto;z-index:10;left:0;right:0;margin-top:2px}
+.sched-result{padding:8px 12px;font-size:12px;cursor:pointer;display:flex;flex-direction:column}
+.sched-result:hover{background:var(--bg)}
+.sched-result small{color:var(--mid);font-size:10px}
+.tl-wrap{overflow-x:auto;margin:14px 0}
+.tl-grid{display:flex;flex-direction:column;min-width:500px}
+.tl-header{display:flex;border-bottom:1px solid var(--bdr);padding-left:110px}
+.tl-hour{font-size:9px;color:var(--mid);text-align:left;border-left:1px solid var(--bg)}
+.tl-row{display:flex;align-items:center;border-bottom:1px solid var(--bg);height:32px}
+.tl-name{width:110px;font-size:11px;padding-right:8px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-blocks{flex:1;display:flex;position:relative;height:100%;cursor:pointer}
+.tl-busy{position:absolute;top:2px;bottom:2px;background:#e57373;border-radius:3px;opacity:.7}
+.tl-tent{position:absolute;top:2px;bottom:2px;background:#ffb74d;border-radius:3px;opacity:.6}
+.tl-sel{position:absolute;top:0;bottom:0;background:var(--red);opacity:.25;border:2px solid var(--red);border-radius:3px}
+.sched-foot{padding:14px 18px;border-top:1px solid var(--bdr);display:flex;gap:8px;flex-shrink:0}
+
 @media print{.hdr,.sidebar{display:none}.runner{display:block}.main{padding:0}}
 @media(max-width:700px){.sidebar{width:180px}.main{padding:14px 16px 40px}}
 @media(max-width:500px){.sidebar{display:none}.runner{display:block}}
@@ -203,7 +233,7 @@ const CONFIG = {
   clientId: 'c6595fee-5861-474a-b604-4487ac361580',
   authority: 'https://login.microsoftonline.com/8c8bc073-973e-4ddf-9384-38498e8aa324',
   redirectUri: window.location.origin + window.location.pathname,
-  scopes: ['User.Read','Calendars.ReadWrite','Mail.Send','Sites.ReadWrite.All'],
+  scopes: ['User.Read','User.ReadBasic.All','Calendars.ReadWrite','Mail.Send','Sites.ReadWrite.All'],
   spSite: 'unicrest.sharepoint.com:/sites/UnicrestGroup'
 };
 const GRAPH = 'https://graph.microsoft.com/v1.0';
@@ -241,7 +271,11 @@ let S = {
   attendance:{}, // {name: true/false} for check-in
   timerOn:false, elapsed:0, startTime:null,
   // modal
-  showAgendaEditor:false, editAgenda:[]
+  showAgendaEditor:false, editAgenda:[],
+  // scheduler
+  showScheduler:false, schedSubject:'', schedDate:'', schedStartHr:8, schedEndHr:18,
+  schedDuration:30, schedTeams:true, schedPeople:[], schedSearchResults:[],
+  schedSearchQuery:'', schedAvailability:[], schedSelTime:null, schedLoading:false
 };
 let tInt = null;
 
@@ -901,6 +935,175 @@ async function edSave(){
 }
 
 /* ═══════════════════════════════
+   SCHEDULER
+   ═══════════════════════════════ */
+function openScheduler(){
+  const today=new Date();
+  S.schedDate=today.toISOString().slice(0,10);
+  S.schedSubject=curSecName()||'';
+  S.schedPeople=[];S.schedSearchResults=[];S.schedSearchQuery='';
+  S.schedAvailability=[];S.schedSelTime=null;S.schedLoading=false;
+  S.schedDuration=30;S.schedTeams=true;S.schedStartHr=8;S.schedEndHr=18;
+  S.showScheduler=true;render();
+}
+function closeScheduler(){S.showScheduler=false;render();}
+
+let _schedDebounce;
+function schedSearch(q){
+  S.schedSearchQuery=q;
+  if(!q||q.length<2){S.schedSearchResults=[];render();return;}
+  clearTimeout(_schedDebounce);
+  _schedDebounce=setTimeout(async()=>{
+    const d=await gGet(`/users?$filter=startswith(displayName,'${encodeURIComponent(q)}') or startswith(mail,'${encodeURIComponent(q)}')&$select=displayName,mail,id&$top=8`);
+    if(d&&d.value) S.schedSearchResults=d.value.filter(u=>u.mail&&!isRoomEmail(u.mail)).map(u=>({name:u.displayName,email:u.mail,id:u.id}));
+    else S.schedSearchResults=[];
+    render();
+    const inp=document.getElementById('schedSearchInp');
+    if(inp){inp.value=q;inp.focus();}
+  },400);
+}
+
+function schedAddPerson(person){
+  if(!S.schedPeople.find(p=>p.email===person.email)) S.schedPeople.push(person);
+  S.schedSearchResults=[];S.schedSearchQuery='';
+  render();
+  if(S.schedPeople.length) schedLoadAvail();
+}
+
+function schedRemovePerson(email){
+  S.schedPeople=S.schedPeople.filter(p=>p.email!==email);
+  S.schedAvailability=S.schedAvailability.filter(a=>a.email!==email);
+  render();
+}
+
+async function schedLoadAvail(){
+  if(!S.schedPeople.length) return;
+  S.schedLoading=true;render();
+  const body={
+    schedules:S.schedPeople.map(p=>p.email),
+    startTime:{dateTime:S.schedDate+'T'+String(S.schedStartHr).padStart(2,'0')+':00:00',timeZone:'Pacific/Auckland'},
+    endTime:{dateTime:S.schedDate+'T'+String(S.schedEndHr).padStart(2,'0')+':00:00',timeZone:'Pacific/Auckland'},
+    availabilityViewInterval:15
+  };
+  const d=await gPost('/me/calendar/getSchedule',body);
+  if(d&&d.value){
+    S.schedAvailability=d.value.map(s=>({
+      email:s.scheduleId,
+      name:S.schedPeople.find(p=>p.email===s.scheduleId)?.name||s.scheduleId,
+      items:(s.scheduleItems||[]).map(it=>({
+        start:new Date(it.start.dateTime+(it.start.dateTime.endsWith('Z')?'':'Z')),
+        end:new Date(it.end.dateTime+(it.end.dateTime.endsWith('Z')?'':'Z')),
+        status:it.status||'busy',subject:it.subject||''
+      }))
+    }));
+  }
+  S.schedLoading=false;render();
+}
+
+function schedSelectTime(minutesFromStart){
+  const snapped=Math.round(minutesFromStart/15)*15;
+  const hr=S.schedStartHr+Math.floor(snapped/60);
+  const min=snapped%60;
+  S.schedSelTime=String(hr).padStart(2,'0')+':'+String(min).padStart(2,'0');
+  render();
+}
+
+async function schedBook(){
+  if(!S.schedSelTime||!S.schedPeople.length){toast('Select a time and add people');return;}
+  const startDT=S.schedDate+'T'+S.schedSelTime+':00';
+  const st=new Date(startDT);
+  const en=new Date(st.getTime()+S.schedDuration*60000);
+  const endDT=S.schedDate+'T'+String(en.getHours()).padStart(2,'0')+':'+String(en.getMinutes()).padStart(2,'0')+':00';
+  const body={
+    subject:S.schedSubject||'Meeting',
+    start:{dateTime:startDT,timeZone:'Pacific/Auckland'},
+    end:{dateTime:endDT,timeZone:'Pacific/Auckland'},
+    attendees:S.schedPeople.map(p=>({emailAddress:{address:p.email,name:p.name},type:'required'}))
+  };
+  if(S.schedTeams){body.isOnlineMeeting=true;body.onlineMeetingProvider='teamsForBusiness';}
+  const result=await gPost('/me/events',body);
+  if(result){toast('Meeting booked and invites sent');closeScheduler();}
+  else toast('Failed to book meeting');
+}
+
+function schedSetDate(v){S.schedDate=v;if(S.schedPeople.length)schedLoadAvail();else render();}
+function schedSetStartHr(v){S.schedStartHr=parseInt(v);if(S.schedPeople.length)schedLoadAvail();else render();}
+function schedSetEndHr(v){S.schedEndHr=parseInt(v);if(S.schedPeople.length)schedLoadAvail();else render();}
+
+function rScheduler(){
+  const totalMin=(S.schedEndHr-S.schedStartHr)*60;
+  const pxPerMin=Math.max(600/totalMin,2);
+  let headerHtml='';
+  for(let h=S.schedStartHr;h<S.schedEndHr;h++) headerHtml+=`<div class="tl-hour" style="width:${60*pxPerMin}px;padding:2px 4px">${String(h).padStart(2,'0')}:00</div>`;
+
+  let rowsHtml='';
+  const dayStartStr=S.schedDate+'T'+String(S.schedStartHr).padStart(2,'0')+':00:00';
+  const dayStartMs=new Date(dayStartStr).getTime();
+  S.schedAvailability.forEach(person=>{
+    let blocks='';
+    person.items.forEach(it=>{
+      const sMin=Math.max(0,(it.start.getTime()-dayStartMs)/60000);
+      const eMin=Math.min(totalMin,(it.end.getTime()-dayStartMs)/60000);
+      if(eMin>0&&sMin<totalMin){
+        const cls=it.status==='tentative'?'tl-tent':'tl-busy';
+        blocks+=`<div class="${cls}" style="left:${sMin*pxPerMin}px;width:${Math.max(2,(eMin-sMin)*pxPerMin)}px" title="${e(it.subject||it.status)}"></div>`;
+      }
+    });
+    let selBlock='';
+    if(S.schedSelTime){
+      const sh=parseInt(S.schedSelTime.split(':')[0]),sm=parseInt(S.schedSelTime.split(':')[1]);
+      const selMin=(sh-S.schedStartHr)*60+sm;
+      selBlock=`<div class="tl-sel" style="left:${selMin*pxPerMin}px;width:${S.schedDuration*pxPerMin}px"></div>`;
+    }
+    rowsHtml+=`<div class="tl-row"><div class="tl-name">${e(person.name)}</div>
+      <div class="tl-blocks" style="width:${totalMin*pxPerMin}px" onclick="schedSelectTime(Math.floor(event.offsetX/${pxPerMin}))">${blocks}${selBlock}</div></div>`;
+  });
+
+  let selDisplay='';
+  if(S.schedSelTime){
+    const sh=parseInt(S.schedSelTime.split(':')[0]),sm=parseInt(S.schedSelTime.split(':')[1]);
+    const em2=(sm+S.schedDuration)%60,eh2=sh+Math.floor((sm+S.schedDuration)/60);
+    selDisplay=`<div style="background:var(--lg);padding:8px 12px;border-radius:6px;font-size:13px;margin-top:10px">
+      Selected: <strong>${S.schedSelTime} \u2013 ${String(eh2).padStart(2,'0')}:${String(em2).padStart(2,'0')}</strong> (${S.schedDuration} min)</div>`;
+  }
+
+  return `<div class="sched-overlay" onclick="if(event.target===this)closeScheduler()">
+    <div class="sched-panel">
+      <div class="sched-hdr"><h3>Book a meeting</h3><button class="a-rm" style="font-size:20px" onclick="closeScheduler()">&times;</button></div>
+      <div class="sched-body">
+        <div class="sched-field"><label>Subject</label><input type="text" value="${e(S.schedSubject)}" oninput="S.schedSubject=this.value"></div>
+        <div class="sched-field" style="position:relative">
+          <label>Add people</label>
+          <input type="text" id="schedSearchInp" placeholder="Search by name or email..." value="${e(S.schedSearchQuery)}" oninput="schedSearch(this.value)" autocomplete="off">
+          ${S.schedSearchResults.length?`<div class="sched-results">${S.schedSearchResults.map(r=>`<div class="sched-result" onclick="schedAddPerson({name:'${e(r.name).replace(/'/g,"\\'")}',email:'${e(r.email)}',id:'${e(r.id)}'})">
+            ${e(r.name)}<small>${e(r.email)}</small></div>`).join('')}</div>`:''}
+        </div>
+        <div class="sched-people">${S.schedPeople.map(p=>`<span class="sched-chip">${e(p.name)}<button onclick="schedRemovePerson('${e(p.email)}')">&times;</button></span>`).join('')}</div>
+        <div style="display:flex;gap:8px;margin:14px 0">
+          <div class="sched-field" style="flex:1"><label>Date</label><input type="date" value="${S.schedDate}" onchange="schedSetDate(this.value)"></div>
+          <div class="sched-field" style="width:80px"><label>From</label><select onchange="schedSetStartHr(this.value)">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i===S.schedStartHr?'selected':''}>${String(i).padStart(2,'0')}:00</option>`).join('')}</select></div>
+          <div class="sched-field" style="width:80px"><label>To</label><select onchange="schedSetEndHr(this.value)">${Array.from({length:24},(_,i)=>`<option value="${i}" ${i===S.schedEndHr?'selected':''}>${String(i).padStart(2,'0')}:00</option>`).join('')}</select></div>
+          <div class="sched-field" style="width:90px"><label>Duration</label><select onchange="S.schedDuration=parseInt(this.value);render()">
+            ${[15,30,45,60,90,120].map(d=>`<option value="${d}" ${d===S.schedDuration?'selected':''}>${d} min</option>`).join('')}</select></div>
+        </div>
+        <label style="font-size:12px;display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px">
+          <input type="checkbox" ${S.schedTeams?'checked':''} onchange="S.schedTeams=this.checked"> Include Teams link</label>
+        ${S.schedLoading?'<div class="loading" style="padding:20px"><div class="spinner"></div>Loading availability...</div>':`
+          ${S.schedPeople.length?`<div class="sub-l">Availability</div>
+            <div class="tl-wrap"><div class="tl-grid"><div class="tl-header">${headerHtml}</div>${rowsHtml}</div></div>
+            <div style="display:flex;gap:12px;font-size:11px;color:var(--mid);margin-top:4px">
+              <span><span style="display:inline-block;width:12px;height:10px;background:#e57373;border-radius:2px;vertical-align:middle"></span> Busy</span>
+              <span><span style="display:inline-block;width:12px;height:10px;background:#ffb74d;border-radius:2px;vertical-align:middle"></span> Tentative</span>
+              <span><span style="display:inline-block;width:12px;height:10px;background:var(--bg);border-radius:2px;vertical-align:middle;border:1px solid var(--bdr)"></span> Free</span>
+            </div>${selDisplay}`:'<div style="font-size:13px;color:var(--mid);padding:16px 0">Add people to see their availability.</div>'}
+        `}
+      </div>
+      <div class="sched-foot"><button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeScheduler()">Cancel</button>
+        <button class="add-btn" style="flex:1" onclick="schedBook()">Send invite</button></div>
+    </div></div>`;
+}
+
+/* ═══════════════════════════════
    TOAST
    ═══════════════════════════════ */
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
@@ -914,14 +1117,14 @@ function render(){
   else if(S.screen==='dash'){btn.style.display='';btn.textContent='Sign out';btn.className='hdr-btn';btn.onclick=logout;app.innerHTML='<div class="wrap">'+rDash()+'</div>';}
   else if(S.screen==='runner'){
     btn.style.display='';btn.textContent='End meeting';btn.className='hdr-btn red';btn.onclick=hdrAction;
-    app.innerHTML=rRunner()+(S.showAgendaEditor?rAgendaEditor():'');
+    app.innerHTML=rRunner()+(S.showAgendaEditor?rAgendaEditor():'')+(S.showScheduler?rScheduler():'');
     const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
     timerUI();
   }
   else if(S.screen==='prep'){
     btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;
     document.getElementById('clockEl').textContent='';
-    app.innerHTML=rPrep()+(S.showAgendaEditor?rAgendaEditor():'');
+    app.innerHTML=rPrep()+(S.showAgendaEditor?rAgendaEditor():'')+(S.showScheduler?rScheduler():'');
     const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
   }
   else if(S.screen==='summary'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;document.getElementById('clockEl').textContent='';app.innerHTML='<div class="wrap">'+rSummary()+'</div>';}
@@ -1137,7 +1340,8 @@ function rRunner(){
 
 function rCheckinSection(att){
   const present=getPresentAttendees();
-  let html=`<div class="main-sub">Mark who is present. ${present.length} of ${S.attendees.length} checked in.</div>`;
+  let html=`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;
+  html+=`<div class="main-sub">Mark who is present. ${present.length} of ${S.attendees.length} checked in.</div>`;
   html+=`<div style="margin-bottom:16px">`;
   S.attendees.forEach(a=>{
     const checked=S.attendance[a.name];
@@ -1157,7 +1361,8 @@ function rNotesSection(att){
   const oo=att.map(a=>`<option value="${e(a.name)}">${e(a.name)}</option>`).join('');
   const secActions=S.actions.filter(a=>a.section===curSecName());
   return `
-    <div class="sub-l" style="margin-top:8px">Notes</div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>
+    <div class="sub-l" style="margin-top:0">Notes</div>
     <textarea class="notes" id="sN" placeholder="Notes..." oninput="updNotes(this.value)"></textarea>
     <div class="sub-l">Actions</div>
     ${rActionsList(secActions)}
@@ -1170,7 +1375,8 @@ function rHeadlinesSection(att){
   const discussed=S.headlines.filter(h=>h.status==='discussed');
   const secActions=S.actions.filter(a=>a.section===curSecName());
 
-  let html=`<div class="main-sub">Discussion points. Anyone can add a headline before or during the meeting.</div>`;
+  let html=`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;
+  html+=`<div class="main-sub">Discussion points. Anyone can add a headline before or during the meeting.</div>`;
 
   // Add headline
   html+=`<div class="add-row" style="margin-bottom:16px">
@@ -1220,7 +1426,8 @@ function rHeadlineItem(h,oo){
 
 function rIssuesSection(att){
   const oo=att.map(a=>`<option value="${e(a.name)}">${e(a.name)}</option>`).join('');
-  let html=`<div class="main-sub">Identify, Discuss, Solve. Tap the status badge to cycle.</div>`;
+  let html=`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;
+  html+=`<div class="main-sub">Identify, Discuss, Solve. Tap the status badge to cycle.</div>`;
 
   // Issues
   html+=`<div class="sub-l">Issues</div>`;
