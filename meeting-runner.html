@@ -466,9 +466,11 @@ async function findSharedCal(){
 }
 
 async function loadCalEvents(weekOffset){
+  if(S.calLoading)return;
   S.calLoading=true;render();
-  const calId=await findSharedCal();
-  if(!calId){S.calLoading=false;toast('Shared calendar not found');render();return;}
+  try{
+    const calId=await findSharedCal();
+    if(!calId){S.calLoading=false;S.calWeekStart=new Date();toast('Shared calendar not found');render();return;}
 
   // Calculate week start (Monday)
   const now=new Date();
@@ -494,6 +496,7 @@ async function loadCalEvents(weekOffset){
     }));
   } else S.calEvents=[];
   S.calLoading=false;render();
+  }catch(err){console.error('Calendar load error',err);S.calLoading=false;S.calWeekStart=new Date();toast('Error loading calendar');render();}
 }
 
 function calNavWeek(dir){
@@ -537,7 +540,7 @@ async function startMtg(idx){
 }
 function startAdhoc(){S.activeMeeting=null;S.seriesId=null;startMtg();}
 function endMeeting(){timerStop();S.sections[S.curSec].done=true;S.screen='summary';render();}
-function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.viewDate=new Date();document.getElementById('clockEl').textContent='';loadCal();}
+function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.calWeekStart=null;S.calEvents=[];S.viewDate=new Date();document.getElementById('clockEl').textContent='';loadCal();}
 function hdrAction(){if(S.screen==='runner'){if(confirm('End this meeting?'))endMeeting();}else if(S.screen==='summary')backToDash();}
 
 /* ═══ AGENDA EDITOR ═══ */
@@ -700,8 +703,9 @@ function rSidebarLayout(mode){
 function bookBtn(){return `<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;}
 
 function rCalendar(){
-  if(!S.calWeekStart)loadCalEvents(0);
   if(S.calLoading)return `<div class="loading" style="padding:20px"><div class="spinner"></div>Loading calendar...</div>`;
+  if(!S.calWeekStart&&!S.calLoading){setTimeout(()=>loadCalEvents(0),0);return `<div class="loading" style="padding:20px"><div class="spinner"></div>Loading calendar...</div>`;}
+  if(!S.calEvents.length&&!S.calWeekStart)return `<div style="font-size:13px;color:var(--mid);padding:16px 0">No calendar events found.</div>`;
 
   const ws=S.calWeekStart||new Date();
   const days=[];
