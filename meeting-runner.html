@@ -1066,12 +1066,20 @@ function rScheduler(){
   });
 
   let selDisplay='';
-  if(S.schedSelTime){
-    const sh=parseInt(S.schedSelTime.split(':')[0]),sm=parseInt(S.schedSelTime.split(':')[1]);
+  let meetStartTime=S.schedSelTime||'';
+  let meetEndTime='';
+  if(meetStartTime){
+    const sh=parseInt(meetStartTime.split(':')[0]),sm=parseInt(meetStartTime.split(':')[1]);
     const em2=(sm+S.schedDuration)%60,eh2=sh+Math.floor((sm+S.schedDuration)/60);
-    selDisplay=`<div style="background:var(--lg);padding:8px 12px;border-radius:6px;font-size:13px;margin-top:10px">
-      Selected: <strong>${S.schedSelTime} \u2013 ${String(eh2).padStart(2,'0')}:${String(em2).padStart(2,'0')}</strong> (${S.schedDuration} min)</div>`;
+    meetEndTime=String(eh2).padStart(2,'0')+':'+String(em2).padStart(2,'0');
   }
+  selDisplay=`<div style="background:${meetStartTime?'var(--lg)':'var(--bg)'};padding:10px 14px;border-radius:6px;margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:12px;font-weight:700;color:var(--mid)">Meeting time:</span>
+    <input type="time" value="${meetStartTime}" onchange="S.schedSelTime=this.value;render();" style="padding:6px 8px;border:1px solid var(--bdr);border-radius:4px;font-size:13px;font-family:'Arvo',serif">
+    <span style="font-size:12px;color:var(--mid)">\u2013</span>
+    <span style="font-size:13px;font-weight:700">${meetEndTime||'--:--'}</span>
+    <span style="font-size:11px;color:var(--mid)">(${S.schedDuration} min)</span>
+  </div>`;
 
   return `<div class="sched-overlay" onclick="if(event.target===this)closeScheduler()">
     <div class="sched-panel">
@@ -1103,6 +1111,7 @@ function rScheduler(){
               <span><span style="display:inline-block;width:12px;height:10px;background:var(--bg);border-radius:2px;vertical-align:middle;border:1px solid var(--bdr)"></span> Free</span>
             </div>${selDisplay}`:'<div style="font-size:13px;color:var(--mid);padding:16px 0">Add people to see their availability.</div>'}
         `}
+        ${!S.schedPeople.length?selDisplay:''}
       </div>
       <div class="sched-foot"><button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeScheduler()">Cancel</button>
         <button class="add-btn" style="flex:1" onclick="schedBook()">Send invite</button></div>
