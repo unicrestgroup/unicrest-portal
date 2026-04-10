@@ -951,16 +951,22 @@ function closeScheduler(){S.showScheduler=false;render();}
 let _schedDebounce;
 function schedSearch(q){
   S.schedSearchQuery=q;
-  if(!q||q.length<2){S.schedSearchResults=[];render();return;}
+  if(!q||q.length<2){S.schedSearchResults=[];updateSchedDropdown();return;}
   clearTimeout(_schedDebounce);
   _schedDebounce=setTimeout(async()=>{
     const d=await gGet(`/users?$filter=startswith(displayName,'${encodeURIComponent(q)}') or startswith(mail,'${encodeURIComponent(q)}')&$select=displayName,mail,id&$top=8`);
     if(d&&d.value) S.schedSearchResults=d.value.filter(u=>u.mail&&!isRoomEmail(u.mail)).map(u=>({name:u.displayName,email:u.mail,id:u.id}));
     else S.schedSearchResults=[];
-    render();
-    const inp=document.getElementById('schedSearchInp');
-    if(inp){inp.value=q;inp.focus();}
+    updateSchedDropdown();
   },400);
+}
+
+function updateSchedDropdown(){
+  const container=document.getElementById('schedDropdown');
+  if(!container) return;
+  if(!S.schedSearchResults.length){container.innerHTML='';return;}
+  container.innerHTML=`<div class="sched-results">${S.schedSearchResults.map(r=>`<div class="sched-result" onclick="schedAddPerson({name:'${e(r.name).replace(/'/g,"\\'")}',email:'${e(r.email)}',id:'${e(r.id)}'})">
+    ${e(r.name)}<small>${e(r.email)}</small></div>`).join('')}</div>`;
 }
 
 function schedAddPerson(person){
@@ -1074,9 +1080,9 @@ function rScheduler(){
         <div class="sched-field"><label>Subject</label><input type="text" value="${e(S.schedSubject)}" oninput="S.schedSubject=this.value"></div>
         <div class="sched-field" style="position:relative">
           <label>Add people</label>
-          <input type="text" id="schedSearchInp" placeholder="Search by name or email..." value="${e(S.schedSearchQuery)}" oninput="schedSearch(this.value)" autocomplete="off">
-          ${S.schedSearchResults.length?`<div class="sched-results">${S.schedSearchResults.map(r=>`<div class="sched-result" onclick="schedAddPerson({name:'${e(r.name).replace(/'/g,"\\'")}',email:'${e(r.email)}',id:'${e(r.id)}'})">
-            ${e(r.name)}<small>${e(r.email)}</small></div>`).join('')}</div>`:''}
+          <input type="text" id="schedSearchInp" placeholder="Search by name or email..." oninput="schedSearch(this.value)" autocomplete="off">
+          <div id="schedDropdown">${S.schedSearchResults.length?`<div class="sched-results">${S.schedSearchResults.map(r=>`<div class="sched-result" onclick="schedAddPerson({name:'${e(r.name).replace(/'/g,"\\'")}',email:'${e(r.email)}',id:'${e(r.id)}'})">
+            ${e(r.name)}<small>${e(r.email)}</small></div>`).join('')}</div>`:''}</div>
         </div>
         <div class="sched-people">${S.schedPeople.map(p=>`<span class="sched-chip">${e(p.name)}<button onclick="schedRemovePerson('${e(p.email)}')">&times;</button></span>`).join('')}</div>
         <div style="display:flex;gap:8px;margin:14px 0">
