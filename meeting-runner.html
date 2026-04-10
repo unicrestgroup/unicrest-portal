@@ -247,6 +247,15 @@ async function gGet(url) {
 }
 
 /* ═══ CALENDAR ═══ */
+function classifyFreq(rec) {
+  if (!rec || !rec.pattern) return 'today';
+  const t = rec.pattern.type, iv = rec.pattern.interval || 1;
+  if (t === 'daily') return 'daily';
+  if (t === 'weekly') return iv <= 2 ? 'weekly' : 'monthly';
+  if (t === 'absoluteMonthly' || t === 'relativeMonthly') return 'monthly';
+  return 'weekly';
+}
+
 async function loadCal() {
   S.loadingCal=true; render();
   const now=new Date();
@@ -258,24 +267,35 @@ async function loadCal() {
     $select:'id,subject,start,end,attendees,onlineMeetingUrl,seriesMasterId,type'
   });
   const d=await gGet('/me/calendarView?'+p);
-  S.loadingCal=false;
-  if(d&&d.value){
-    S.meetings=d.value.map(ev=>{
-      const rec=ev.type==='occurrence'||ev.type==='exception'||!!ev.seriesMasterId;
-      const sid=ev.seriesMasterId||(rec?ev.id:null);
-      const st=new Date(ev.start.dateTime+'Z');
-      const en=new Date(ev.end.dateTime+'Z');
-      const att=(ev.attendees||[]).map(a=>({name:a.emailAddress.name,email:a.emailAddress.address}));
-      return {
-        id:ev.id, subject:ev.subject||'Untitled', start:st, end:en,
-        durMin:Math.round((en-st)/60000), attendees:att,
-        isRec:rec, seriesId:sid,
-        onlineUrl:ev.onlineMeetingUrl||null,
-        cf: rec ? getCF(sid) : []
-      };
-    });
-  }
-  render();
+  if(!d||!d.value){ S.loadingCal=false; render(); return; }
+
+  const sids = new Set();
+  d.value.forEach(ev => { if(ev.seriesMasterId) sids.add(ev.seriesMasterId); });
+
+  const pats = {};
+  await Promise.all([...sids].map(async sid => {
+    try {
+      const m = await gGet('/me/events/'+sid+'?$select=recurrence');
+      if (m && m.recurrence) pats[sid] = m.recurrence;
+    } catch(err) { console.warn('Series fetch failed', sid); }
+  }));
+
+  S.meetings = d.value.map(ev => {
+    const rec = ev.type==='occurrence' || ev.type==='exception' || !!ev.seriesMasterId;
+    const sid = ev.seriesMasterId || (rec ? ev.id : null);
+    const st = new Date(ev.start.dateTime+'Z');
+    const en = new Date(ev.end.dateTime+'Z');
+    const att = (ev.attendees||[]).map(a=>({name:a.emailAddress.name, email:a.emailAddress.address}));
+    const freq = rec ? classifyFreq(pats[sid]) : 'today';
+    return {
+      id:ev.id, subject:ev.subject||'Untitled', start:st, end:en,
+      durMin:Math.round((en-st)/60000), attendees:att,
+      isRec:rec, seriesId:sid, freq,
+      onlineUrl:ev.onlineMeetingUrl||null,
+      cf: rec ? getCF(sid) : []
+    };
+  });
+  S.loadingCal=false; render();
 }
 
 /* ═══ TIMER ═══ */
@@ -378,25 +398,46 @@ function rDash(){
   const ds=now.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   if(!S.meetings.length) return `<div class="day-label">${ds}</div><div class="empty">No meetings on your calendar today.</div><button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
 
-  const cards=S.meetings.map((m,i)=>{
-    const time=m.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
-    const n=m.attendees.length;
-    let cfH='';
-    if(m.cf.length){
-      cfH=`<div class="cf-section"><div class="cf-label">Carry-forward actions (${m.cf.length})</div>
-        ${m.cf.map(a=>`<div class="cf-item"><div class="cf-dot"></div>${e(a.text)}${a.owner?' \u2014 <span style="color:var(--mid)">'+e(a.owner)+'</span>':''}</div>`).join('')}</div>`;
-    }
-    return `<div class="card click">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between">
-        <div><div style="font-size:14px;font-weight:700">${e(m.subject)}</div>
-        <div style="font-size:12px;color:var(--mid);margin-top:2px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div></div>
-        <span class="badge ${m.isRec?'rec':'one'}">${m.isRec?'Recurring':'One-off'}</span>
-      </div>${cfH}
-      <button class="start-btn" onclick="startMtg(${i})">Start meeting</button>
-    </div>`;
-  }).join('');
+  const groups = [
+    { key:'today', label:'Today', icon:'\u{1F4C5}', meetings:[] },
+    { key:'daily', label:'Daily', icon:'\u{1F501}', meetings:[] },
+    { key:'weekly', label:'Weekly', icon:'\u{1F4C6}', meetings:[] },
+    { key:'monthly', label:'Monthly', icon:'\u{1F5D3}', meetings:[] }
+  ];
+  S.meetings.forEach((m,i) => {
+    const g = groups.find(g=>g.key===m.freq) || groups[0];
+    g.meetings.push({...m, idx:i});
+  });
 
-  return `<div class="day-label">${ds}<span class="sync-note">Synced from Outlook</span></div>${cards}<button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
+  let html = `<div class="day-label">${ds}<span class="sync-note">Synced from Outlook</span></div>`;
+
+  groups.forEach(g => {
+    if (!g.meetings.length) return;
+    html += `<div style="margin-top:16px;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px">
+      <span style="font-size:14px">${g.icon}</span> ${g.label}
+      <span style="font-weight:400;opacity:.6">(${g.meetings.length})</span>
+    </div>`;
+    g.meetings.forEach(m => {
+      const time=m.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
+      const n=m.attendees.length;
+      let cfH='';
+      if(m.cf.length){
+        cfH=`<div class="cf-section"><div class="cf-label">Carry-forward actions (${m.cf.length})</div>
+          ${m.cf.map(a=>`<div class="cf-item"><div class="cf-dot"></div>${e(a.text)}${a.owner?' \u2014 <span style="color:var(--mid)">'+e(a.owner)+'</span>':''}</div>`).join('')}</div>`;
+      }
+      html += `<div class="card click">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between">
+          <div><div style="font-size:14px;font-weight:700">${e(m.subject)}</div>
+          <div style="font-size:12px;color:var(--mid);margin-top:2px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div></div>
+          <span class="badge ${m.isRec?'rec':'one'}">${m.isRec?'Recurring':'One-off'}</span>
+        </div>${cfH}
+        <button class="start-btn" onclick="startMtg(${m.idx})">Start meeting</button>
+      </div>`;
+    });
+  });
+
+  html += `<button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
+  return html;
 }
 
 function rRunner(){
