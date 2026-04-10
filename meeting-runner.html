@@ -208,11 +208,19 @@ const CONFIG = {
 };
 const GRAPH = 'https://graph.microsoft.com/v1.0';
 const DEFAULT_AGENDA = [
-  {name:'Check-in',duration:5,type:'notes'},
+  {name:'Check-in',duration:5,type:'checkin'},
   {name:'Updates',duration:10,type:'headlines'},
   {name:'Issues & Actions',duration:35,type:'issues'},
   {name:'Wrap-up',duration:5,type:'wrapup'}
 ];
+
+// Filter out room/resource emails
+const ROOM_FILTERS = ['room','fishbowl','boardroom','meeting','conference','resource'];
+function isRoomEmail(email){
+  if(!email) return false;
+  const lower=email.toLowerCase();
+  return ROOM_FILTERS.some(f=>lower.includes(f));
+}
 
 let msalApp, accessToken, currentUser, siteId;
 
@@ -222,13 +230,15 @@ let msalApp, accessToken, currentUser, siteId;
 let S = {
   screen:'login',
   meetings:[], allMeetings:[], loadingCal:false, enabledSeries:new Set(),
-  viewDate: new Date(), // current day being viewed on dashboard
-  // prep (pre-meeting view)
+  viewDate: new Date(),
+  // prep
   prepMeeting:null, prepSeriesId:null, prepAgenda:[],
   // runner
   activeMeeting:null, seriesId:null, curSec:0,
-  sections:[], // agenda for this meeting
+  sections:[],
   headlines:[], actions:[], issues:[], ratings:[],
+  attendees:[], // managed attendee list
+  attendance:{}, // {name: true/false} for check-in
   timerOn:false, elapsed:0, startTime:null,
   // modal
   showAgendaEditor:false, editAgenda:[]
@@ -376,27 +386,97 @@ async function spDeleteItem(listKey, itemId){
 }
 
 /* ═══════════════════════════════
-   AGENDA CONFIG
+   AGENDA & ATTENDEES CONFIG
    ═══════════════════════════════ */
-async function getAgenda(seriesId){
-  if(!seriesId || !LISTS.config.id) return [...DEFAULT_AGENDA];
+async function getConfig(seriesId){
+  if(!seriesId || !LISTS.config.id) return {agenda:[...DEFAULT_AGENDA], attendees:null};
   const items = await spGetItems('config','SeriesId',seriesId);
   if(items.length && items[0].fields.AgendaJSON){
-    try{return JSON.parse(items[0].fields.AgendaJSON);}catch{return [...DEFAULT_AGENDA];}
+    try{
+      const raw=JSON.parse(items[0].fields.AgendaJSON);
+      // Support old format (array) and new format (object with agenda + attendees)
+      if(Array.isArray(raw)) return {agenda:raw, attendees:null};
+      return {agenda:raw.agenda||[...DEFAULT_AGENDA], attendees:raw.attendees||null};
+    }catch{return {agenda:[...DEFAULT_AGENDA], attendees:null};}
   }
-  return [...DEFAULT_AGENDA];
+  return {agenda:[...DEFAULT_AGENDA], attendees:null};
 }
 
-async function saveAgenda(seriesId, agenda){
+async function getAgenda(seriesId){
+  const cfg=await getConfig(seriesId);
+  return cfg.agenda;
+}
+
+async function saveConfig(seriesId, agenda, attendees){
   if(!seriesId || !LISTS.config.id) return;
   const items = await spGetItems('config','SeriesId',seriesId);
-  const json = JSON.stringify(agenda);
+  const json = JSON.stringify({agenda, attendees});
   if(items.length){
     await spUpdateItem('config', items[0].id, {AgendaJSON:json});
   } else {
     await spAddItem('config', {Title:seriesId, SeriesId:seriesId, AgendaJSON:json});
   }
+}
+
+async function saveAgenda(seriesId, agenda){
+  // Preserve existing attendees
+  const cfg=await getConfig(seriesId);
+  await saveConfig(seriesId, agenda, cfg.attendees);
   toast('Agenda saved');
+}
+
+function loadAttendeesFromMeeting(meeting){
+  if(!meeting||!meeting.attendees) return [];
+  return meeting.attendees.filter(a=>!isRoomEmail(a.email));
+}
+
+async function loadManagedAttendees(seriesId, meeting){
+  const cfg=await getConfig(seriesId);
+  if(cfg.attendees){
+    S.attendees=cfg.attendees;
+  } else {
+    S.attendees=loadAttendeesFromMeeting(meeting);
+  }
+  // Init attendance map
+  S.attendance={};
+  S.attendees.forEach(a=>{S.attendance[a.name]=false;});
+}
+
+async function saveAttendees(){
+  const sid=S.seriesId||S.prepSeriesId;
+  if(!sid) return;
+  const cfg=await getConfig(sid);
+  await saveConfig(sid, cfg.agenda, S.attendees);
+  toast('Attendees saved');
+}
+
+function addAttendee(){
+  const input=document.getElementById('addAttName');
+  if(!input||!input.value.trim()) return;
+  const name=input.value.trim();
+  if(!S.attendees.find(a=>a.name===name)){
+    S.attendees.push({name, email:''});
+    S.attendance[name]=false;
+    saveAttendees();
+  }
+  input.value='';
+  render();
+}
+
+function removeAttendee(name){
+  S.attendees=S.attendees.filter(a=>a.name!==name);
+  delete S.attendance[name];
+  saveAttendees();
+  render();
+}
+
+function toggleAttendance(name){
+  S.attendance[name]=!S.attendance[name];
+  render();
+}
+
+function getPresentAttendees(){
+  return S.attendees.filter(a=>S.attendance[a.name]);
 }
 
 /* ═══════════════════════════════
@@ -748,6 +828,7 @@ async function prepMtg(idx){
   await loadActions(m.seriesId);
   await loadIssues(m.seriesId);
   await loadRatings(m.seriesId);
+  await loadManagedAttendees(m.seriesId, m);
   S.screen='prep'; render();
 }
 
@@ -778,6 +859,7 @@ async function startMtg(idx){
   await loadActions(S.seriesId);
   await loadIssues(S.seriesId);
   await loadRatings(S.seriesId);
+  await loadManagedAttendees(S.seriesId, m);
 
   S.screen='runner';render();
 }
@@ -924,8 +1006,7 @@ function rDash(){
 function curSections(){return S.screen==='prep'?S.prepAgenda:S.sections;}
 function curSecName(){return curSections()[S.curSec].name;}
 function curAttendees(){
-  if(S.screen==='prep') return S.prepMeeting?S.prepMeeting.attendees:[];
-  return S.activeMeeting?S.activeMeeting.attendees:[];
+  return S.attendees;
 }
 
 /* ══ PREPARE (Full pre-meeting editor) ══ */
@@ -952,7 +1033,14 @@ function rPrep(){
 
   sb+=`<div class="sb-section">
     <div class="sb-section-label">Attendees</div>
-    <div class="sb-attendee">${att.length?att.map(a=>e(a.name)).join('<br>'):'None'}</div>
+    ${S.attendees.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--mid);padding:2px 0">
+      <span>${e(a.name)}</span>
+      <button class="a-rm" style="font-size:12px" onclick="removeAttendee('${e(a.name)}')">&times;</button>
+    </div>`).join('')}
+    <div style="display:flex;gap:4px;margin-top:6px">
+      <input type="text" id="addAttName" placeholder="Add name..." style="flex:1;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px;font-size:10px" onkeydown="if(event.key==='Enter')addAttendee()">
+      <button class="add-btn" style="padding:4px 8px;font-size:10px" onclick="addAttendee()">+</button>
+    </div>
     <button class="sb-edit-btn" onclick="openAgendaEditor()">Edit agenda sections</button>
   </div></div>`;
 
@@ -964,7 +1052,8 @@ function rPrep(){
   </div>`;
 
   // Section content (reuse same functions as runner)
-  if(sec.type==='headlines') main+=rHeadlinesSection(att);
+  if(sec.type==='checkin') main+=rCheckinSection(att);
+  else if(sec.type==='headlines') main+=rHeadlinesSection(att);
   else if(sec.type==='issues') main+=rIssuesSection(att);
   else if(sec.type==='wrapup') main+=rWrapupSection();
   else main+=rNotesSection(att);
@@ -1007,7 +1096,14 @@ function rRunner(){
 
   sb+=`<div class="sb-section">
     <div class="sb-section-label">Attendees</div>
-    <div class="sb-attendee">${att.length?att.map(a=>e(a.name)).join('<br>'):'None'}</div>
+    ${S.attendees.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--mid);padding:2px 0">
+      <span>${e(a.name)}</span>
+      <button class="a-rm" style="font-size:12px" onclick="removeAttendee('${e(a.name)}')">&times;</button>
+    </div>`).join('')}
+    <div style="display:flex;gap:4px;margin-top:6px">
+      <input type="text" id="addAttName" placeholder="Add name..." style="flex:1;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px;font-size:10px" onkeydown="if(event.key==='Enter')addAttendee()">
+      <button class="add-btn" style="padding:4px 8px;font-size:10px" onclick="addAttendee()">+</button>
+    </div>
     ${S.seriesId?'<button class="sb-edit-btn" onclick="openAgendaEditor()">Edit agenda</button>':''}
   </div></div>`;
 
@@ -1022,7 +1118,8 @@ function rRunner(){
   main+=`<div class="main-title">${e(sec.name)}</div>`;
 
   // Section content based on type
-  if(sec.type==='headlines') main+=rHeadlinesSection(att);
+  if(sec.type==='checkin') main+=rCheckinSection(att);
+  else if(sec.type==='headlines') main+=rHeadlinesSection(att);
   else if(sec.type==='issues') main+=rIssuesSection(att);
   else if(sec.type==='wrapup') main+=rWrapupSection();
   else main+=rNotesSection(att);
@@ -1036,6 +1133,24 @@ function rRunner(){
 
   main+=`</div>`;
   return `<div class="runner">${sb}${main}</div>`;
+}
+
+function rCheckinSection(att){
+  const present=getPresentAttendees();
+  let html=`<div class="main-sub">Mark who is present. ${present.length} of ${S.attendees.length} checked in.</div>`;
+  html+=`<div style="margin-bottom:16px">`;
+  S.attendees.forEach(a=>{
+    const checked=S.attendance[a.name];
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg);cursor:pointer" onclick="toggleAttendance('${e(a.name)}')">
+      <div class="a-chk ${checked?'done':''}" style="width:22px;height:22px">${checked?'&#10003;':''}</div>
+      <div style="font-size:14px;${checked?'':'opacity:.5'}">${e(a.name)}</div>
+      ${checked?'<span style="font-size:10px;color:var(--green);margin-left:auto">Present</span>':'<span style="font-size:10px;color:var(--mid);margin-left:auto">Absent</span>'}
+    </div>`;
+  });
+  html+=`</div>`;
+  html+=`<div class="sub-l">Notes</div>`;
+  html+=`<textarea class="notes" id="sN" placeholder="Check-in notes..." oninput="updNotes(this.value)"></textarea>`;
+  return html;
 }
 
 function rNotesSection(att){
@@ -1184,28 +1299,46 @@ function rWrapupSection(){
   const userName=currentUser?currentUser.name||currentUser.username:'';
 
   html+=`<div class="sub-l" style="margin-top:20px">Rate this meeting</div>`;
-  html+=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-    <div style="display:flex;gap:4px">`;
-  for(let i=1;i<=10;i++){
-    const isSelected=myRating&&myRating.rating===i;
-    html+=`<div onclick="submitRating(${i})" style="width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;
-      background:${isSelected?'var(--red)':i<=(myRating?myRating.rating:0)?'var(--red)':'var(--bg)'};
-      color:${isSelected||i<=(myRating?myRating.rating:0)?'var(--white)':'var(--mid)'}">${i}</div>`;
-  }
-  html+=`</div></div>`;
 
+  // Average display
   if(S.ratings.length){
-    html+=`<div style="background:var(--bg);border-radius:6px;padding:12px 14px;margin-bottom:8px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:13px;font-weight:700">Average rating</div>
-        <div style="font-size:22px;font-weight:700;color:${avg>=7?'var(--green)':avg>=5?'var(--amber)':'var(--red)'}">${avg}<span style="font-size:12px;font-weight:400;color:var(--mid)">/10</span></div>
-      </div>
-      <div style="font-size:12px;color:var(--mid)">`;
-    S.ratings.forEach(r=>{
-      html+=`<div style="display:flex;justify-content:space-between;padding:2px 0"><span>${e(r.by)}</span><span style="font-weight:700">${r.rating}</span></div>`;
-    });
-    html+=`</div></div>`;
+    html+=`<div style="background:var(--bg);border-radius:6px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:13px;font-weight:700">Average</div>
+      <div style="font-size:24px;font-weight:700;color:${avg>=7?'var(--green)':avg>=5?'var(--amber)':'var(--red)'}">${avg}<span style="font-size:12px;font-weight:400;color:var(--mid)">/10</span></div>
+    </div>`;
   }
+
+  // Per-attendee rating rows
+  S.attendees.forEach(a=>{
+    const isMe=a.name===userName;
+    const theirRating=S.ratings.find(r=>r.by===a.name);
+    const present=S.attendance[a.name];
+
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg)">
+      <div style="flex:1;font-size:13px;${present?'':'opacity:.4'}">
+        ${e(a.name)}
+        ${!present?'<span style="font-size:10px;color:var(--mid)">(absent)</span>':''}
+      </div>`;
+
+    if(isMe){
+      // Current user gets clickable rating buttons
+      html+=`<div style="display:flex;gap:3px">`;
+      for(let i=1;i<=10;i++){
+        const sel=myRating&&i<=myRating.rating;
+        html+=`<div onclick="submitRating(${i})" style="width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;
+          background:${sel?'var(--red)':'var(--bg)'};color:${sel?'var(--white)':'var(--mid)'}">${i}</div>`;
+      }
+      html+=`</div>`;
+    } else {
+      // Other users shown as read-only
+      if(theirRating){
+        html+=`<div style="font-size:16px;font-weight:700;color:${theirRating.rating>=7?'var(--green)':theirRating.rating>=5?'var(--amber)':'var(--red)'};min-width:30px;text-align:center">${theirRating.rating}</div>`;
+      } else {
+        html+=`<div style="font-size:11px;color:var(--bdr);min-width:30px;text-align:center">\u2014</div>`;
+      }
+    }
+    html+=`</div>`;
+  });
 
   return html;
 }
@@ -1250,7 +1383,7 @@ function submitActionFromHL(hlId){
 
 /* ══ AGENDA EDITOR MODAL ══ */
 function rAgendaEditor(){
-  const types=[{v:'notes',l:'Notes'},{v:'headlines',l:'Headlines'},{v:'issues',l:'Issues & Actions'},{v:'wrapup',l:'Wrap-up'}];
+  const types=[{v:'checkin',l:'Check-in'},{v:'notes',l:'Notes'},{v:'headlines',l:'Headlines'},{v:'issues',l:'Issues & Actions'},{v:'wrapup',l:'Wrap-up'}];
   let rows=S.editAgenda.map((s,i)=>{
     const typeOpts=types.map(t=>`<option value="${t.v}" ${s.type===t.v?'selected':''}>${t.l}</option>`).join('');
     return `<div class="modal-sec">
