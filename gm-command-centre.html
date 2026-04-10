@@ -234,6 +234,25 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sm-tl{flex:1;overflow-y:auto;position:relative;}
 .sm-tl::-webkit-scrollbar{width:4px;}
 .sm-tl::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+/* DASHBOARD */
+.wday-btn{background:var(--soft);border:1px solid var(--border);color:var(--mid);border-radius:6px;padding:5px 10px;font-size:11px;font-family:var(--font);font-weight:700;cursor:pointer;}
+.wday-btn.on{background:rgba(239,62,66,.08);border-color:rgba(239,62,66,.3);color:var(--red);}
+.dash-stat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 20px;min-width:140px;}
+.dash-sv{font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+.dash-sl{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:.1em;margin-top:4px;}
+.dash-row{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 18px;display:flex;align-items:center;gap:14px;margin-bottom:7px;}
+.dash-row-subj{font-size:13px;font-weight:700;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dash-row-from{font-size:11px;color:var(--mid);min-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dash-row-dur{font-size:14px;font-weight:700;min-width:64px;text-align:right;}
+.dash-row-dur.fast{color:var(--green);}
+.dash-row-dur.med{color:var(--amber);}
+.dash-row-dur.slow{color:var(--red-text);}
+.dash-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.dash-bar-lbl{font-size:11px;color:var(--mid);min-width:72px;text-align:right;}
+.dash-bar-track{flex:1;background:var(--soft);border-radius:4px;height:18px;overflow:hidden;}
+.dash-bar-fill{height:100%;border-radius:4px;background:var(--red);display:flex;align-items:center;padding-left:8px;}
+.dash-bar-cnt{font-size:10px;font-weight:700;color:#fff;}
+
 /* EVENT DETAIL PANEL */
 #cal-panel{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;}
 .cp-inner{max-width:720px;margin:0 auto;padding:28px 36px 80px;}
@@ -444,11 +463,65 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <!-- DASHBOARD PAGE -->
     <div id="dashboard-page" style="display:none;flex:1;overflow-y:auto;">
       <div style="background:var(--dark);padding:22px 32px 18px;border-bottom:3px solid var(--red);">
-        <div style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;">Dashboard</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.35);">Coming soon.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:22px;font-weight:700;color:#fff;margin-bottom:3px;">Email Response Time</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.35);">Working hours only. Last 90 days.</div>
+          </div>
+          <button onclick="scanResponseTimes()" id="dash-scan-btn" style="background:var(--red);border:none;color:#fff;border-radius:8px;padding:10px 20px;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;">&#9654; Scan emails</button>
+        </div>
       </div>
-      <div style="max-width:880px;margin:60px auto;padding:0 32px;text-align:center;color:var(--mid);font-size:14px;font-style:italic;">
-        This page is blank. Let me know what you'd like here.
+      <div style="max-width:960px;margin:0 auto;padding:24px 32px;">
+
+        <!-- Working hours settings -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mid);margin-bottom:14px;">Working Hours Settings</div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:11px;color:var(--mid);font-weight:700;margin-bottom:8px;">Working days</div>
+              <div style="display:flex;gap:6px;" id="wday-btns">
+                <button onclick="toggleWDay(0)" id="wd-0" class="wday-btn">Sun</button>
+                <button onclick="toggleWDay(1)" id="wd-1" class="wday-btn on">Mon</button>
+                <button onclick="toggleWDay(2)" id="wd-2" class="wday-btn on">Tue</button>
+                <button onclick="toggleWDay(3)" id="wd-3" class="wday-btn on">Wed</button>
+                <button onclick="toggleWDay(4)" id="wd-4" class="wday-btn on">Thu</button>
+                <button onclick="toggleWDay(5)" id="wd-5" class="wday-btn on">Fri</button>
+                <button onclick="toggleWDay(6)" id="wd-6" class="wday-btn">Sat</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--mid);font-weight:700;margin-bottom:8px;">Working hours</div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <select id="wh-start" onchange="saveWorkSettings()" style="background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--font);color:var(--text);outline:none;"></select>
+                <span style="font-size:12px;color:var(--mid);">to</span>
+                <select id="wh-end" onchange="saveWorkSettings()" style="background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--font);color:var(--text);outline:none;"></select>
+              </div>
+            </div>
+            <div style="margin-left:auto;font-size:11px;color:var(--mid);font-style:italic;padding-top:28px;" id="dash-last-scan"></div>
+          </div>
+        </div>
+
+        <!-- Stats cards -->
+        <div id="dash-stats" style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;"></div>
+
+        <!-- Distribution chart -->
+        <div id="dash-chart-wrap" style="display:none;background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:24px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mid);margin-bottom:16px;">Response Time Distribution</div>
+          <div id="dash-chart"></div>
+        </div>
+
+        <!-- Results list -->
+        <div id="dash-results"></div>
+
+        <!-- Scan progress -->
+        <div id="dash-progress" style="display:none;text-align:center;padding:40px;color:var(--mid);">
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;">
+            <div class="spinner"></div>
+            <span id="dash-progress-text">Scanning sent emails...</span>
+          </div>
+          <div style="margin-top:12px;font-size:12px;font-style:italic;">This may take 15-30 seconds for large mailboxes.</div>
+        </div>
+
       </div>
     </div>
 
@@ -964,6 +1037,7 @@ function showPage(page){
   document.getElementById('nav-tl').classList.toggle('active',page==='timelog');
   document.getElementById('nav-dash').classList.toggle('active',page==='dashboard');
   if(page==='timelog'){tlOffset=0;loadFromGH().then(function(){renderTL();});}
+  if(page==='dashboard'){initDashboard();}
 }
 
 // TIMER
@@ -1109,6 +1183,224 @@ function renderTL(){
     var col=taskColour[e.task];
     return '<div class="tl-entry"><div class="tl-e-bar" style="background:'+col+';"></div><div class="tl-e-task">'+e.task+'</div><div class="tl-e-time">'+sf+' - '+ef+'</div><div class="tl-e-dur">'+fmtDur(e.dur)+'</div></div>';
   }).join('');
+}
+
+
+// -- DASHBOARD --------------------------------------------------------------
+var workDays=[1,2,3,4,5];
+var workStart=7;
+var workEnd=17;
+
+function initDashboard(){
+  // Populate hour selects
+  var startSel=document.getElementById('wh-start');
+  var endSel=document.getElementById('wh-end');
+  for(var h=0;h<24;h++){
+    var lbl=(h===0?'12am':h<12?h+'am':h===12?'12pm':(h-12)+'pm');
+    startSel.innerHTML+='<option value="'+h+'">'+lbl+'</option>';
+    endSel.innerHTML+='<option value="'+h+'">'+lbl+'</option>';
+  }
+  // Load saved settings
+  var saved=localStorage.getItem('gm_work_settings');
+  if(saved){try{var s=JSON.parse(saved);workDays=s.days||workDays;workStart=s.start!=null?s.start:workStart;workEnd=s.end!=null?s.end:workEnd;}catch(e){}}
+  startSel.value=workStart;
+  endSel.value=workEnd;
+  workDays.forEach(function(d){var btn=document.getElementById('wd-'+d);if(btn)btn.classList.add('on');});
+  // Show cached results if available
+  var cached=localStorage.getItem('gm_dash_results');
+  var cachedTs=localStorage.getItem('gm_dash_ts');
+  if(cached&&cachedTs){
+    try{
+      var rows=JSON.parse(cached);
+      renderDashResults(rows);
+      document.getElementById('dash-last-scan').textContent='Last scanned: '+new Date(parseInt(cachedTs)).toLocaleString('en-NZ',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true});
+    }catch(e){}
+  }
+}
+
+function toggleWDay(d){
+  var idx=workDays.indexOf(d);
+  if(idx>=0)workDays.splice(idx,1);else workDays.push(d);
+  var btn=document.getElementById('wd-'+d);
+  if(btn)btn.classList.toggle('on',workDays.indexOf(d)>=0);
+  saveWorkSettings();
+}
+
+function saveWorkSettings(){
+  workStart=parseInt(document.getElementById('wh-start').value);
+  workEnd=parseInt(document.getElementById('wh-end').value);
+  localStorage.setItem('gm_work_settings',JSON.stringify({days:workDays,start:workStart,end:workEnd}));
+}
+
+function workMinsBetween(startMs, endMs){
+  if(endMs<=startMs)return 0;
+  var mins=0;
+  var cur=new Date(startMs);
+  // Snap to next working moment if outside hours
+  while(cur.getTime()<endMs){
+    var dow=cur.getDay();
+    if(workDays.indexOf(dow)<0){
+      // skip to next day at workStart
+      cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);continue;
+    }
+    var dayS=new Date(cur);dayS.setHours(workStart,0,0,0);
+    var dayE=new Date(cur);dayE.setHours(workEnd,0,0,0);
+    if(cur<dayS){cur=dayS;continue;}
+    if(cur>=dayE){cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);continue;}
+    var periodEnd=new Date(Math.min(endMs,dayE.getTime()));
+    mins+=(periodEnd.getTime()-cur.getTime())/60000;
+    cur=new Date(dayE.getTime());
+    cur.setDate(cur.getDate()+1);cur.setHours(workStart,0,0,0);
+  }
+  return Math.round(mins);
+}
+
+function fmtMins(mins){
+  if(mins<60)return mins+'m';
+  var h=Math.floor(mins/60),m=mins%60;
+  return m>0?h+'h '+m+'m':h+'h';
+}
+
+async function scanResponseTimes(){
+  var btn=document.getElementById('dash-scan-btn');
+  btn.disabled=true;btn.textContent='Scanning...';
+  document.getElementById('dash-progress').style.display='block';
+  document.getElementById('dash-stats').innerHTML='';
+  document.getElementById('dash-results').innerHTML='';
+  document.getElementById('dash-chart-wrap').style.display='none';
+
+  try{
+    // Fetch sent replies from last 90 days
+    setProgress('Fetching sent replies...');
+    var since=new Date();since.setDate(since.getDate()-90);
+    var sinceISO=since.toISOString();
+
+    // Get sent items that are replies
+    var sentData=await gGet('https://graph.microsoft.com/v1.0/me/mailFolders/sentitems/messages?$filter=sentDateTime ge '+sinceISO+'&$select=subject,sentDateTime,conversationId,toRecipients&$top=100&$orderby=sentDateTime desc');
+    var sentItems=(sentData.value||[]).filter(function(m){return m.subject&&(m.subject.toLowerCase().startsWith('re:')||m.subject.toLowerCase().startsWith('re :')||m.subject.toLowerCase().startsWith('fw:')==false);});
+
+    // Dedupe: one reply per conversationId (take earliest reply)
+    var convMap={};
+    sentItems.forEach(function(m){
+      if(!convMap[m.conversationId]||new Date(m.sentDateTime)<new Date(convMap[m.conversationId].sentDateTime)){
+        convMap[m.conversationId]=m;
+      }
+    });
+    var convIds=Object.keys(convMap);
+    setProgress('Found '+convIds.length+' reply threads. Fetching originals...');
+
+    var results=[];
+    var batchSize=8;
+    for(var i=0;i<convIds.length;i+=batchSize){
+      var batch=convIds.slice(i,i+batchSize);
+      setProgress('Processing '+(i+1)+' to '+Math.min(i+batchSize,convIds.length)+' of '+convIds.length+'...');
+      var batchResults=await Promise.all(batch.map(async function(cid){
+        try{
+          var reply=convMap[cid];
+          // Find the received message in this conversation (not sent by me)
+          var convMsgs=await gGet('https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq ''+cid+'' and isDraft eq false&$select=subject,receivedDateTime,sentDateTime,from,isDraft&$top=10&$orderby=receivedDateTime asc');
+          var msgs=convMsgs.value||[];
+          // Find the first received (inbound) message before the reply
+          var replySent=new Date(reply.sentDateTime).getTime();
+          var inbound=null;
+          for(var j=0;j<msgs.length;j++){
+            var m=msgs[j];
+            var mTime=new Date(m.receivedDateTime).getTime();
+            if(mTime<replySent&&m.from&&m.from.emailAddress){
+              // Not sent by me - check it's not in sent items by looking at folder or sentDateTime vs receivedDateTime
+              if(Math.abs(mTime-new Date(m.sentDateTime||m.receivedDateTime).getTime())<60000*5){
+                // likely sent by me, skip
+                continue;
+              }
+              inbound=m;
+              break;
+            }
+          }
+          if(!inbound)return null;
+          var receivedMs=new Date(inbound.receivedDateTime).getTime();
+          var wMins=workMinsBetween(receivedMs,replySent);
+          if(wMins<0)return null;
+          return{
+            subject:reply.subject,
+            from:inbound.from&&inbound.from.emailAddress?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
+            received:receivedMs,
+            replied:replySent,
+            wMins:wMins
+          };
+        }catch(e){return null;}
+      }));
+      results=results.concat(batchResults.filter(function(r){return r!==null;}));
+    }
+
+    if(!results.length){
+      document.getElementById('dash-progress').style.display='none';
+      document.getElementById('dash-results').innerHTML='<div style="text-align:center;padding:40px;color:var(--mid);font-style:italic;">No reply data found for the selected period.</div>';
+      btn.disabled=false;btn.textContent='&#9654; Scan emails';
+      return;
+    }
+
+    // Cache results
+    localStorage.setItem('gm_dash_results',JSON.stringify(results));
+    localStorage.setItem('gm_dash_ts',Date.now().toString());
+    document.getElementById('dash-last-scan').textContent='Last scanned: '+new Date().toLocaleString('en-NZ',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',hour12:true});
+
+    document.getElementById('dash-progress').style.display='none';
+    renderDashResults(results);
+  }catch(err){
+    console.error(err);
+    document.getElementById('dash-progress').style.display='none';
+    document.getElementById('dash-results').innerHTML='<div style="text-align:center;padding:40px;color:var(--red-text);">Scan failed: '+err.message+'</div>';
+  }
+  btn.disabled=false;btn.textContent='&#9654; Scan emails';
+}
+
+function setProgress(txt){document.getElementById('dash-progress-text').textContent=txt;}
+
+function renderDashResults(results){
+  if(!results||!results.length)return;
+  results.sort(function(a,b){return a.wMins-b.wMins;});
+  var total=results.length;
+  var sum=results.reduce(function(s,r){return s+r.wMins;},0);
+  var avg=Math.round(sum/total);
+  var fastest=results[0].wMins;
+  var slowest=results[results.length-1].wMins;
+  var under1h=results.filter(function(r){return r.wMins<60;}).length;
+  var under4h=results.filter(function(r){return r.wMins<240;}).length;
+
+  // Stats
+  document.getElementById('dash-stats').innerHTML=
+    '<div class="dash-stat"><div class="dash-sv">'+fmtMins(avg)+'</div><div class="dash-sl">Avg response time</div></div>'+
+    '<div class="dash-stat"><div class="dash-sv" style="color:var(--green)">'+fmtMins(fastest)+'</div><div class="dash-sl">Fastest</div></div>'+
+    '<div class="dash-stat"><div class="dash-sv" style="color:var(--red-text)">'+fmtMins(slowest)+'</div><div class="dash-sl">Slowest</div></div>'+
+    '<div class="dash-stat"><div class="dash-sv">'+total+'</div><div class="dash-sl">Replies tracked</div></div>'+
+    '<div class="dash-stat"><div class="dash-sv">'+Math.round(under1h/total*100)+'%</div><div class="dash-sl">Under 1 hour</div></div>';
+
+  // Distribution chart
+  var buckets=[
+    {lbl:'Under 30m',count:results.filter(function(r){return r.wMins<30;}).length},
+    {lbl:'30m - 1h', count:results.filter(function(r){return r.wMins>=30&&r.wMins<60;}).length},
+    {lbl:'1h - 2h',  count:results.filter(function(r){return r.wMins>=60&&r.wMins<120;}).length},
+    {lbl:'2h - 4h',  count:results.filter(function(r){return r.wMins>=120&&r.wMins<240;}).length},
+    {lbl:'4h - 8h',  count:results.filter(function(r){return r.wMins>=240&&r.wMins<480;}).length},
+    {lbl:'Over 8h',  count:results.filter(function(r){return r.wMins>=480;}).length}
+  ];
+  var maxCount=Math.max.apply(null,buckets.map(function(b){return b.count;}));
+  var chartHtml=buckets.map(function(b){
+    var pct=maxCount>0?Math.round(b.count/maxCount*100):0;
+    return '<div class="dash-bar-row"><div class="dash-bar-lbl">'+b.lbl+'</div><div class="dash-bar-track"><div class="dash-bar-fill" style="width:'+pct+'%"><span class="dash-bar-cnt">'+(b.count>0?b.count:'')+'</span></div></div></div>';
+  }).join('');
+  document.getElementById('dash-chart').innerHTML=chartHtml;
+  document.getElementById('dash-chart-wrap').style.display='block';
+
+  // Results list - sorted slowest first
+  var sorted=results.slice().sort(function(a,b){return b.wMins-a.wMins;});
+  var listTitle='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--mid);margin-bottom:12px;">All Replies (slowest first)</div>';
+  var listHtml=sorted.map(function(r){
+    var cls=r.wMins<60?'fast':r.wMins<240?'med':'slow';
+    var recvd=new Date(r.received).toLocaleDateString('en-NZ',{day:'2-digit',month:'short'});
+    return '<div class="dash-row"><div class="dash-row-from">'+r.from+'</div><div class="dash-row-subj">'+r.subject+'</div><div style="font-size:11px;color:var(--mid);white-space:nowrap;">'+recvd+'</div><div class="dash-row-dur '+cls+'">'+fmtMins(r.wMins)+'</div></div>';
+  }).join('');
+  document.getElementById('dash-results').innerHTML=listTitle+listHtml;
 }
 
 init();
