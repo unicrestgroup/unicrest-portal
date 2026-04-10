@@ -446,7 +446,7 @@ async function addAction(text, owner, due, section){
   if(!LISTS.actions.id) return;
   const today = new Date().toISOString().slice(0,10);
   const userName = currentUser.name || currentUser.username;
-  const sid = S.seriesId || 'adhoc_'+Date.now();
+  const sid = S.seriesId || S.prepSeriesId || 'adhoc_'+Date.now();
   const item = await spAddItem('actions', {
     Title:text, SeriesId:sid, Owner:owner, DueDate:due,
     Status:'open', Section:section, MeetingDate:today, CreatedByName:userName
