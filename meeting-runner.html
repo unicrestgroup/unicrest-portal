@@ -456,11 +456,9 @@ async function findSharedCal(){
   if(sharedCalId)return sharedCalId;
   const d=await gGet(`/users/${CAL_USER}/calendars?$select=id,name&$top=20`);
   if(d&&d.value){
-    // Look for a non-default calendar (the shared leave/events one)
-    const nonDefault=d.value.filter(c=>c.name!=='Calendar');
-    if(nonDefault.length)sharedCalId=nonDefault[0].id;
-    else if(d.value.length)sharedCalId=d.value[0].id;
-    console.log('Shared calendars found:',d.value.map(c=>c.name).join(', '),'using:',sharedCalId);
+    const target=d.value.find(c=>c.name==='Unicrest Leave/Events');
+    if(target)sharedCalId=target.id;
+    else console.warn('Unicrest Leave/Events calendar not found. Available:',d.value.map(c=>c.name).join(', '));
   }
   return sharedCalId;
 }
