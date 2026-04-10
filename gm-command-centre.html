@@ -303,8 +303,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   <div class="sidebar">
     <div class="sb-top"><div class="sb-mark">UC</div><div class="sb-brand"><span style="color:var(--red)">UNI</span>CREST</div></div>
     <div class="sb-items">
-      <div class="sb-item active" id="nav-home" onclick="showPage('home')"><div class="sb-icon">&#8962;</div><div class="sb-lbl">Dashboard</div></div>
+      <div class="sb-item active" id="nav-home" onclick="showPage('home')"><div class="sb-icon">&#8962;</div><div class="sb-lbl">Command Centre</div></div>
       <div class="sb-item" id="nav-tl" onclick="showPage('timelog')"><div class="sb-icon">&#9711;</div><div class="sb-lbl">Timelog</div></div>
+      <div class="sb-item" id="nav-dash" onclick="showPage('dashboard')"><div class="sb-icon">&#9638;</div><div class="sb-lbl">Dashboard</div></div>
     </div>
   </div>
   <div class="app-body">
@@ -438,6 +439,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <div class="tl-entries" id="tl-entries"></div>
       </div>
     </div>
+  </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div id="dashboard-page" style="display:none;flex:1;overflow-y:auto;">
+      <div style="background:var(--dark);padding:22px 32px 18px;border-bottom:3px solid var(--red);">
+        <div style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;">Dashboard</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.35);">Coming soon.</div>
+      </div>
+      <div style="max-width:880px;margin:60px auto;padding:0 32px;text-align:center;color:var(--mid);font-size:14px;font-style:italic;">
+        This page is blank. Let me know what you'd like here.
+      </div>
+    </div>
+
   </div>
 </div>
 <!-- EMAIL PANEL -->
@@ -945,8 +959,10 @@ async function createCalEvent(){
 function showPage(page){
   document.getElementById('home-page').style.display=page==='home'?'block':'none';
   document.getElementById('timelog-page').style.display=page==='timelog'?'block':'none';
+  document.getElementById('dashboard-page').style.display=page==='dashboard'?'block':'none';
   document.getElementById('nav-home').classList.toggle('active',page==='home');
   document.getElementById('nav-tl').classList.toggle('active',page==='timelog');
+  document.getElementById('nav-dash').classList.toggle('active',page==='dashboard');
   if(page==='timelog'){tlOffset=0;loadFromGH().then(function(){renderTL();});}
 }
 
