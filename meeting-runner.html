@@ -221,7 +221,8 @@ let msalApp, accessToken, currentUser, siteId;
    ═══════════════════════════════ */
 let S = {
   screen:'login',
-  meetings:[], loadingCal:false,
+  meetings:[], allMeetings:[], loadingCal:false,
+  viewDate: new Date(), // current day being viewed on dashboard
   // prep (pre-meeting view)
   prepMeeting:null, prepSeriesId:null, prepAgenda:[],
   // runner
@@ -477,22 +478,28 @@ async function deleteAction(id){
    CALENDAR
    ═══════════════════════════════ */
 function classifyFreq(rec){
-  if(!rec||!rec.pattern) return 'today';
+  if(!rec||!rec.pattern){console.log('No recurrence pattern, defaulting to today');return 'today';}
   const t=rec.pattern.type, iv=rec.pattern.interval||1;
+  console.log('Recurrence:', t, 'interval:', iv);
   if(t==='daily') return 'daily';
-  if(t==='weekly') return iv<=2?'weekly':'monthly';
+  if(t==='weekly' && iv===1) return 'weekly';
+  if(t==='weekly' && iv===2) return 'fortnightly';
+  if(t==='weekly') return 'monthly';
   if(t==='absoluteMonthly'||t==='relativeMonthly') return 'monthly';
+  if(t==='absoluteYearly'||t==='relativeYearly') return 'monthly';
+  console.log('Unknown recurrence type:', t);
   return 'weekly';
 }
 
 async function loadCal(){
   S.loadingCal=true; render();
   const now=new Date();
-  const sod=new Date(now);sod.setHours(0,0,0,0);
-  const eod=new Date(now);eod.setHours(23,59,59,999);
+  // Fetch a full month from today
+  const start=new Date(now);start.setHours(0,0,0,0);
+  const end=new Date(now);end.setMonth(end.getMonth()+1);end.setHours(23,59,59,999);
   const p=new URLSearchParams({
-    startDateTime:sod.toISOString(),endDateTime:eod.toISOString(),
-    $orderby:'start/dateTime',$top:'50',
+    startDateTime:start.toISOString(),endDateTime:end.toISOString(),
+    $orderby:'start/dateTime',$top:'200',
     $select:'id,subject,start,end,attendees,onlineMeetingUrl,seriesMasterId,type'
   });
   const d=await gGet('/me/calendarView?'+p);
@@ -504,21 +511,43 @@ async function loadCal(){
   await Promise.all([...sids].map(async sid=>{
     try{const m=await gGet('/me/events/'+sid+'?$select=recurrence');if(m&&m.recurrence)pats[sid]=m.recurrence;}catch{}
   }));
+  console.log('Recurrence patterns fetched:', Object.keys(pats).length, 'of', sids.size);
 
-  S.meetings=d.value.map(ev=>{
+  S.allMeetings=d.value.map(ev=>{
     const rec=ev.type==='occurrence'||ev.type==='exception'||!!ev.seriesMasterId;
     const sid=ev.seriesMasterId||(rec?ev.id:null);
     const st=new Date(ev.start.dateTime+'Z');
     const en=new Date(ev.end.dateTime+'Z');
     const att=(ev.attendees||[]).map(a=>({name:a.emailAddress.name,email:a.emailAddress.address}));
+    const freq=rec?classifyFreq(pats[sid]):'today';
     return {
       id:ev.id,subject:ev.subject||'Untitled',start:st,end:en,
       durMin:Math.round((en-st)/60000),attendees:att,
-      isRec:rec,seriesId:sid,freq:rec?classifyFreq(pats[sid]):'today',
+      isRec:rec,seriesId:sid,freq,
       onlineUrl:ev.onlineMeetingUrl||null
     };
   });
+  filterMeetingsByDate();
   S.loadingCal=false;render();
+}
+
+function filterMeetingsByDate(){
+  const vd=S.viewDate;
+  const dayStart=new Date(vd);dayStart.setHours(0,0,0,0);
+  const dayEnd=new Date(vd);dayEnd.setHours(23,59,59,999);
+  S.meetings=S.allMeetings.filter(m=>m.start>=dayStart&&m.start<=dayEnd);
+}
+
+function navDay(offset){
+  S.viewDate=new Date(S.viewDate.getTime()+offset*86400000);
+  filterMeetingsByDate();
+  render();
+}
+
+function goToday(){
+  S.viewDate=new Date();
+  filterMeetingsByDate();
+  render();
 }
 
 /* ═══════════════════════════════
@@ -605,7 +634,7 @@ function endMeeting(){
   timerStop();S.sections[S.curSec].done=true;
   S.screen='summary';render();
 }
-function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.prepAgenda=[];document.getElementById('clockEl').textContent='';loadCal();}
+function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.prepAgenda=[];S.viewDate=new Date();document.getElementById('clockEl').textContent='';loadCal();}
 function hdrAction(){if(S.screen==='runner'){if(confirm('End this meeting?'))endMeeting();}else if(S.screen==='summary')backToDash();}
 function updNotes(v){curSections()[S.curSec].notes=v;}
 
@@ -677,19 +706,35 @@ function rLogin(){
 
 function rDash(){
   if(S.loadingCal)return `<div class="loading"><div class="spinner"></div>Loading your calendar...</div>`;
-  const now=new Date();
-  const ds=now.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  if(!S.meetings.length) return `<div class="day-label">${ds}</div><div class="empty">No meetings on your calendar today.</div><button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
+  const vd=S.viewDate;
+  const ds=vd.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const isToday=new Date().toDateString()===vd.toDateString();
+
+  // Day nav
+  let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <button class="hdr-btn" style="background:var(--dark);color:var(--white)" onclick="navDay(-1)">\u2190</button>
+    <div style="text-align:center">
+      <div style="font-size:14px;font-weight:700">${ds}</div>
+      ${!isToday?'<button style="background:none;color:var(--red);font-size:11px;font-weight:700;padding:2px 0;font-family:Arvo,serif" onclick="goToday()">Back to today</button>':'<div style="font-size:11px;color:var(--mid)">Today</div>'}
+    </div>
+    <button class="hdr-btn" style="background:var(--dark);color:var(--white)" onclick="navDay(1)">\u2192</button>
+  </div>`;
+
+  if(!S.meetings.length){
+    html+=`<div class="empty">No meetings on this day.</div>`;
+    html+=`<button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
+    return html;
+  }
 
   const groups=[
-    {key:'today',label:'Today',meetings:[]},
+    {key:'today',label:'One-off',meetings:[]},
     {key:'daily',label:'Daily',meetings:[]},
     {key:'weekly',label:'Weekly',meetings:[]},
+    {key:'fortnightly',label:'Fortnightly',meetings:[]},
     {key:'monthly',label:'Monthly',meetings:[]}
   ];
   S.meetings.forEach((m,i)=>{const g=groups.find(g=>g.key===m.freq)||groups[0];g.meetings.push({...m,idx:i});});
 
-  let html=`<div class="day-label">${ds}<span class="sync-note">Synced from Outlook</span></div>`;
   groups.forEach(g=>{
     if(!g.meetings.length)return;
     html+=`<div class="grp-label">${g.label}<span class="cnt">(${g.meetings.length})</span></div>`;
@@ -700,9 +745,9 @@ function rDash(){
         <div style="display:flex;align-items:flex-start;justify-content:space-between">
           <div><div style="font-size:14px;font-weight:700">${e(m.subject)}</div>
           <div style="font-size:12px;color:var(--mid);margin-top:2px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div></div>
-          <span class="badge ${m.isRec?'rec':'one'}">${m.isRec?'Recurring':'One-off'}</span>
+          <span class="badge ${m.isRec?'rec':'one'}">${m.isRec?g.label:'One-off'}</span>
         </div>
-        <button class="start-btn" onclick="startMtg(${m.idx})">Start meeting</button>
+        ${isToday?'<button class="start-btn" onclick="startMtg('+m.idx+')">Start meeting</button>':''}
         ${m.isRec?'<button class="start-btn" onclick="prepMtg('+m.idx+')" style="background:var(--dark);margin-top:6px">Prepare / View agenda</button>':''}
       </div>`;
     });
