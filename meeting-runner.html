@@ -885,6 +885,12 @@ function rHeadlineItem(h,oo){
       <textarea placeholder="Discussion notes..." oninput="updateHeadline('${h.id}',{notes:this.value})">${e(h.notes)}</textarea>
     </div>
     <button class="hl-action-btn" onclick="promptActionFromHL('${h.id}')">+ Create action from this</button>
+    <div class="add-row" id="hlAction_${h.id}" style="display:none;margin-top:6px">
+      <input type="text" id="hlAT_${h.id}" placeholder="Action..." onkeydown="if(event.key==='Enter')submitActionFromHL('${h.id}')">
+      <select id="hlAO_${h.id}"><option value="">Owner</option>${oo}</select>
+      <input type="date" id="hlAD_${h.id}" style="max-width:140px">
+      <button class="add-btn" onclick="submitActionFromHL('${h.id}')">Add</button>
+    </div>
   </div>`;
 }
 
@@ -989,12 +995,19 @@ function rAddAction(oo, section){
 }
 
 function promptActionFromHL(hlId){
-  const hl=S.headlines.find(h=>h.id===hlId);
-  if(!hl) return;
-  const text=prompt('Action from "'+hl.text+'":', '');
-  if(!text) return;
-  const owner=prompt('Owner:','');
-  addAction(text, owner||'', '', curSecName());
+  // Toggle inline form visibility
+  const el=document.getElementById('hlAction_'+hlId);
+  if(el) el.style.display=el.style.display==='none'?'flex':'none';
+}
+function submitActionFromHL(hlId){
+  const t=document.getElementById('hlAT_'+hlId);
+  const o=document.getElementById('hlAO_'+hlId);
+  const d=document.getElementById('hlAD_'+hlId);
+  if(!t||!t.value.trim()) return;
+  addAction(t.value.trim(), o?o.value:'', d?d.value:'', curSecName());
+  t.value='';if(d)d.value='';
+  const el=document.getElementById('hlAction_'+hlId);
+  if(el) el.style.display='none';
 }
 
 /* ══ AGENDA EDITOR MODAL ══ */
