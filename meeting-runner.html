@@ -508,7 +508,7 @@ async function loadCal(){
   const p=new URLSearchParams({
     startDateTime:start.toISOString(),endDateTime:end.toISOString(),
     $orderby:'start/dateTime',$top:'200',
-    $select:'id,subject,start,end,attendees,onlineMeetingUrl,seriesMasterId,type'
+    $select:'id,subject,start,end,attendees,onlineMeetingUrl,seriesMasterId,type,iCalUId'
   });
   const d=await gGet('/me/calendarView?'+p);
   if(!d||!d.value){S.loadingCal=false;render();return;}
@@ -520,26 +520,31 @@ async function loadCal(){
   let pats={};
   try{pats=JSON.parse(localStorage.getItem('mr_patterns_v2')||'{}');}catch{}
 
-  // Only fetch patterns we don't have cached
-  const toFetch=[...sids].filter(sid=>!pats[sid]);
+  // Fetch recurrence patterns AND iCalUId for series masters (iCalUId is shared across all users)
+  let sharedIds={};
+  try{sharedIds=JSON.parse(localStorage.getItem('mr_sharedids_v1')||'{}');}catch{}
+  const toFetch=[...sids].filter(sid=>!pats[sid]||!sharedIds[sid]);
   for(let i=0;i<toFetch.length;i+=4){
     const batch=toFetch.slice(i,i+4);
     await Promise.all(batch.map(async sid=>{
-      try{const m=await gGet('/me/events/'+sid+'?$select=recurrence');if(m&&m.recurrence)pats[sid]=m.recurrence;}catch{}
+      try{const m=await gGet('/me/events/'+sid+'?$select=recurrence,iCalUId');if(m){if(m.recurrence)pats[sid]=m.recurrence;if(m.iCalUId)sharedIds[sid]=m.iCalUId;}}catch{}
     }));
     if(i+4<toFetch.length) await new Promise(r=>setTimeout(r,500));
   }
   // Cache for next time
   try{localStorage.setItem('mr_patterns_v2',JSON.stringify(pats));}catch{}
-  console.log('Patterns:', Object.keys(pats).length, 'total,', toFetch.length, 'fetched fresh');
+  try{localStorage.setItem('mr_sharedids_v1',JSON.stringify(sharedIds));}catch{}
+  console.log('Patterns:', Object.keys(pats).length, 'SharedIds:', Object.keys(sharedIds).length, 'Fetched:', toFetch.length);
 
   S.allMeetings=d.value.map(ev=>{
     const rec=ev.type==='occurrence'||ev.type==='exception'||!!ev.seriesMasterId;
-    const sid=ev.seriesMasterId||(rec?ev.id:null);
+    const localSid=ev.seriesMasterId||(rec?ev.id:null);
+    // Use shared iCalUId so all users see the same series key
+    const sid=rec?(sharedIds[localSid]||localSid):(ev.iCalUId||ev.id);
     const st=new Date(ev.start.dateTime+'Z');
     const en=new Date(ev.end.dateTime+'Z');
     const att=(ev.attendees||[]).map(a=>({name:a.emailAddress.name,email:a.emailAddress.address}));
-    const freq=rec?classifyFreq(pats[sid]):'today';
+    const freq=rec?classifyFreq(pats[localSid]):'today';
     return {
       id:ev.id,subject:ev.subject||'Untitled',start:st,end:en,
       durMin:Math.round((en-st)/60000),attendees:att,
