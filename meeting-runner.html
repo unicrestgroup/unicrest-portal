@@ -338,11 +338,14 @@ async function createList(name, key){
    ═══════════════════════════════ */
 function spUrl(listKey){return `/sites/${siteId}/lists/${LISTS[listKey].id}`;}
 
-async function spGetItems(listKey, filter){
+async function spGetItems(listKey, fieldName, fieldValue){
   let url = spUrl(listKey)+'/items?$expand=fields&$top=200';
-  if(filter) url += '&$filter='+encodeURIComponent(filter);
   const d = await gGet(url);
-  return d && d.value ? d.value : [];
+  const items = d && d.value ? d.value : [];
+  if(fieldName && fieldValue){
+    return items.filter(it => it.fields && it.fields[fieldName] === fieldValue);
+  }
+  return items;
 }
 
 async function spAddItem(listKey, fields){
@@ -362,7 +365,7 @@ async function spDeleteItem(listKey, itemId){
    ═══════════════════════════════ */
 async function getAgenda(seriesId){
   if(!seriesId || !LISTS.config.id) return [...DEFAULT_AGENDA];
-  const items = await spGetItems('config', `fields/SeriesId eq '${seriesId}'`);
+  const items = await spGetItems('config','SeriesId',seriesId);
   if(items.length && items[0].fields.AgendaJSON){
     try{return JSON.parse(items[0].fields.AgendaJSON);}catch{return [...DEFAULT_AGENDA];}
   }
@@ -371,7 +374,7 @@ async function getAgenda(seriesId){
 
 async function saveAgenda(seriesId, agenda){
   if(!seriesId || !LISTS.config.id) return;
-  const items = await spGetItems('config', `fields/SeriesId eq '${seriesId}'`);
+  const items = await spGetItems('config','SeriesId',seriesId);
   const json = JSON.stringify(agenda);
   if(items.length){
     await spUpdateItem('config', items[0].id, {AgendaJSON:json});
@@ -386,7 +389,7 @@ async function saveAgenda(seriesId, agenda){
    ═══════════════════════════════ */
 async function loadHeadlines(seriesId){
   if(!seriesId || !LISTS.headlines.id){S.headlines=[];return;}
-  const items = await spGetItems('headlines', `fields/SeriesId eq '${seriesId}'`);
+  const items = await spGetItems('headlines','SeriesId',seriesId);
   S.headlines = items.map(it=>({
     id:it.id, text:it.fields.Title||'', seriesId:it.fields.SeriesId,
     date:it.fields.MeetingDate||'', by:it.fields.CreatedByName||'',
@@ -433,7 +436,7 @@ async function deleteHeadline(id){
    ═══════════════════════════════ */
 async function loadActions(seriesId){
   if(!seriesId || !LISTS.actions.id){S.actions=[];return;}
-  const items = await spGetItems('actions', `fields/SeriesId eq '${seriesId}'`);
+  const items = await spGetItems('actions','SeriesId',seriesId);
   S.actions = items.map(it=>({
     id:it.id, text:it.fields.Title||'', owner:it.fields.Owner||'',
     due:it.fields.DueDate||'', status:it.fields.Status||'open',
