@@ -407,7 +407,7 @@ async function addHeadline(text){
       Title:text, SeriesId:sid, MeetingDate:today,
       CreatedByName:userName, Status:'open', Notes:''
     });
-    if(item) S.headlines.push({id:item.id, text, seriesId:sid, date:today, by:userName, status:'open', notes:''});
+    if(item){S.headlines.push({id:item.id, text, seriesId:sid, date:today, by:userName, status:'open', notes:''});toast('Headline saved');}
     else toast('Failed to save headline');
   } catch(err){console.error('addHeadline error',err);toast('Error saving headline');}
   render();
@@ -451,7 +451,8 @@ async function addAction(text, owner, due, section){
     Title:text, SeriesId:sid, Owner:owner, DueDate:due,
     Status:'open', Section:section, MeetingDate:today, CreatedByName:userName
   });
-  if(item) S.actions.push({id:item.id, text, owner, due, status:'open', section, date:today, by:userName, done:false});
+  if(item){S.actions.push({id:item.id, text, owner, due, status:'open', section, date:today, by:userName, done:false});toast('Action saved');}
+  else toast('Failed to save action');
   render();
 }
 
@@ -567,8 +568,17 @@ async function prepMtg(idx){
 }
 
 function startFromPrep(){
-  const idx=S.meetings.findIndex(m=>m.id===S.prepMeeting.id);
-  startMtg(idx>=0?idx:undefined);
+  // Carry prep data directly into runner, no reload needed
+  S.activeMeeting=S.prepMeeting;
+  S.seriesId=S.prepSeriesId;
+  S.curSec=0;
+  S.sections=S.prepAgenda.map(a=>({...a})); // keep notes from prep
+  S.issues=[];
+  S.elapsed=0;
+  S.startTime=new Date();
+  S.timerOn=false;
+  // headlines and actions are already in S.headlines and S.actions from prep
+  S.screen='runner';render();
 }
 
 async function startMtg(idx){
