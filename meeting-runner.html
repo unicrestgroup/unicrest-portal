@@ -7,12 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.0/lib/msal-browser.min.js"></script>
 <style>
-:root{
-  --red:#EF3E42;--dark:#231F20;--mid:#464749;--bg:#EEEEEE;--white:#fff;
-  --green:#2E7D32;--amber:#F57F17;--blue:#1565C0;
-  --lr:#FFEBEE;--lg:#E8F5E9;--la:#FFF8E1;--lb:#E3F2FD;
-  --bdr:#D5D5D5;--sh:0 2px 8px rgba(0,0,0,.08);--r:8px;
-}
+:root{--red:#EF3E42;--dark:#231F20;--mid:#464749;--bg:#EEEEEE;--white:#fff;--green:#2E7D32;--amber:#F57F17;--blue:#1565C0;--lr:#FFEBEE;--lg:#E8F5E9;--la:#FFF8E1;--lb:#E3F2FD;--bdr:#D5D5D5;--sh:0 2px 8px rgba(0,0,0,.08);--r:8px}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Arvo',serif;background:var(--bg);color:var(--dark);min-height:100vh;overflow-x:hidden}
 button{font-family:'Arvo',serif;cursor:pointer;border:none}
@@ -42,94 +37,59 @@ input,textarea,select{font-family:'Arvo',serif}
 .login-btn:hover{background:var(--mid)}
 .tagline{font-size:11px;color:var(--mid);margin-top:16px;font-style:italic}
 
-/* Dashboard cards */
+/* Cards */
 .card{background:var(--white);border-radius:var(--r);box-shadow:var(--sh);padding:14px 16px;margin-bottom:10px}
 .card.click{cursor:pointer;transition:box-shadow .2s}
 .card.click:hover{box-shadow:0 4px 16px rgba(0,0,0,.12)}
 .badge{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0}
 .badge.rec{background:var(--lb);color:var(--blue)}
 .badge.one{background:var(--bg);color:var(--mid)}
-.day-label{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.sync-note{font-size:11px;font-weight:400;color:var(--mid)}
 .grp-label{margin-top:16px;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
 .grp-label .cnt{font-weight:400;opacity:.6}
-.cf-section{margin-top:10px;padding-top:10px;border-top:1px solid var(--bg)}
-.cf-label{font-size:11px;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.cf-item{display:flex;align-items:center;gap:7px;font-size:12px;margin-bottom:3px}
-.cf-dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0}
 .start-btn{background:var(--red);color:var(--white);text-align:center;padding:9px;border-radius:6px;font-size:13px;font-weight:700;margin-top:10px;width:100%;transition:background .2s}
 .start-btn:hover{background:#d63336}
 .adhoc-btn{border:1px dashed var(--bdr);border-radius:var(--r);padding:12px;text-align:center;font-size:13px;color:var(--mid);margin-top:6px;background:none;width:100%;transition:all .2s}
 .adhoc-btn:hover{border-color:var(--red);color:var(--red)}
 
-/* ══ RUNNER SIDEBAR LAYOUT ══ */
+/* Runner sidebar */
 .runner{display:flex;height:calc(100vh - 46px)}
 .sidebar{width:220px;background:#f7f7f7;border-right:1px solid var(--bdr);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
 .sb-meeting{padding:12px 14px;border-bottom:1px solid var(--bdr);font-size:13px;font-weight:700}
 .sb-meeting small{font-weight:400;color:var(--mid);display:block;margin-top:2px;font-size:11px}
-
 .sb-item{padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mid);cursor:pointer;transition:background .15s;border-left:3px solid transparent}
 .sb-item:hover{background:#f0f0f0}
 .sb-item.active{background:var(--white);border-left-color:var(--red);color:var(--dark);font-weight:700}
 .sb-item.done{opacity:.6}
-.sb-item.done .sn{background:var(--green)}
 .sn{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:var(--white);background:var(--bdr)}
 .sn.act{background:var(--red)}
+.sn.done{background:var(--green)}
 .sb-item .sb-time{margin-left:auto;font-size:10px;font-variant-numeric:tabular-nums;flex-shrink:0}
 .sb-item .sb-time.over{color:var(--red);font-weight:700}
-
 .sb-section{border-top:1px solid var(--bdr);padding:12px 14px;margin-top:auto}
 .sb-section-label{font-size:10px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.sb-attendee{font-size:11px;color:var(--mid);line-height:1.8}
 .sb-edit-btn{background:none;color:var(--blue);font-size:11px;padding:4px 0;text-decoration:underline;margin-top:8px;display:block}
 
 /* Main content */
 .main{flex:1;overflow-y:auto;padding:20px 24px 40px;background:var(--white)}
 .main-title{font-size:16px;font-weight:700;margin-bottom:4px}
-.main-sub{font-size:12px;color:var(--mid);margin-bottom:16px}
+.main-sub{font-size:12px;color:var(--mid);margin-bottom:14px}
+.main-nav{display:flex;gap:8px;margin-top:24px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--bg)}
 
+/* Timer */
 .t-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .t-disp{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;min-width:70px;text-align:center}
 .t-disp.over{color:var(--red)}
 .t-btn{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--dark);color:var(--white);transition:background .2s}
 .t-btn:hover{background:var(--mid)}
-.t-lbl{color:var(--mid);font-size:11px}
 .t-bar{flex:1;height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
 .t-fill{height:100%;background:var(--green);border-radius:2px;transition:width 1s linear,background .3s}
 .t-fill.warn{background:var(--amber)}
 .t-fill.over{background:var(--red)}
 
+/* Form elements */
 textarea.notes{width:100%;min-height:80px;border:1px solid var(--bdr);border-radius:6px;padding:10px 12px;font-size:13px;resize:vertical;line-height:1.5}
 textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 .sub-l{font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 6px}
-
-/* Headlines */
-.hl-item{background:var(--bg);border-radius:6px;padding:10px 12px;margin-bottom:8px;position:relative}
-.hl-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.hl-text{font-size:13px;font-weight:700;flex:1}
-.hl-meta{font-size:10px;color:var(--mid);margin-top:2px}
-.hl-status{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;cursor:pointer}
-.hl-status.open{background:var(--lb);color:var(--blue)}
-.hl-status.discussed{background:var(--lg);color:var(--green)}
-.hl-notes{margin-top:6px}
-.hl-notes textarea{width:100%;min-height:40px;border:1px solid var(--bdr);border-radius:4px;padding:6px 8px;font-size:12px;resize:vertical;line-height:1.4}
-.hl-notes textarea:focus{outline:2px solid var(--red);border-color:transparent}
-.hl-action-btn{font-size:11px;color:var(--red);background:none;padding:4px 0;margin-top:4px;font-weight:700}
-
-/* Actions */
-.a-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bg)}
-.a-item:last-child{border-bottom:none}
-.a-chk{width:18px;height:18px;border:2px solid var(--bdr);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:10px}
-.a-chk.done{background:var(--green);border-color:var(--green);color:white}
-.a-chk.cf{border-color:var(--amber)}
-.a-txt{font-size:13px;line-height:1.4;flex:1}
-.a-txt.dn{text-decoration:line-through;opacity:.5}
-.a-meta{font-size:11px;color:var(--mid);margin-top:1px}
-.a-meta span{margin-right:10px}
-.cf-badge{font-size:9px;background:var(--la);color:var(--amber);padding:1px 6px;border-radius:8px;font-weight:700;margin-left:4px}
-.a-rm{background:none;color:var(--bdr);font-size:15px;padding:2px 4px;line-height:1}
-.a-rm:hover{color:var(--red)}
-
 .add-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 .add-row input,.add-row select{padding:7px 10px;border:1px solid var(--bdr);border-radius:6px;font-size:12px;background:var(--white)}
 .add-row input{flex:1;min-width:100px}
@@ -138,11 +98,29 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 .add-btn:hover{background:#d63336}
 .add-btn.sec{background:var(--dark)}
 
+/* Headlines */
+.hl-item{background:var(--bg);border-radius:6px;padding:10px 12px;margin-bottom:8px}
+.hl-text{font-size:13px;font-weight:700;flex:1}
+.hl-meta{font-size:10px;color:var(--mid);margin-top:2px}
+.hl-status{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;text-transform:uppercase;cursor:pointer}
+.hl-status.open{background:var(--lb);color:var(--blue)}
+.hl-status.discussed{background:var(--lg);color:var(--green)}
+.hl-action-btn{font-size:11px;color:var(--red);background:none;padding:4px 0;margin-top:4px;font-weight:700}
+
+/* Actions */
+.a-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--bg)}
+.a-item:last-child{border-bottom:none}
+.a-chk{width:20px;height:20px;border:2px solid var(--bdr);border-radius:4px;flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:11px}
+.a-chk.done{background:var(--green);border-color:var(--green);color:white}
+.a-txt{font-size:13px;line-height:1.4;flex:1}
+.a-txt.dn{text-decoration:line-through;opacity:.5}
+.a-meta{font-size:11px;color:var(--mid);margin-top:1px}
+.a-meta span{margin-right:10px}
+.cf-badge{font-size:9px;background:var(--la);color:var(--amber);padding:1px 6px;border-radius:8px;font-weight:700;margin-left:4px}
+.a-rm{background:none;color:var(--bdr);font-size:15px;padding:2px 4px;line-height:1}
+.a-rm:hover{color:var(--red)}
+
 /* Issues */
-.issue-item{padding:10px 0;border-bottom:1px solid var(--bg)}
-.issue-item:last-child{border-bottom:none}
-.issue-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.issue-title{font-size:13px;font-weight:700;flex:1}
 .ib{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;cursor:pointer}
 .ib.open{background:var(--lr);color:var(--red)}
 .ib.discussing{background:var(--la);color:var(--amber)}
@@ -151,22 +129,8 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 /* Summary */
 .sum-sec{margin-bottom:16px}
 .sum-sec h3{font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.sum-notes{font-size:13px;line-height:1.6;color:var(--mid);white-space:pre-wrap}
-.sum-act{padding:4px 0;font-size:12px;display:flex;gap:8px}
-.sum-dot{width:6px;height:6px;border-radius:50%;background:var(--red);margin-top:5px;flex-shrink:0}
 
-/* Nav footer in main */
-.main-nav{display:flex;gap:8px;margin-top:24px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--bg)}
-
-/* Loading/empty */
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--mid);font-size:14px}
-.spinner{width:32px;height:32px;border:3px solid var(--bdr);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:40px 20px;color:var(--mid);font-size:14px}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:10px 18px;border-radius:6px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s}
-.toast.show{opacity:1}
-
-/* Agenda editor modal */
+/* Modal */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:250;display:flex;align-items:center;justify-content:center}
 .modal{background:var(--white);border-radius:var(--r);box-shadow:0 8px 32px rgba(0,0,0,.2);padding:24px;width:90%;max-width:480px;max-height:80vh;overflow-y:auto}
 .modal h3{font-size:16px;margin-bottom:16px}
@@ -174,12 +138,10 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 .modal-sec input{flex:1;padding:6px 8px;border:1px solid var(--bdr);border-radius:4px;font-size:12px}
 .modal-sec input:focus{outline:2px solid var(--red);border-color:transparent}
 .modal-sec .dur-input{width:60px}
-.modal-sec .rm-sec{color:var(--bdr);background:none;font-size:16px;padding:2px 4px}
-.modal-sec .rm-sec:hover{color:var(--red)}
 
-/* Scheduler overlay */
+/* Scheduler */
 .sched-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:250;display:flex;justify-content:flex-end}
-.sched-panel{width:min(680px,90vw);background:var(--white);height:100%;overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.15);display:flex;flex-direction:column}
+.sched-panel{width:min(680px,90vw);background:var(--white);height:100%;overflow-y:auto;display:flex;flex-direction:column}
 .sched-hdr{padding:14px 18px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .sched-hdr h3{font-size:15px;font-weight:700}
 .sched-body{padding:16px 18px;flex:1;overflow-y:auto}
@@ -187,8 +149,7 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 .sched-field label{display:block;font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
 .sched-field input,.sched-field select{width:100%;padding:8px 10px;border:1px solid var(--bdr);border-radius:6px;font-size:13px}
 .sched-field input:focus{outline:2px solid var(--red);border-color:transparent}
-.sched-people{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.sched-chip{background:var(--bg);padding:4px 10px;border-radius:14px;font-size:11px;display:flex;align-items:center;gap:5px}
+.sched-chip{background:var(--bg);padding:4px 10px;border-radius:14px;font-size:11px;display:inline-flex;align-items:center;gap:5px;margin:2px}
 .sched-chip button{background:none;color:var(--mid);font-size:13px;padding:0;line-height:1}
 .sched-chip button:hover{color:var(--red)}
 .sched-results{position:absolute;background:var(--white);border:1px solid var(--bdr);border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.12);max-height:180px;overflow-y:auto;z-index:10;left:0;right:0;margin-top:2px}
@@ -196,16 +157,24 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 .sched-result:hover{background:var(--bg)}
 .sched-result small{color:var(--mid);font-size:10px}
 .tl-wrap{overflow-x:auto;margin:14px 0}
-.tl-grid{display:flex;flex-direction:column;min-width:500px}
-.tl-header{display:flex;border-bottom:1px solid var(--bdr);padding-left:110px}
-.tl-hour{font-size:9px;color:var(--mid);text-align:left;border-left:1px solid var(--bg)}
-.tl-row{display:flex;align-items:center;border-bottom:1px solid var(--bg);height:32px}
-.tl-name{width:110px;font-size:11px;padding-right:8px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-row{display:flex;align-items:center;border-bottom:1px solid var(--bg);height:28px}
+.tl-name{width:100px;font-size:10px;padding-right:6px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tl-blocks{flex:1;display:flex;position:relative;height:100%;cursor:pointer}
-.tl-busy{position:absolute;top:2px;bottom:2px;background:#e57373;border-radius:3px;opacity:.7}
-.tl-tent{position:absolute;top:2px;bottom:2px;background:#ffb74d;border-radius:3px;opacity:.6}
-.tl-sel{position:absolute;top:0;bottom:0;background:var(--red);opacity:.25;border:2px solid var(--red);border-radius:3px}
+.tl-slot{height:100%;border-right:1px solid rgba(0,0,0,.04)}
+.tl-slot.busy{background:#e57373}
+.tl-slot.tentative{background:#ffb74d}
+.tl-slot.oof{background:#ce93d8}
+.tl-slot.elsewhere{background:#90caf9}
+.tl-sel{position:absolute;top:0;bottom:0;background:rgba(239,62,66,.25);border:2px solid var(--red);border-radius:3px;pointer-events:none}
 .sched-foot{padding:14px 18px;border-top:1px solid var(--bdr);display:flex;gap:8px;flex-shrink:0}
+
+/* Utilities */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--mid);font-size:14px}
+.spinner{width:32px;height:32px;border:3px solid var(--bdr);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:40px 20px;color:var(--mid);font-size:14px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--dark);color:var(--white);padding:10px 18px;border-radius:6px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
 
 @media print{.hdr,.sidebar{display:none}.runner{display:block}.main{padding:0}}
 @media(max-width:700px){.sidebar{width:180px}.main{padding:14px 16px 40px}}
@@ -213,11 +182,10 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 </style>
 </head>
 <body>
-
 <div class="hdr">
   <h1>MEETING <span>RUNNER</span></h1>
   <div class="hdr-r">
-    <button class="hdr-btn" id="bookBtn" style="display:none;background:var(--red)" onclick="openScheduler()">Book a meeting</button>
+    <button class="hdr-btn red" id="bookBtn" style="display:none" onclick="openScheduler()">Book a meeting</button>
     <span id="clockEl" style="color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums"></span>
     <span id="userEl" style="color:rgba(255,255,255,.5)"></span>
     <button class="hdr-btn" id="hdrBtn" style="display:none"></button>
@@ -227,765 +195,322 @@ textarea.notes:focus{outline:2px solid var(--red);border-color:transparent}
 <div class="toast" id="toast"></div>
 
 <script>
-/* ═══════════════════════════════
-   CONFIG
-   ═══════════════════════════════ */
-const CONFIG = {
-  clientId: 'c6595fee-5861-474a-b604-4487ac361580',
-  authority: 'https://login.microsoftonline.com/8c8bc073-973e-4ddf-9384-38498e8aa324',
-  redirectUri: window.location.origin + window.location.pathname,
-  scopes: ['User.Read','User.ReadBasic.All','Calendars.ReadWrite','Mail.Send','Sites.ReadWrite.All'],
-  spSite: 'unicrest.sharepoint.com:/sites/UnicrestGroup'
+/* ═══ CONFIG ═══ */
+const CFG={
+  clientId:'c6595fee-5861-474a-b604-4487ac361580',
+  authority:'https://login.microsoftonline.com/8c8bc073-973e-4ddf-9384-38498e8aa324',
+  redirectUri:window.location.origin+window.location.pathname,
+  scopes:['User.Read','User.ReadBasic.All','Calendars.ReadWrite','Mail.Send','Sites.ReadWrite.All'],
+  spSite:'unicrest.sharepoint.com:/sites/UnicrestGroup'
 };
-const GRAPH = 'https://graph.microsoft.com/v1.0';
-const DEFAULT_AGENDA = [
+const G='https://graph.microsoft.com/v1.0';
+const DEF_AGENDA=[
   {name:'Check-in',duration:5,type:'checkin'},
   {name:'Updates',duration:10,type:'headlines'},
   {name:'Issues & Actions',duration:35,type:'issues'},
   {name:'Wrap-up',duration:5,type:'wrapup'}
 ];
+const ROOM_WORDS=['room','fishbowl','boardroom','conference','resource'];
+function isRoom(email){if(!email)return false;const l=email.toLowerCase();return ROOM_WORDS.some(w=>l.includes(w));}
 
-// Filter out room/resource emails
-const ROOM_FILTERS = ['room','fishbowl','boardroom','meeting','conference','resource'];
-function isRoomEmail(email){
-  if(!email) return false;
-  const lower=email.toLowerCase();
-  return ROOM_FILTERS.some(f=>lower.includes(f));
+let msalApp,accessToken,currentUser,siteId;
+let tInt=null;
+
+/* ═══ STATE ═══ */
+let S={
+  screen:'login',
+  meetings:[],allMeetings:[],loadingCal:false,enabledSeries:new Set(),
+  viewDate:new Date(),
+  prepMeeting:null,prepSeriesId:null,prepAgenda:[],
+  activeMeeting:null,seriesId:null,curSec:0,
+  sections:[],headlines:[],actions:[],issues:[],ratings:[],
+  attendees:[],attendance:{},
+  timerOn:false,elapsed:0,startTime:null,
+  showAgendaEditor:false,editAgenda:[],
+  showScheduler:false,schedSubject:'',schedDate:'',schedStartHr:7,schedEndHr:19,
+  schedDuration:30,schedTeams:true,schedPeople:[],schedSearchResults:[],
+  schedAvail:[],schedSelTime:null,schedLoading:false
+};
+
+/* ═══ LISTS ═══ */
+const LISTS={config:{name:'MR_Config',id:null},headlines:{name:'MR_Headlines',id:null},actions:{name:'MR_Actions',id:null},issues:{name:'MR_Issues',id:null},ratings:{name:'MR_Ratings',id:null}};
+
+/* ═══ GRAPH HELPERS ═══ */
+async function getToken(){try{const r=await msalApp.acquireTokenSilent({scopes:CFG.scopes,account:currentUser});accessToken=r.accessToken;return accessToken;}catch{await msalApp.acquireTokenRedirect({scopes:CFG.scopes});return null;}}
+async function gGet(u){const t=await getToken();if(!t)return null;const r=await fetch(G+u,{headers:{Authorization:'Bearer '+t}});if(!r.ok){console.error('GET',r.status,u);return null;}return r.json();}
+async function gPost(u,b){const t=await getToken();if(!t)return null;const r=await fetch(G+u,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok){const e=await r.text();console.error('POST',r.status,u,e);return null;}if(r.status===202)return{ok:true};return r.json();}
+async function gPatch(u,b){const t=await getToken();if(!t)return null;const r=await fetch(G+u,{method:'PATCH',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(b)});if(!r.ok)console.error('PATCH',r.status,u);return r.ok;}
+async function gDel(u){const t=await getToken();if(!t)return;await fetch(G+u,{method:'DELETE',headers:{Authorization:'Bearer '+t}});}
+
+/* ═══ SHAREPOINT ═══ */
+function spUrl(k){return `/sites/${siteId}/lists/${LISTS[k].id}`;}
+async function spItems(k,field,val){const d=await gGet(spUrl(k)+'/items?$expand=fields&$top=200');const items=d&&d.value?d.value:[];if(field&&val)return items.filter(i=>i.fields&&i.fields[field]===val);return items;}
+async function spAdd(k,fields){return await gPost(spUrl(k)+'/items',{fields});}
+async function spUpd(k,id,fields){return await gPatch(spUrl(k)+`/items/${id}/fields`,fields);}
+async function spDel(k,id){await gDel(spUrl(k)+`/items/${id}`);}
+
+async function initSP(){
+  const site=await gGet('/sites/'+CFG.spSite);
+  if(!site){console.error('SP site not found');return;}
+  siteId=site.id;
+  const ex=await gGet(`/sites/${siteId}/lists?$select=id,displayName`);
+  const lists=ex&&ex.value?ex.value:[];
+  const schemas={
+    config:[{name:'SeriesId',text:{}},{name:'AgendaJSON',text:{allowMultipleLines:true}}],
+    headlines:[{name:'SeriesId',text:{}},{name:'MeetingDate',text:{}},{name:'CreatedByName',text:{}},{name:'Status',text:{}},{name:'Notes',text:{allowMultipleLines:true}}],
+    actions:[{name:'SeriesId',text:{}},{name:'Owner',text:{}},{name:'DueDate',text:{}},{name:'Status',text:{}},{name:'Section',text:{}},{name:'MeetingDate',text:{}},{name:'CreatedByName',text:{}}],
+    issues:[{name:'SeriesId',text:{}},{name:'Status',text:{}},{name:'Notes',text:{allowMultipleLines:true}},{name:'CreatedByName',text:{}}],
+    ratings:[{name:'SeriesId',text:{}},{name:'MeetingDate',text:{}},{name:'RatedBy',text:{}},{name:'Rating',text:{}}]
+  };
+  for(const k of Object.keys(LISTS)){
+    const f=lists.find(l=>l.displayName===LISTS[k].name);
+    if(f){LISTS[k].id=f.id;}else{
+      const c=await gPost(`/sites/${siteId}/lists`,{displayName:LISTS[k].name,columns:schemas[k],list:{template:'genericList'}});
+      if(c)LISTS[k].id=c.id;
+    }
+  }
 }
 
-let msalApp, accessToken, currentUser, siteId;
-
-/* ═══════════════════════════════
-   STATE
-   ═══════════════════════════════ */
-let S = {
-  screen:'login',
-  meetings:[], allMeetings:[], loadingCal:false, enabledSeries:new Set(),
-  viewDate: new Date(),
-  // prep
-  prepMeeting:null, prepSeriesId:null, prepAgenda:[],
-  // runner
-  activeMeeting:null, seriesId:null, curSec:0,
-  sections:[],
-  headlines:[], actions:[], issues:[], ratings:[],
-  attendees:[], // managed attendee list
-  attendance:{}, // {name: true/false} for check-in
-  timerOn:false, elapsed:0, startTime:null,
-  // modal
-  showAgendaEditor:false, editAgenda:[],
-  // scheduler
-  showScheduler:false, schedSubject:'', schedDate:'', schedStartHr:8, schedEndHr:18,
-  schedDuration:30, schedTeams:true, schedPeople:[], schedSearchResults:[],
-  schedSearchQuery:'', schedAvailability:[], schedSelTime:null, schedLoading:false
-};
-let tInt = null;
-
-/* ═══════════════════════════════
-   AUTH
-   ═══════════════════════════════ */
+/* ═══ AUTH ═══ */
 async function initAuth(){
-  try {
-    msalApp = new msal.PublicClientApplication({
-      auth:{clientId:CONFIG.clientId,authority:CONFIG.authority,redirectUri:CONFIG.redirectUri},
-      cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}
-    });
+  try{
+    msalApp=new msal.PublicClientApplication({auth:{clientId:CFG.clientId,authority:CFG.authority,redirectUri:CFG.redirectUri},cache:{cacheLocation:'localStorage',storeAuthStateInCookie:false}});
     await msalApp.initialize();
-    const resp = await msalApp.handleRedirectPromise();
+    const resp=await msalApp.handleRedirectPromise();
     if(resp){accessToken=resp.accessToken;currentUser=resp.account;}
-    else{
-      const a=msalApp.getAllAccounts();
-      if(a.length){currentUser=a[0];try{const t=await msalApp.acquireTokenSilent({scopes:CONFIG.scopes,account:currentUser});accessToken=t.accessToken;}catch{currentUser=null;}}
-    }
+    else{const a=msalApp.getAllAccounts();if(a.length){currentUser=a[0];try{const t=await msalApp.acquireTokenSilent({scopes:CFG.scopes,account:currentUser});accessToken=t.accessToken;}catch{currentUser=null;}}}
     if(currentUser&&accessToken){
       S.screen='dash';
       document.getElementById('userEl').textContent=currentUser.name||currentUser.username;
-      await initSharePoint();
+      await initSP();
       loadCal();
     }
-  } catch(err){console.error('Auth error',err);}
+  }catch(err){console.error('Auth error',err);}
   render();
 }
-
-async function login(){try{await msalApp.loginRedirect({scopes:CONFIG.scopes});}catch(e){alert('Login failed: '+e.message);}}
+async function login(){try{await msalApp.loginRedirect({scopes:CFG.scopes});}catch(e){alert('Login failed: '+e.message);}}
 function logout(){msalApp.logoutRedirect();}
 
-async function getToken(){
-  try{const r=await msalApp.acquireTokenSilent({scopes:CONFIG.scopes,account:currentUser});accessToken=r.accessToken;return accessToken;}
-  catch{await msalApp.acquireTokenRedirect({scopes:CONFIG.scopes});return null;}
-}
-
-async function gGet(url){const t=await getToken();if(!t)return null;const r=await fetch(GRAPH+url,{headers:{Authorization:'Bearer '+t}});if(!r.ok){console.error('Graph GET',r.status,url);return null;}return r.json();}
-async function gPost(url,body){const t=await getToken();if(!t)return null;const r=await fetch(GRAPH+url,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){const err=await r.text();console.error('Graph POST',r.status,url,err);return null;}return r.json();}
-async function gPatch(url,body){const t=await getToken();if(!t)return null;const r=await fetch(GRAPH+url,{method:'PATCH',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){console.error('Graph PATCH',r.status,url);return null;}return r.json();}
-async function gDel(url){const t=await getToken();if(!t)return;await fetch(GRAPH+url,{method:'DELETE',headers:{Authorization:'Bearer '+t}});}
-
-/* ═══════════════════════════════
-   SHAREPOINT SETUP
-   ═══════════════════════════════ */
-const LISTS = {
-  config: {name:'MR_Config', id:null},
-  headlines: {name:'MR_Headlines', id:null},
-  actions: {name:'MR_Actions', id:null},
-  issues: {name:'MR_Issues', id:null},
-  ratings: {name:'MR_Ratings', id:null}
-};
-
-async function initSharePoint(){
-  // Get site ID
-  const site = await gGet('/sites/'+CONFIG.spSite);
-  if(!site){console.error('Could not find SharePoint site');return;}
-  siteId = site.id;
-
-  // Ensure lists exist
-  const existing = await gGet(`/sites/${siteId}/lists?$select=id,displayName`);
-  const ex = existing && existing.value ? existing.value : [];
-
-  for(const key of Object.keys(LISTS)){
-    const found = ex.find(l => l.displayName === LISTS[key].name);
-    if(found){LISTS[key].id = found.id;}
-    else{
-      const created = await createList(LISTS[key].name, key);
-      if(created) LISTS[key].id = created.id;
-    }
+/* ═══ CONFIG (Agenda + Attendees) ═══ */
+async function getConfig(sid){
+  if(!sid||!LISTS.config.id)return{agenda:[...DEF_AGENDA],attendees:null};
+  const items=await spItems('config','SeriesId',sid);
+  if(items.length&&items[0].fields.AgendaJSON){
+    try{const r=JSON.parse(items[0].fields.AgendaJSON);if(Array.isArray(r))return{agenda:r,attendees:null};return{agenda:r.agenda||[...DEF_AGENDA],attendees:r.attendees||null};}catch{}
   }
+  return{agenda:[...DEF_AGENDA],attendees:null};
 }
-
-async function createList(name, key){
-  const cols = {
-    config: [
-      {name:'SeriesId',text:{}},
-      {name:'AgendaJSON',text:{allowMultipleLines:true}}
-    ],
-    headlines: [
-      {name:'SeriesId',text:{}},
-      {name:'MeetingDate',text:{}},
-      {name:'CreatedByName',text:{}},
-      {name:'Status',text:{}},
-      {name:'Notes',text:{allowMultipleLines:true}}
-    ],
-    actions: [
-      {name:'SeriesId',text:{}},
-      {name:'Owner',text:{}},
-      {name:'DueDate',text:{}},
-      {name:'Status',text:{}},
-      {name:'Section',text:{}},
-      {name:'MeetingDate',text:{}},
-      {name:'CreatedByName',text:{}}
-    ],
-    issues: [
-      {name:'SeriesId',text:{}},
-      {name:'Status',text:{}},
-      {name:'Notes',text:{allowMultipleLines:true}},
-      {name:'CreatedByName',text:{}}
-    ],
-    ratings: [
-      {name:'SeriesId',text:{}},
-      {name:'MeetingDate',text:{}},
-      {name:'RatedBy',text:{}},
-      {name:'Rating',text:{}}
-    ]
-  };
-  const body = {
-    displayName: name,
-    columns: cols[key],
-    list: {template:'genericList'}
-  };
-  return await gPost(`/sites/${siteId}/lists`, body);
+async function saveConfig(sid,agenda,attendees){
+  if(!sid||!LISTS.config.id)return;
+  const items=await spItems('config','SeriesId',sid);
+  const json=JSON.stringify({agenda,attendees});
+  if(items.length)await spUpd('config',items[0].id,{AgendaJSON:json});
+  else await spAdd('config',{Title:sid,SeriesId:sid,AgendaJSON:json});
 }
+async function saveAgenda(sid,agenda){const c=await getConfig(sid);await saveConfig(sid,agenda,c.attendees);toast('Agenda saved');}
+async function saveAttendees(){const sid=S.seriesId||S.prepSeriesId;if(!sid)return;const c=await getConfig(sid);await saveConfig(sid,c.agenda,S.attendees);toast('Attendees saved');}
 
-/* ═══════════════════════════════
-   SHAREPOINT CRUD
-   ═══════════════════════════════ */
-function spUrl(listKey){return `/sites/${siteId}/lists/${LISTS[listKey].id}`;}
-
-async function spGetItems(listKey, fieldName, fieldValue){
-  let url = spUrl(listKey)+'/items?$expand=fields&$top=200';
-  const d = await gGet(url);
-  const items = d && d.value ? d.value : [];
-  if(fieldName && fieldValue){
-    return items.filter(it => it.fields && it.fields[fieldName] === fieldValue);
-  }
-  return items;
-}
-
-async function spAddItem(listKey, fields){
-  return await gPost(spUrl(listKey)+'/items', {fields});
-}
-
-async function spUpdateItem(listKey, itemId, fields){
-  return await gPatch(spUrl(listKey)+`/items/${itemId}/fields`, fields);
-}
-
-async function spDeleteItem(listKey, itemId){
-  await gDel(spUrl(listKey)+`/items/${itemId}`);
-}
-
-/* ═══════════════════════════════
-   AGENDA & ATTENDEES CONFIG
-   ═══════════════════════════════ */
-async function getConfig(seriesId){
-  if(!seriesId || !LISTS.config.id) return {agenda:[...DEFAULT_AGENDA], attendees:null};
-  const items = await spGetItems('config','SeriesId',seriesId);
-  if(items.length && items[0].fields.AgendaJSON){
-    try{
-      const raw=JSON.parse(items[0].fields.AgendaJSON);
-      // Support old format (array) and new format (object with agenda + attendees)
-      if(Array.isArray(raw)) return {agenda:raw, attendees:null};
-      return {agenda:raw.agenda||[...DEFAULT_AGENDA], attendees:raw.attendees||null};
-    }catch{return {agenda:[...DEFAULT_AGENDA], attendees:null};}
-  }
-  return {agenda:[...DEFAULT_AGENDA], attendees:null};
-}
-
-async function getAgenda(seriesId){
-  const cfg=await getConfig(seriesId);
-  return cfg.agenda;
-}
-
-async function saveConfig(seriesId, agenda, attendees){
-  if(!seriesId || !LISTS.config.id) return;
-  const items = await spGetItems('config','SeriesId',seriesId);
-  const json = JSON.stringify({agenda, attendees});
-  if(items.length){
-    await spUpdateItem('config', items[0].id, {AgendaJSON:json});
-  } else {
-    await spAddItem('config', {Title:seriesId, SeriesId:seriesId, AgendaJSON:json});
-  }
-}
-
-async function saveAgenda(seriesId, agenda){
-  // Preserve existing attendees
-  const cfg=await getConfig(seriesId);
-  await saveConfig(seriesId, agenda, cfg.attendees);
-  toast('Agenda saved');
-}
-
-function loadAttendeesFromMeeting(meeting){
-  if(!meeting||!meeting.attendees) return [];
-  return meeting.attendees.filter(a=>!isRoomEmail(a.email));
-}
-
-async function loadManagedAttendees(seriesId, meeting){
-  const cfg=await getConfig(seriesId);
-  if(cfg.attendees){
-    S.attendees=cfg.attendees;
-  } else {
-    S.attendees=loadAttendeesFromMeeting(meeting);
-  }
-  // Init attendance map
-  S.attendance={};
-  S.attendees.forEach(a=>{S.attendance[a.name]=false;});
-}
-
-async function saveAttendees(){
-  const sid=S.seriesId||S.prepSeriesId;
-  if(!sid) return;
-  const cfg=await getConfig(sid);
-  await saveConfig(sid, cfg.agenda, S.attendees);
-  toast('Attendees saved');
-}
-
-function addAttendee(){
-  const input=document.getElementById('addAttName');
-  if(!input||!input.value.trim()) return;
-  const name=input.value.trim();
-  if(!S.attendees.find(a=>a.name===name)){
-    S.attendees.push({name, email:''});
-    S.attendance[name]=false;
-    saveAttendees();
-  }
-  input.value='';
+/* ═══ HEADLINES ═══ */
+async function loadHL(sid){if(!sid||!LISTS.headlines.id){S.headlines=[];return;}const items=await spItems('headlines','SeriesId',sid);S.headlines=items.map(i=>({id:i.id,text:i.fields.Title||'',by:i.fields.CreatedByName||'',status:i.fields.Status||'open',notes:i.fields.Notes||''}));}
+async function addHL(text){
+  if(!text||!text.trim())return;text=text.trim();
+  const sid=S.seriesId||S.prepSeriesId;if(!sid){toast('Cannot add headlines here');return;}
+  const u=currentUser.name||currentUser.username;const today=new Date().toISOString().slice(0,10);
+  const item=await spAdd('headlines',{Title:text,SeriesId:sid,MeetingDate:today,CreatedByName:u,Status:'open',Notes:''});
+  if(item)S.headlines.push({id:item.id,text,by:u,status:'open',notes:''});
   render();
 }
+let _hlDb={};
+async function updHL(id,fields){
+  const h=S.headlines.find(x=>x.id===id);if(!h)return;
+  if(fields.status!==undefined){h.status=fields.status;await spUpd('headlines',id,{Status:fields.status});}
+  if(fields.notes!==undefined){h.notes=fields.notes;clearTimeout(_hlDb[id]);_hlDb[id]=setTimeout(()=>spUpd('headlines',id,{Notes:fields.notes}),800);return;}
+}
+async function delHL(id){await spDel('headlines',id);S.headlines=S.headlines.filter(x=>x.id!==id);render();}
 
-function removeAttendee(name){
-  S.attendees=S.attendees.filter(a=>a.name!==name);
-  delete S.attendance[name];
-  saveAttendees();
+/* ═══ ACTIONS ═══ */
+async function loadAct(sid){if(!sid||!LISTS.actions.id){S.actions=[];return;}const items=await spItems('actions','SeriesId',sid);S.actions=items.map(i=>({id:i.id,text:i.fields.Title||'',owner:i.fields.Owner||'',due:i.fields.DueDate||'',status:i.fields.Status||'open',section:i.fields.Section||'',done:i.fields.Status==='done'}));}
+async function addAct(text,owner,due,section){
+  if(!text||!text.trim())return;text=text.trim();
+  const sid=S.seriesId||S.prepSeriesId||'adhoc_'+Date.now();
+  const u=currentUser.name||currentUser.username;const today=new Date().toISOString().slice(0,10);
+  const item=await spAdd('actions',{Title:text,SeriesId:sid,Owner:owner,DueDate:due,Status:'open',Section:section,MeetingDate:today,CreatedByName:u});
+  if(item){S.actions.push({id:item.id,text,owner,due,status:'open',section,done:false});toast('Action saved');}
   render();
 }
+async function togAct(id){const a=S.actions.find(x=>x.id===id);if(!a)return;a.done=!a.done;a.status=a.done?'done':'open';await spUpd('actions',id,{Status:a.status});render();}
+async function delAct(id){await spDel('actions',id);S.actions=S.actions.filter(x=>x.id!==id);render();}
 
-function toggleAttendance(name){
-  S.attendance[name]=!S.attendance[name];
-  render();
+/* ═══ ISSUES ═══ */
+async function loadIss(sid){if(!sid||!LISTS.issues.id){S.issues=[];return;}const items=await spItems('issues','SeriesId',sid);S.issues=items.map(i=>({id:i.id,title:i.fields.Title||'',status:i.fields.Status||'open',notes:i.fields.Notes||'',by:i.fields.CreatedByName||''}));}
+async function addIss(){
+  const t=document.getElementById('iT');if(!t||!t.value.trim())return;const text=t.value.trim();
+  const sid=S.seriesId||S.prepSeriesId;const u=currentUser.name||currentUser.username;
+  if(sid&&LISTS.issues.id){const item=await spAdd('issues',{Title:text,SeriesId:sid,Status:'open',Notes:'',CreatedByName:u});if(item)S.issues.push({id:item.id,title:text,status:'open',notes:'',by:u});}
+  else S.issues.push({id:Date.now(),title:text,status:'open',notes:'',by:u});
+  t.value='';render();
 }
+async function cycleIss(id){const i=S.issues.find(x=>x.id===id);if(!i)return;const o=['open','discussing','solved'];i.status=o[(o.indexOf(i.status)+1)%o.length];if(typeof id==='string')await spUpd('issues',id,{Status:i.status});render();}
+let _issDb={};
+function issNotes(id,v){const i=S.issues.find(x=>x.id===id);if(!i)return;i.notes=v;if(typeof id==='string'){clearTimeout(_issDb[id]);_issDb[id]=setTimeout(()=>spUpd('issues',id,{Notes:v}),800);}}
+async function delIss(id){if(typeof id==='string')await spDel('issues',id);S.issues=S.issues.filter(x=>x.id!==id);render();}
 
-function getPresentAttendees(){
-  return S.attendees.filter(a=>S.attendance[a.name]);
+/* ═══ RATINGS ═══ */
+async function loadRat(sid){if(!sid||!LISTS.ratings.id){S.ratings=[];return;}const today=new Date().toISOString().slice(0,10);const items=await spItems('ratings','SeriesId',sid);S.ratings=items.filter(i=>i.fields.MeetingDate===today).map(i=>({id:i.id,by:i.fields.RatedBy||'',rating:parseFloat(i.fields.Rating)||0}));}
+async function submitRat(val,forUser){
+  const v=parseFloat(val);if(isNaN(v)||v<1||v>10)return;
+  const sid=S.seriesId||S.prepSeriesId;if(!sid||!LISTS.ratings.id)return;
+  const name=forUser||currentUser.name||currentUser.username;const today=new Date().toISOString().slice(0,10);
+  const ex=S.ratings.find(r=>r.by===name);
+  if(ex){ex.rating=v;await spUpd('ratings',ex.id,{Rating:String(v)});}
+  else{const item=await spAdd('ratings',{Title:name+' '+today,SeriesId:sid,MeetingDate:today,RatedBy:name,Rating:String(v)});if(item)S.ratings.push({id:item.id,by:name,rating:v});}
+  toast(name+': '+v+'/10');render();
 }
+function avgRat(){if(!S.ratings.length)return 0;return(S.ratings.reduce((a,r)=>a+r.rating,0)/S.ratings.length).toFixed(1);}
 
-/* ═══════════════════════════════
-   HEADLINES
-   ═══════════════════════════════ */
-async function loadHeadlines(seriesId){
-  if(!seriesId || !LISTS.headlines.id){S.headlines=[];return;}
-  const items = await spGetItems('headlines','SeriesId',seriesId);
-  S.headlines = items.map(it=>({
-    id:it.id, text:it.fields.Title||'', seriesId:it.fields.SeriesId,
-    date:it.fields.MeetingDate||'', by:it.fields.CreatedByName||'',
-    status:it.fields.Status||'open', notes:it.fields.Notes||''
-  }));
+/* ═══ ATTENDEES ═══ */
+async function loadAtt(sid,meeting){
+  const c=await getConfig(sid);
+  if(c.attendees)S.attendees=c.attendees;
+  else S.attendees=meeting&&meeting.attendees?meeting.attendees.filter(a=>!isRoom(a.email)):[];
+  S.attendance={};S.attendees.forEach(a=>{S.attendance[a.name]=false;});
 }
+function addAttendee(){const i=document.getElementById('addAttName');if(!i||!i.value.trim())return;const n=i.value.trim();if(!S.attendees.find(a=>a.name===n)){S.attendees.push({name:n,email:''});S.attendance[n]=false;saveAttendees();}i.value='';render();}
+function rmAttendee(n){S.attendees=S.attendees.filter(a=>a.name!==n);delete S.attendance[n];saveAttendees();render();}
+function togAtt(n){S.attendance[n]=!S.attendance[n];render();}
+function presentAtt(){return S.attendees.filter(a=>S.attendance[a.name]);}
 
-async function addHeadline(text){
-  if(!text || !text.trim()) return;
-  text = text.trim();
-  const sid = S.seriesId || S.prepSeriesId;
-  if(!sid){toast('Cannot add headlines to ad-hoc meetings');return;}
-  if(!LISTS.headlines.id){toast('SharePoint list not ready');return;}
-  const today = new Date().toISOString().slice(0,10);
-  const userName = currentUser.name || currentUser.username;
-  try {
-    const item = await spAddItem('headlines', {
-      Title:text, SeriesId:sid, MeetingDate:today,
-      CreatedByName:userName, Status:'open', Notes:''
-    });
-    if(item){S.headlines.push({id:item.id, text, seriesId:sid, date:today, by:userName, status:'open', notes:''});toast('Headline saved');}
-    else toast('Failed to save headline');
-  } catch(err){console.error('addHeadline error',err);toast('Error saving headline');}
-  render();
-}
-
-let _hlDebounce={};
-async function updateHeadline(id, fields){
-  const hl = S.headlines.find(h=>h.id===id);
-  if(!hl) return;
-  const spFields = {};
-  if(fields.status !== undefined){hl.status=fields.status; spFields.Status=fields.status;}
-  if(fields.notes !== undefined){
-    hl.notes=fields.notes;
-    // Debounce notes saves to avoid 409 conflicts
-    clearTimeout(_hlDebounce[id]);
-    _hlDebounce[id]=setTimeout(()=>{spUpdateItem('headlines', id, {Notes:fields.notes});},800);
-    return;
-  }
-  await spUpdateItem('headlines', id, spFields);
-}
-
-async function deleteHeadline(id){
-  await spDeleteItem('headlines', id);
-  S.headlines = S.headlines.filter(h=>h.id!==id);
-  render();
-}
-
-/* ═══════════════════════════════
-   ACTIONS (SharePoint)
-   ═══════════════════════════════ */
-async function loadActions(seriesId){
-  if(!seriesId || !LISTS.actions.id){S.actions=[];return;}
-  const items = await spGetItems('actions','SeriesId',seriesId);
-  S.actions = items.map(it=>({
-    id:it.id, text:it.fields.Title||'', owner:it.fields.Owner||'',
-    due:it.fields.DueDate||'', status:it.fields.Status||'open',
-    section:it.fields.Section||'', date:it.fields.MeetingDate||'',
-    by:it.fields.CreatedByName||'', done:it.fields.Status==='done'
-  }));
-}
-
-async function addAction(text, owner, due, section){
-  if(!LISTS.actions.id) return;
-  const today = new Date().toISOString().slice(0,10);
-  const userName = currentUser.name || currentUser.username;
-  const sid = S.seriesId || S.prepSeriesId || 'adhoc_'+Date.now();
-  const item = await spAddItem('actions', {
-    Title:text, SeriesId:sid, Owner:owner, DueDate:due,
-    Status:'open', Section:section, MeetingDate:today, CreatedByName:userName
-  });
-  if(item){S.actions.push({id:item.id, text, owner, due, status:'open', section, date:today, by:userName, done:false});toast('Action saved');}
-  else toast('Failed to save action');
-  render();
-}
-
-async function toggleAction(id){
-  const a = S.actions.find(x=>x.id===id);
-  if(!a) return;
-  a.done=!a.done; a.status=a.done?'done':'open';
-  await spUpdateItem('actions', id, {Status:a.status});
-  render();
-}
-
-async function deleteAction(id){
-  await spDeleteItem('actions', id);
-  S.actions = S.actions.filter(x=>x.id!==id);
-  render();
-}
-
-/* ═══════════════════════════════
-   CALENDAR
-   ═══════════════════════════════ */
+/* ═══ CALENDAR ═══ */
 function classifyFreq(rec){
-  if(!rec||!rec.pattern){return 'today';}
-  const t=rec.pattern.type, iv=rec.pattern.interval||1;
-  const days=rec.pattern.daysOfWeek||[];
-  console.log('Recurrence:', t, 'interval:', iv, 'days:', days.join(','));
-  if(t==='daily') return 'daily';
-  if(t==='weekly' && iv===1 && days.length>=4) return 'daily'; // every weekday = daily
-  if(t==='weekly' && iv===1) return 'weekly';
-  if(t==='weekly' && iv===2) return 'fortnightly';
-  if(t==='weekly') return 'monthly';
-  if(t==='absoluteMonthly'||t==='relativeMonthly') return 'monthly';
-  if(t==='absoluteYearly'||t==='relativeYearly') return 'monthly';
-  return 'weekly';
+  if(!rec||!rec.pattern)return'today';
+  const t=rec.pattern.type,iv=rec.pattern.interval||1,days=rec.pattern.daysOfWeek||[];
+  if(t==='daily')return'daily';
+  if(t==='weekly'&&iv===1&&days.length>=4)return'daily';
+  if(t==='weekly'&&iv===1)return'weekly';
+  if(t==='weekly'&&iv===2)return'fortnightly';
+  if(t==='weekly')return'monthly';
+  if(t==='absoluteMonthly'||t==='relativeMonthly')return'monthly';
+  return'weekly';
 }
-
 async function loadCal(){
-  S.loadingCal=true; render();
-  const now=new Date();
-  // Fetch a full month from today
-  const start=new Date(now);start.setHours(0,0,0,0);
-  const end=new Date(now);end.setMonth(end.getMonth()+1);end.setHours(23,59,59,999);
-  const p=new URLSearchParams({
-    startDateTime:start.toISOString(),endDateTime:end.toISOString(),
-    $orderby:'start/dateTime',$top:'200',
-    $select:'id,subject,start,end,attendees,onlineMeetingUrl,seriesMasterId,type,iCalUId'
-  });
+  S.loadingCal=true;render();
+  const now=new Date(),start=new Date(now),end=new Date(now);
+  start.setHours(0,0,0,0);end.setMonth(end.getMonth()+1);end.setHours(23,59,59,999);
+  const p=new URLSearchParams({startDateTime:start.toISOString(),endDateTime:end.toISOString(),$orderby:'start/dateTime',$top:'200',$select:'id,subject,start,end,attendees,onlineMeetingUrl,seriesMasterId,type,iCalUId'});
   const d=await gGet('/me/calendarView?'+p);
   if(!d||!d.value){S.loadingCal=false;render();return;}
 
-  const sids=new Set();
-  d.value.forEach(ev=>{if(ev.seriesMasterId)sids.add(ev.seriesMasterId);});
-
-  // Load cached patterns
-  let pats={};
-  try{pats=JSON.parse(localStorage.getItem('mr_patterns_v2')||'{}');}catch{}
-
-  // Fetch recurrence patterns AND iCalUId for series masters (iCalUId is shared across all users)
-  let sharedIds={};
-  try{sharedIds=JSON.parse(localStorage.getItem('mr_sharedids_v1')||'{}');}catch{}
+  const sids=new Set();d.value.forEach(ev=>{if(ev.seriesMasterId)sids.add(ev.seriesMasterId);});
+  let pats={},sharedIds={};
+  try{pats=JSON.parse(localStorage.getItem('mr_pat3')||'{}');sharedIds=JSON.parse(localStorage.getItem('mr_sid3')||'{}');}catch{}
   const toFetch=[...sids].filter(sid=>!pats[sid]||!sharedIds[sid]);
   for(let i=0;i<toFetch.length;i+=4){
     const batch=toFetch.slice(i,i+4);
-    await Promise.all(batch.map(async sid=>{
-      try{const m=await gGet('/me/events/'+sid+'?$select=recurrence,iCalUId');if(m){if(m.recurrence)pats[sid]=m.recurrence;if(m.iCalUId)sharedIds[sid]=m.iCalUId;}}catch{}
-    }));
-    if(i+4<toFetch.length) await new Promise(r=>setTimeout(r,500));
+    await Promise.all(batch.map(async sid=>{try{const m=await gGet('/me/events/'+sid+'?$select=recurrence,iCalUId');if(m){if(m.recurrence)pats[sid]=m.recurrence;if(m.iCalUId)sharedIds[sid]=m.iCalUId;}}catch{}}));
+    if(i+4<toFetch.length)await new Promise(r=>setTimeout(r,500));
   }
-  // Cache for next time
-  try{localStorage.setItem('mr_patterns_v2',JSON.stringify(pats));}catch{}
-  try{localStorage.setItem('mr_sharedids_v1',JSON.stringify(sharedIds));}catch{}
-  console.log('Patterns:', Object.keys(pats).length, 'SharedIds:', Object.keys(sharedIds).length, 'Fetched:', toFetch.length);
+  try{localStorage.setItem('mr_pat3',JSON.stringify(pats));localStorage.setItem('mr_sid3',JSON.stringify(sharedIds));}catch{}
 
   S.allMeetings=d.value.map(ev=>{
     const rec=ev.type==='occurrence'||ev.type==='exception'||!!ev.seriesMasterId;
     const localSid=ev.seriesMasterId||(rec?ev.id:null);
-    // Use shared iCalUId so all users see the same series key
     const sid=rec?(sharedIds[localSid]||localSid):(ev.iCalUId||ev.id);
-    const st=new Date(ev.start.dateTime+'Z');
-    const en=new Date(ev.end.dateTime+'Z');
+    const st=new Date(ev.start.dateTime+'Z'),en=new Date(ev.end.dateTime+'Z');
     const att=(ev.attendees||[]).map(a=>({name:a.emailAddress.name,email:a.emailAddress.address}));
-    const freq=rec?classifyFreq(pats[localSid]):'today';
-    return {
-      id:ev.id,subject:ev.subject||'Untitled',start:st,end:en,
-      durMin:Math.round((en-st)/60000),attendees:att,
-      isRec:rec,seriesId:sid,freq,
-      onlineUrl:ev.onlineMeetingUrl||null
-    };
+    return{id:ev.id,subject:ev.subject||'Untitled',start:st,end:en,durMin:Math.round((en-st)/60000),attendees:att,isRec:rec,seriesId:sid,freq:rec?classifyFreq(pats[localSid]):'today',onlineUrl:ev.onlineMeetingUrl||null};
   });
-  filterMeetingsByDate();
-  // Load which meetings have agendas enabled
-  await loadEnabledSeries();
+  filterByDate();
+  await loadEnabled();
   S.loadingCal=false;render();
 }
-
-async function loadEnabledSeries(){
-  if(!LISTS.config.id) return;
-  const items = await spGetItems('config');
-  S.enabledSeries=new Set(items.filter(it=>it.fields&&it.fields.SeriesId).map(it=>it.fields.SeriesId));
-}
-
-async function toggleAgenda(seriesId){
-  if(!seriesId||!LISTS.config.id) return;
-  if(S.enabledSeries.has(seriesId)){
-    // Disable: delete the config entry
-    const items = await spGetItems('config','SeriesId',seriesId);
-    if(items.length) await spDeleteItem('config', items[0].id);
-    S.enabledSeries.delete(seriesId);
-    toast('Agenda disabled');
-  } else {
-    // Enable: create config entry with default agenda
-    await spAddItem('config', {Title:seriesId, SeriesId:seriesId, AgendaJSON:JSON.stringify(DEFAULT_AGENDA)});
-    S.enabledSeries.add(seriesId);
-    toast('Agenda enabled');
-  }
+function filterByDate(){const d=S.viewDate,s=new Date(d),e=new Date(d);s.setHours(0,0,0,0);e.setHours(23,59,59,999);S.meetings=S.allMeetings.filter(m=>m.start>=s&&m.start<=e);}
+function navDay(n){S.viewDate=new Date(S.viewDate.getTime()+n*86400000);filterByDate();render();}
+function goToday(){S.viewDate=new Date();filterByDate();render();}
+async function loadEnabled(){if(!LISTS.config.id)return;const items=await spItems('config');S.enabledSeries=new Set(items.filter(i=>i.fields&&i.fields.SeriesId).map(i=>i.fields.SeriesId));}
+async function toggleEnabled(sid){
+  if(!sid||!LISTS.config.id)return;
+  if(S.enabledSeries.has(sid)){const items=await spItems('config','SeriesId',sid);if(items.length)await spDel('config',items[0].id);S.enabledSeries.delete(sid);toast('Agenda disabled');}
+  else{await spAdd('config',{Title:sid,SeriesId:sid,AgendaJSON:JSON.stringify({agenda:DEF_AGENDA,attendees:null})});S.enabledSeries.add(sid);toast('Agenda enabled');}
   render();
 }
 
-function filterMeetingsByDate(){
-  const vd=S.viewDate;
-  const dayStart=new Date(vd);dayStart.setHours(0,0,0,0);
-  const dayEnd=new Date(vd);dayEnd.setHours(23,59,59,999);
-  S.meetings=S.allMeetings.filter(m=>m.start>=dayStart&&m.start<=dayEnd);
-}
-
-function navDay(offset){
-  S.viewDate=new Date(S.viewDate.getTime()+offset*86400000);
-  filterMeetingsByDate();
-  render();
-}
-
-function goToday(){
-  S.viewDate=new Date();
-  filterMeetingsByDate();
-  render();
-}
-
-/* ═══════════════════════════════
-   ISSUES (SharePoint)
-   ═══════════════════════════════ */
-async function loadIssues(seriesId){
-  if(!seriesId || !LISTS.issues.id){S.issues=[];return;}
-  const items = await spGetItems('issues','SeriesId',seriesId);
-  S.issues = items.map(it=>({
-    id:it.id, title:it.fields.Title||'', seriesId:it.fields.SeriesId,
-    status:it.fields.Status||'open', notes:it.fields.Notes||'',
-    by:it.fields.CreatedByName||''
-  }));
-}
-
-async function addIssue(){
-  const t=document.getElementById('iT');if(!t||!t.value.trim())return;
-  const text=t.value.trim();
-  const sid=S.seriesId||S.prepSeriesId;
-  if(!sid||!LISTS.issues.id){
-    S.issues.push({id:Date.now(),title:text,status:'open',notes:'',by:''});
-    t.value='';render();return;
-  }
-  const userName=currentUser.name||currentUser.username;
-  const item=await spAddItem('issues',{Title:text,SeriesId:sid,Status:'open',Notes:'',CreatedByName:userName});
-  if(item){S.issues.push({id:item.id,title:text,seriesId:sid,status:'open',notes:'',by:userName});toast('Issue saved');}
-  else toast('Failed to save issue');
-  t.value='';render();t.focus();
-}
-
-async function cycleI(id){
-  const i=S.issues.find(x=>x.id===id);if(!i)return;
-  const o=['open','discussing','solved'];
-  i.status=o[(o.indexOf(i.status)+1)%o.length];
-  if(LISTS.issues.id && typeof id==='string') await spUpdateItem('issues',id,{Status:i.status});
-  render();
-}
-
-let _issDebounce={};
-function iNotes(id,v){
-  const i=S.issues.find(x=>x.id===id);if(!i)return;
-  i.notes=v;
-  if(LISTS.issues.id && typeof id==='string'){
-    clearTimeout(_issDebounce[id]);
-    _issDebounce[id]=setTimeout(()=>{spUpdateItem('issues',id,{Notes:v});},800);
-  }
-}
-
-async function rmIssue(id){
-  if(LISTS.issues.id && typeof id==='string') await spDeleteItem('issues',id);
-  S.issues=S.issues.filter(x=>x.id!==id);
-  render();
-}
-
-/* ═══════════════════════════════
-   RATINGS (SharePoint)
-   ═══════════════════════════════ */
-async function loadRatings(seriesId){
-  if(!seriesId || !LISTS.ratings.id){S.ratings=[];return;}
-  const today=new Date().toISOString().slice(0,10);
-  const items = await spGetItems('ratings','SeriesId',seriesId);
-  // Only show ratings for today's meeting
-  S.ratings = items.filter(it=>it.fields.MeetingDate===today).map(it=>({
-    id:it.id, seriesId:it.fields.SeriesId,
-    date:it.fields.MeetingDate||'', by:it.fields.RatedBy||'',
-    rating:parseFloat(it.fields.Rating)||0
-  }));
-}
-
-function getCurrentUserRating(){
-  const userName=currentUser.name||currentUser.username;
-  return S.ratings.find(r=>r.by===userName);
-}
-
-async function submitRating(value, forUser){
-  const v=parseFloat(value);
-  if(isNaN(v)||v<1||v>10) return;
-  const sid=S.seriesId||S.prepSeriesId;
-  if(!sid||!LISTS.ratings.id){toast('Cannot save rating');return;}
-  const raterName=forUser||currentUser.name||currentUser.username;
-  const today=new Date().toISOString().slice(0,10);
-  const existing=S.ratings.find(r=>r.by===raterName);
-  if(existing){
-    existing.rating=v;
-    await spUpdateItem('ratings',existing.id,{Rating:String(v)});
-  } else {
-    const item=await spAddItem('ratings',{Title:raterName+' '+today,SeriesId:sid,MeetingDate:today,RatedBy:raterName,Rating:String(v)});
-    if(item) S.ratings.push({id:item.id,seriesId:sid,date:today,by:raterName,rating:v});
-  }
-  toast(raterName+': '+v+'/10');
-  render();
-}
-
-function getAverageRating(){
-  if(!S.ratings.length) return 0;
-  const sum=S.ratings.reduce((a,r)=>a+r.rating,0);
-  return (sum/S.ratings.length).toFixed(1);
-}
-
-/* ═══════════════════════════════
-   TIMER
-   ═══════════════════════════════ */
-function timerStart(){if(tInt)return;S.timerOn=true;tInt=setInterval(()=>{S.sections[S.curSec].elapsed++;S.elapsed++;timerUI();},1000);render();}
+/* ═══ TIMER ═══ */
+function timerStart(){if(tInt||S.screen!=='runner')return;S.timerOn=true;tInt=setInterval(()=>{S.sections[S.curSec].elapsed++;S.elapsed++;timerUI();},1000);render();}
 function timerStop(){S.timerOn=false;clearInterval(tInt);tInt=null;render();}
 function timerUI(){
-  const sec=S.sections[S.curSec];
-  const el=document.getElementById('tD'),fl=document.getElementById('tF'),ck=document.getElementById('clockEl');
-  if(!el)return;
-  const rem=sec.duration*60-sec.elapsed,ov=rem<0,ab=Math.abs(rem);
-  el.textContent=(ov?'-':'')+Math.floor(ab/60)+':'+String(ab%60).padStart(2,'0');
-  el.className='t-disp'+(ov?' over':'');
+  const sec=S.sections[S.curSec],rem=sec.duration*60-sec.elapsed,ov=rem<0,ab=Math.abs(rem);
+  const el=document.getElementById('tD'),fl=document.getElementById('tF'),ck=document.getElementById('clockEl'),st=document.getElementById('sbT'+S.curSec);
+  const ts=(ov?'-':'')+Math.floor(ab/60)+':'+String(ab%60).padStart(2,'0');
+  if(el){el.textContent=ts;el.className='t-disp'+(ov?' over':'');}
   if(fl){const p=Math.min((sec.elapsed/(sec.duration*60))*100,100);fl.style.width=p+'%';fl.className='t-fill'+(ov?' over':p>80?' warn':'');}
   if(ck){const m=Math.floor(S.elapsed/60),s=S.elapsed%60;ck.textContent=m+':'+String(s).padStart(2,'0')+' elapsed';}
-  // Update sidebar timer
-  const st=document.getElementById('sbTime'+S.curSec);
-  if(st){st.textContent=(ov?'-':'')+Math.floor(ab/60)+':'+String(ab%60).padStart(2,'0');st.className='sb-time'+(ov?' over':'');}
+  if(st){st.textContent=ts;st.className='sb-time'+(ov?' over':'');}
 }
 
-/* ═══════════════════════════════
-   MEETING LIFECYCLE
-   ═══════════════════════════════ */
-function goSec(i){if(i<0||i>=curSections().length)return;if(S.screen==='runner')timerStop();S.curSec=i;render();if(S.screen==='runner'){timerUI();timerStart();}}
-function nextSec(){S.sections[S.curSec].done=true;timerStop();if(S.curSec<S.sections.length-1){S.curSec++;render();timerStart();}else endMeeting();}
-function prevSec(){if(S.curSec>0){timerStop();S.curSec--;render();timerStart();}}
+/* ═══ MEETING LIFECYCLE ═══ */
+function curSec(){return(S.screen==='prep'?S.prepAgenda:S.sections);}
+function curSecName(){const s=curSec();return s&&s[S.curSec]?s[S.curSec].name:'';}
+function curAtt(){return S.attendees;}
+
+function goSec(i){if(i<0||i>=curSec().length)return;if(S.screen==='runner')timerStop();S.curSec=i;render();if(S.screen==='runner'){timerUI();timerStart();}}
+function nextSec(){if(S.screen==='runner'){S.sections[S.curSec].done=true;timerStop();if(S.curSec<S.sections.length-1){S.curSec++;render();timerStart();}else endMeeting();}}
+function prevSec(){if(S.curSec>0){if(S.screen==='runner')timerStop();S.curSec--;render();if(S.screen==='runner')timerStart();}}
+function updNotes(v){curSec()[S.curSec].notes=v;}
 
 async function prepMtg(idx){
-  const m=S.meetings[idx];
-  S.prepMeeting=m; S.prepSeriesId=m.seriesId;
-  S.curSec=0;
-  const agenda = await getAgenda(m.seriesId);
-  S.prepAgenda = agenda.map(a=>({...a, notes:'', elapsed:0, done:false}));
-  await loadHeadlines(m.seriesId);
-  await loadActions(m.seriesId);
-  await loadIssues(m.seriesId);
-  await loadRatings(m.seriesId);
-  await loadManagedAttendees(m.seriesId, m);
-  S.screen='prep'; render();
+  const m=S.meetings[idx];S.prepMeeting=m;S.prepSeriesId=m.seriesId;S.curSec=0;
+  const agenda=await getConfig(m.seriesId);
+  S.prepAgenda=agenda.agenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
+  await loadHL(m.seriesId);await loadAct(m.seriesId);await loadIss(m.seriesId);await loadRat(m.seriesId);await loadAtt(m.seriesId,m);
+  S.screen='prep';render();
 }
-
 function startFromPrep(){
-  // Carry prep data directly into runner, no reload needed
-  S.activeMeeting=S.prepMeeting;
-  S.seriesId=S.prepSeriesId;
-  S.curSec=0;
-  S.sections=S.prepAgenda.map(a=>({...a})); // keep notes from prep
-  S.elapsed=0;
-  S.startTime=new Date();
-  S.timerOn=false;
-  // headlines and actions are already in S.headlines and S.actions from prep
+  S.activeMeeting=S.prepMeeting;S.seriesId=S.prepSeriesId;S.curSec=0;
+  S.sections=S.prepAgenda.map(a=>({...a}));S.elapsed=0;S.startTime=new Date();S.timerOn=false;
   S.screen='runner';render();timerStart();
 }
-
 async function startMtg(idx){
-  const m=idx!==undefined?S.meetings[idx]:null;
-  S.activeMeeting=m;S.seriesId=m?m.seriesId:null;
-  S.curSec=0;S.elapsed=0;S.startTime=new Date();S.timerOn=false;
-
-  // Load agenda from SharePoint (or default)
-  const agenda = await getAgenda(S.seriesId);
-  S.sections=agenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
-
-  // Load headlines, actions, and issues from SharePoint
-  await loadHeadlines(S.seriesId);
-  await loadActions(S.seriesId);
-  await loadIssues(S.seriesId);
-  await loadRatings(S.seriesId);
-  await loadManagedAttendees(S.seriesId, m);
-
+  const m=idx!==undefined?S.meetings[idx]:null;S.activeMeeting=m;S.seriesId=m?m.seriesId:null;S.curSec=0;S.elapsed=0;S.startTime=new Date();S.timerOn=false;
+  const agenda=await getConfig(S.seriesId);S.sections=agenda.agenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
+  await loadHL(S.seriesId);await loadAct(S.seriesId);await loadIss(S.seriesId);await loadRat(S.seriesId);await loadAtt(S.seriesId,m);
   S.screen='runner';render();timerStart();
 }
 function startAdhoc(){S.activeMeeting=null;S.seriesId=null;startMtg();}
-
-function endMeeting(){
-  timerStop();S.sections[S.curSec].done=true;
-  S.screen='summary';render();
-}
-function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.prepAgenda=[];S.viewDate=new Date();document.getElementById('clockEl').textContent='';loadCal();}
+function endMeeting(){timerStop();S.sections[S.curSec].done=true;S.screen='summary';render();}
+function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.viewDate=new Date();document.getElementById('clockEl').textContent='';loadCal();}
 function hdrAction(){if(S.screen==='runner'){if(confirm('End this meeting?'))endMeeting();}else if(S.screen==='summary')backToDash();}
-function updNotes(v){curSections()[S.curSec].notes=v;}
 
-/* ═══════════════════════════════
-   AGENDA EDITOR
-   ═══════════════════════════════ */
-function openAgendaEditor(){
-  const source = S.screen==='prep' ? S.prepAgenda : S.sections;
-  S.editAgenda=source.map(s=>({name:s.name,duration:s.duration,type:s.type}));
-  S.showAgendaEditor=true;render();
-}
-function closeAgendaEditor(){S.showAgendaEditor=false;render();}
-function edSetName(i,v){S.editAgenda[i].name=v;}
-function edSetDur(i,v){S.editAgenda[i].duration=parseInt(v)||1;}
-function edSetType(i,v){S.editAgenda[i].type=v;}
-function edAddSec(){S.editAgenda.push({name:'New section',duration:5,type:'notes'});render();}
-function edRmSec(i){if(S.editAgenda.length<=1)return;S.editAgenda.splice(i,1);render();}
-function edMove(i,dir){const j=i+dir;if(j<0||j>=S.editAgenda.length)return;const t=S.editAgenda[i];S.editAgenda[i]=S.editAgenda[j];S.editAgenda[j]=t;render();}
-async function edSave(){
-  const sid = S.seriesId || S.prepSeriesId;
-  if(!sid){toast('Cannot save agenda for ad-hoc meetings');return;}
-  await saveAgenda(sid, S.editAgenda);
-  if(S.screen==='prep'){
-    S.prepAgenda=S.editAgenda.map(a=>({...a}));
-  } else {
-    S.sections=S.editAgenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
-    S.curSec=0;
-  }
-  S.showAgendaEditor=false;render();
-}
+/* ═══ AGENDA EDITOR ═══ */
+function openAgendaEd(){S.editAgenda=curSec().map(s=>({name:s.name,duration:s.duration,type:s.type}));S.showAgendaEditor=true;render();}
+function closeAgendaEd(){S.showAgendaEditor=false;render();}
+function edName(i,v){S.editAgenda[i].name=v;}
+function edDur(i,v){S.editAgenda[i].duration=parseInt(v)||1;}
+function edType(i,v){S.editAgenda[i].type=v;}
+function edAdd(){S.editAgenda.push({name:'New section',duration:5,type:'notes'});render();}
+function edRm(i){if(S.editAgenda.length<=1)return;S.editAgenda.splice(i,1);render();}
+function edMove(i,d){const j=i+d;if(j<0||j>=S.editAgenda.length)return;const t=S.editAgenda[i];S.editAgenda[i]=S.editAgenda[j];S.editAgenda[j]=t;render();}
+async function edSave(){const sid=S.seriesId||S.prepSeriesId;if(!sid){toast('Cannot save for ad-hoc');return;}await saveAgenda(sid,S.editAgenda);if(S.screen==='prep')S.prepAgenda=S.editAgenda.map(a=>({...a,notes:'',elapsed:0,done:false}));else{S.sections=S.editAgenda.map(a=>({...a,notes:'',elapsed:0,done:false}));S.curSec=0;}S.showAgendaEditor=false;render();}
 
-/* ═══════════════════════════════
-   SCHEDULER
-   ═══════════════════════════════ */
-function openScheduler(){
-  const today=new Date();
-  S.schedDate=today.toISOString().slice(0,10);
-  try{S.schedSubject=curSecName()||'';}catch{S.schedSubject='';}
-  S.schedPeople=[];S.schedSearchResults=[];S.schedSearchQuery='';
-  S.schedAvailability=[];S.schedSelTime=null;S.schedLoading=false;
-  S.schedDuration=30;S.schedTeams=true;S.schedStartHr=8;S.schedEndHr=18;
-  S.showScheduler=true;render();
-}
+/* ═══ SCHEDULER ═══ */
+function openScheduler(){S.schedDate=new Date().toISOString().slice(0,10);try{S.schedSubject=curSecName();}catch{S.schedSubject='';}S.schedPeople=[];S.schedSearchResults=[];S.schedAvail=[];S.schedSelTime=null;S.schedLoading=false;S.schedDuration=30;S.schedTeams=true;S.showScheduler=true;render();}
 function closeScheduler(){S.showScheduler=false;render();}
 
-let _schedDebounce;
+let _scDb;
 function schedSearch(q){
-  S.schedSearchQuery=q;
-  if(!q||q.length<2){S.schedSearchResults=[];updateSchedDropdown();return;}
-  clearTimeout(_schedDebounce);
-  _schedDebounce=setTimeout(async()=>{
+  if(!q||q.length<2){S.schedSearchResults=[];updateSchedDD();return;}
+  clearTimeout(_scDb);
+  _scDb=setTimeout(async()=>{
     const d=await gGet(`/users?$filter=startswith(displayName,'${encodeURIComponent(q)}') or startswith(mail,'${encodeURIComponent(q)}')&$select=displayName,mail,id&$top=8`);
-    if(d&&d.value) S.schedSearchResults=d.value.filter(u=>u.mail&&!isRoomEmail(u.mail)).map(u=>({name:u.displayName,email:u.mail,id:u.id}));
-    else S.schedSearchResults=[];
-    updateSchedDropdown();
+    S.schedSearchResults=d&&d.value?d.value.filter(u=>u.mail&&!isRoom(u.mail)).map(u=>({name:u.displayName,email:u.mail})):[];
+    updateSchedDD();
   },400);
 }
-
-function updateSchedDropdown(){
-  const container=document.getElementById('schedDropdown');
-  if(!container) return;
-  if(!S.schedSearchResults.length){container.innerHTML='';return;}
-  container.innerHTML=`<div class="sched-results">${S.schedSearchResults.map(r=>`<div class="sched-result" onclick="schedAddPerson({name:'${e(r.name).replace(/'/g,"\\'")}',email:'${e(r.email)}',id:'${e(r.id)}'})">
-    ${e(r.name)}<small>${e(r.email)}</small></div>`).join('')}</div>`;
-}
-
-function schedAddPerson(person){
-  if(!S.schedPeople.find(p=>p.email===person.email)) S.schedPeople.push(person);
-  S.schedSearchResults=[];S.schedSearchQuery='';
-  render();
-  if(S.schedPeople.length) schedLoadAvail();
-}
-
-function schedRemovePerson(email){
-  S.schedPeople=S.schedPeople.filter(p=>p.email!==email);
-  S.schedAvailability=S.schedAvailability.filter(a=>a.email!==email);
-  render();
-}
+function updateSchedDD(){const c=document.getElementById('scDD');if(!c)return;if(!S.schedSearchResults.length){c.innerHTML='';return;}c.innerHTML=`<div class="sched-results">${S.schedSearchResults.map(r=>`<div class="sched-result" onclick="schedAddP('${esc(r.name).replace(/'/g,"\\'")}','${esc(r.email)}')">${esc(r.name)}<small>${esc(r.email)}</small></div>`).join('')}</div>`;}
+function schedAddP(name,email){if(!S.schedPeople.find(p=>p.email===email))S.schedPeople.push({name,email});S.schedSearchResults=[];render();schedLoadAvail();}
+function schedRmP(email){S.schedPeople=S.schedPeople.filter(p=>p.email!==email);S.schedAvail=S.schedAvail.filter(a=>a.email!==email);render();}
 
 async function schedLoadAvail(){
-  if(!S.schedPeople.length) return;
-  S.schedLoading=true;render();
+  if(!S.schedPeople.length)return;S.schedLoading=true;render();
   const body={
     schedules:S.schedPeople.map(p=>p.email),
     startTime:{dateTime:S.schedDate+'T'+String(S.schedStartHr).padStart(2,'0')+':00:00',timeZone:'Pacific/Auckland'},
@@ -993,747 +518,268 @@ async function schedLoadAvail(){
     availabilityViewInterval:15
   };
   const d=await gPost('/me/calendar/getSchedule',body);
-  console.log('getSchedule response:', JSON.stringify(d,null,2));
   if(d&&d.value){
-    S.schedAvailability=d.value.map(s=>{
-      console.log('Schedule for', s.scheduleId, 'items:', s.scheduleItems?.length, s.scheduleItems);
-      return {
+    S.schedAvail=d.value.map(s=>({
       email:s.scheduleId,
       name:S.schedPeople.find(p=>p.email===s.scheduleId)?.name||s.scheduleId,
-      items:(s.scheduleItems||[]).map(it=>{
-        const sdt=it.start.dateTime, edt=it.end.dateTime;
-        console.log('  Item:', it.status, sdt, '->', edt);
-        const sH=parseInt(sdt.substr(11,2)), sM=parseInt(sdt.substr(14,2));
-        const eH=parseInt(edt.substr(11,2)), eM=parseInt(edt.substr(14,2));
-        return {startMin:sH*60+sM, endMin:eH*60+eM, status:it.status||'busy', subject:it.subject||''};
-      })
-    }});
+      view:s.availabilityView||''
+    }));
   }
   S.schedLoading=false;render();
 }
-
-function schedSelectTime(minutesFromStart){
-  const snapped=Math.round(minutesFromStart/15)*15;
-  const hr=S.schedStartHr+Math.floor(snapped/60);
-  const min=snapped%60;
-  S.schedSelTime=String(hr).padStart(2,'0')+':'+String(min).padStart(2,'0');
-  render();
-}
+function schedClickTime(mins){const snapped=Math.round(mins/15)*15;const h=S.schedStartHr+Math.floor(snapped/60),m=snapped%60;S.schedSelTime=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');render();}
+function schedSetDate(v){S.schedDate=v;if(S.schedPeople.length)schedLoadAvail();else render();}
 
 async function schedBook(){
   if(!S.schedSelTime||!S.schedPeople.length){toast('Select a time and add people');return;}
-  const startDT=S.schedDate+'T'+S.schedSelTime+':00';
-  const st=new Date(startDT);
-  const en=new Date(st.getTime()+S.schedDuration*60000);
+  const startDT=S.schedDate+'T'+S.schedSelTime+':00';const st=new Date(startDT);const en=new Date(st.getTime()+S.schedDuration*60000);
   const endDT=S.schedDate+'T'+String(en.getHours()).padStart(2,'0')+':'+String(en.getMinutes()).padStart(2,'0')+':00';
-  const body={
-    subject:S.schedSubject||'Meeting',
-    start:{dateTime:startDT,timeZone:'Pacific/Auckland'},
-    end:{dateTime:endDT,timeZone:'Pacific/Auckland'},
-    attendees:S.schedPeople.map(p=>({emailAddress:{address:p.email,name:p.name},type:'required'}))
-  };
+  const body={subject:S.schedSubject||'Meeting',start:{dateTime:startDT,timeZone:'Pacific/Auckland'},end:{dateTime:endDT,timeZone:'Pacific/Auckland'},attendees:S.schedPeople.map(p=>({emailAddress:{address:p.email,name:p.name},type:'required'}))};
   if(S.schedTeams){body.isOnlineMeeting=true;body.onlineMeetingProvider='teamsForBusiness';}
-  const result=await gPost('/me/events',body);
-  if(result){toast('Meeting booked and invites sent');closeScheduler();}
-  else toast('Failed to book meeting');
+  const r=await gPost('/me/events',body);
+  if(r){toast('Meeting booked');closeScheduler();}else toast('Failed to book');
 }
 
-function schedSetDate(v){S.schedDate=v;if(S.schedPeople.length)schedLoadAvail();else render();}
-function schedSetStartHr(v){S.schedStartHr=parseInt(v);if(S.schedPeople.length)schedLoadAvail();else render();}
-function schedSetEndHr(v){S.schedEndHr=parseInt(v);if(S.schedPeople.length)schedLoadAvail();else render();}
-
-function rScheduler(){
-  const totalMin=(S.schedEndHr-S.schedStartHr)*60;
-  const pxPerMin=Math.max(600/totalMin,2);
-  let headerHtml='';
-  for(let h=S.schedStartHr;h<S.schedEndHr;h++) headerHtml+=`<div class="tl-hour" style="width:${60*pxPerMin}px;padding:2px 4px">${String(h).padStart(2,'0')}:00</div>`;
-
-  let rowsHtml='';
-  const viewStartMin=S.schedStartHr*60;
-  S.schedAvailability.forEach(person=>{
-    let blocks='';
-    person.items.forEach(it=>{
-      const sMin=Math.max(0,it.startMin-viewStartMin);
-      const eMin=Math.min(totalMin,it.endMin-viewStartMin);
-      if(eMin>0&&sMin<totalMin){
-        const cls=it.status==='tentative'?'tl-tent':'tl-busy';
-        blocks+=`<div class="${cls}" style="left:${sMin*pxPerMin}px;width:${Math.max(2,(eMin-sMin)*pxPerMin)}px" title="${e(it.subject||it.status)}"></div>`;
-      }
-    });
-    let selBlock='';
-    if(S.schedSelTime){
-      const sh=parseInt(S.schedSelTime.split(':')[0]),sm=parseInt(S.schedSelTime.split(':')[1]);
-      const selMin=(sh-S.schedStartHr)*60+sm;
-      selBlock=`<div class="tl-sel" style="left:${selMin*pxPerMin}px;width:${S.schedDuration*pxPerMin}px"></div>`;
-    }
-    rowsHtml+=`<div class="tl-row"><div class="tl-name">${e(person.name)}</div>
-      <div class="tl-blocks" style="width:${totalMin*pxPerMin}px" onclick="schedSelectTime(Math.floor(event.offsetX/${pxPerMin}))">${blocks}${selBlock}</div></div>`;
-  });
-
-  let meetStartTime=S.schedSelTime||'';
-  let meetEndTime='';
-  if(meetStartTime){
-    const sh=parseInt(meetStartTime.split(':')[0]),sm=parseInt(meetStartTime.split(':')[1]);
-    const em2=(sm+S.schedDuration)%60,eh2=sh+Math.floor((sm+S.schedDuration)/60);
-    meetEndTime=String(eh2).padStart(2,'0')+':'+String(em2).padStart(2,'0');
-  }
-
-  return `<div class="sched-overlay" onclick="if(event.target===this)closeScheduler()">
-    <div class="sched-panel">
-      <div class="sched-hdr"><h3>Book a meeting</h3><button class="a-rm" style="font-size:20px" onclick="closeScheduler()">&times;</button></div>
-      <div class="sched-body">
-        <div class="sched-field"><label>Subject</label><input type="text" value="${e(S.schedSubject)}" oninput="S.schedSubject=this.value"></div>
-        <div class="sched-field" style="position:relative">
-          <label>Add people</label>
-          <input type="text" id="schedSearchInp" placeholder="Search by name or email..." oninput="schedSearch(this.value)" autocomplete="off">
-          <div id="schedDropdown">${S.schedSearchResults.length?`<div class="sched-results">${S.schedSearchResults.map(r=>`<div class="sched-result" onclick="schedAddPerson({name:'${e(r.name).replace(/'/g,"\\'")}',email:'${e(r.email)}',id:'${e(r.id)}'})">
-            ${e(r.name)}<small>${e(r.email)}</small></div>`).join('')}</div>`:''}</div>
-        </div>
-        <div class="sched-people">${S.schedPeople.map(p=>`<span class="sched-chip">${e(p.name)}<button onclick="schedRemovePerson('${e(p.email)}')">&times;</button></span>`).join('')}</div>
-        <div style="display:flex;gap:8px;margin:14px 0">
-          <div class="sched-field" style="flex:1"><label>Date</label><input type="date" value="${S.schedDate}" onchange="schedSetDate(this.value)"></div>
-          <div class="sched-field" style="width:90px"><label>From</label><input type="time" value="${meetStartTime}" onchange="S.schedSelTime=this.value;render();" style="font-size:13px"></div>
-          <div class="sched-field" style="width:90px"><label>To</label><input type="time" value="${meetEndTime}" readonly style="font-size:13px;background:var(--bg);color:var(--mid)"></div>
-          <div class="sched-field" style="width:90px"><label>Duration</label><select onchange="S.schedDuration=parseInt(this.value);render()">
-            ${[15,30,45,60,90,120].map(d=>`<option value="${d}" ${d===S.schedDuration?'selected':''}>${d} min</option>`).join('')}</select></div>
-        </div>
-        <label style="font-size:12px;display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px">
-          <input type="checkbox" ${S.schedTeams?'checked':''} onchange="S.schedTeams=this.checked"> Include Teams link</label>
-        ${S.schedLoading?'<div class="loading" style="padding:20px"><div class="spinner"></div>Loading availability...</div>':`
-          ${S.schedPeople.length?`<div class="sub-l">Availability</div>
-            <div class="tl-wrap"><div class="tl-grid"><div class="tl-header">${headerHtml}</div>${rowsHtml}</div></div>
-            <div style="display:flex;gap:12px;font-size:11px;color:var(--mid);margin-top:4px">
-              <span><span style="display:inline-block;width:12px;height:10px;background:#e57373;border-radius:2px;vertical-align:middle"></span> Busy</span>
-              <span><span style="display:inline-block;width:12px;height:10px;background:#ffb74d;border-radius:2px;vertical-align:middle"></span> Tentative</span>
-              <span><span style="display:inline-block;width:12px;height:10px;background:var(--bg);border-radius:2px;vertical-align:middle;border:1px solid var(--bdr)"></span> Free</span>
-            </div>`:'<div style="font-size:13px;color:var(--mid);padding:16px 0">Add people to see their availability.</div>'}
-        `}
-      </div>
-      <div class="sched-foot"><button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeScheduler()">Cancel</button>
-        <button class="add-btn" style="flex:1" onclick="schedBook()">Send invite</button></div>
-    </div></div>`;
+/* ═══ EMAIL SUMMARY ═══ */
+async function emailSummary(){
+  const att=S.attendees.length?S.attendees:S.activeMeeting?S.activeMeeting.attendees:[];
+  if(!att.length||!att[0].email){toast('No attendee emails');return;}
+  const mt=S.activeMeeting?S.activeMeeting.subject:'Meeting';
+  const ds=S.startTime?S.startTime.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}):'';
+  const tm=Math.floor(S.elapsed/60);
+  let body='<div style="font-family:Arial,sans-serif;max-width:600px">';
+  body+=`<h2 style="color:#EF3E42">${esc(mt)}</h2><p style="color:#666">${ds}, ${tm} minutes</p>`;
+  (S.sections||[]).filter(s=>s.notes).forEach(s=>{body+=`<h3>${esc(s.name)}</h3><p style="color:#666;white-space:pre-wrap">${esc(s.notes)}</p>`;});
+  const openA=S.actions.filter(a=>!a.done);
+  if(openA.length){body+='<h3 style="color:#EF3E42">Open Actions</h3><ul>';openA.forEach(a=>{body+=`<li>${esc(a.text)}${a.owner?' — <strong>'+esc(a.owner)+'</strong>':''}${a.due?' (due '+a.due+')':''}</li>`;});body+='</ul>';}
+  if(S.headlines.length){body+='<h3>Headlines</h3><ul>';S.headlines.forEach(h=>{body+=`<li>[${h.status}] ${esc(h.text)}${h.notes?' — '+esc(h.notes):''}</li>`;});body+='</ul>';}
+  if(S.ratings.length)body+=`<h3>Rating: ${avgRat()}/10</h3><p style="color:#666">${S.ratings.map(r=>esc(r.by)+': '+r.rating).join(' · ')}</p>`;
+  body+='<hr style="border:none;border-top:1px solid #ddd;margin-top:20px"><p style="color:#999;font-size:12px">Meeting Runner · Unicrest Group</p></div>';
+  const recipients=att.filter(a=>a.email).map(a=>({emailAddress:{address:a.email,name:a.name}}));
+  const btn=document.getElementById('emailBtn');if(btn){btn.textContent='Sending...';btn.disabled=true;}
+  const t=await getToken();if(!t)return;
+  const r=await fetch(G+'/me/sendMail',{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({message:{subject:'Meeting Summary: '+mt+' — '+ds,body:{contentType:'HTML',content:body},toRecipients:recipients}})});
+  if(r.ok||r.status===202){toast('Email sent to '+recipients.length+' attendees');if(btn){btn.textContent='Sent!';setTimeout(()=>{btn.textContent='Email to attendees';btn.disabled=false;},2000);}}
+  else{toast('Email failed');if(btn){btn.textContent='Email to attendees';btn.disabled=false;}}
 }
 
-/* ═══════════════════════════════
-   TOAST
-   ═══════════════════════════════ */
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+/* ═══ TOAST ═══ */
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
 
-/* ═══════════════════════════════
-   RENDER
-   ═══════════════════════════════ */
+/* ═══ INLINE ACTION FROM HEADLINE ═══ */
+function toggleHLAction(id){const el=document.getElementById('hlA_'+id);if(el)el.style.display=el.style.display==='none'?'flex':'none';}
+function submitHLAction(id){const t=document.getElementById('hlAT_'+id),o=document.getElementById('hlAO_'+id),d=document.getElementById('hlAD_'+id);if(!t||!t.value.trim())return;addAct(t.value.trim(),o?o.value:'',d?d.value:'',curSecName());t.value='';const el=document.getElementById('hlA_'+id);if(el)el.style.display='none';}
+
+/* ═══════════════════════════════════════
+   RENDERERS
+   ═══════════════════════════════════════ */
 function render(){
-  const app=document.getElementById('app'),btn=document.getElementById('hdrBtn'),bookBtn=document.getElementById('bookBtn');
-  if(S.screen==='login'){btn.style.display='none';bookBtn.style.display='none';app.innerHTML='<div class="wrap">'+rLogin()+'</div>';}
-  else if(S.screen==='dash'){btn.style.display='';btn.textContent='Sign out';btn.className='hdr-btn';btn.onclick=logout;bookBtn.style.display='';app.innerHTML='<div class="wrap">'+rDash()+'</div>'+(S.showScheduler?rScheduler():'');}
-  else if(S.screen==='runner'){
-    btn.style.display='';btn.textContent='End meeting';btn.className='hdr-btn red';btn.onclick=hdrAction;bookBtn.style.display='none';
-    app.innerHTML=rRunner()+(S.showAgendaEditor?rAgendaEditor():'')+(S.showScheduler?rScheduler():'');
-    const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
-    timerUI();
-  }
-  else if(S.screen==='prep'){
-    btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;bookBtn.style.display='none';
-    document.getElementById('clockEl').textContent='';
-    app.innerHTML=rPrep()+(S.showAgendaEditor?rAgendaEditor():'')+(S.showScheduler?rScheduler():'');
-    const na=document.getElementById('sN');if(na)na.value=curSections()[S.curSec].notes||'';
-  }
-  else if(S.screen==='summary'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;bookBtn.style.display='none';document.getElementById('clockEl').textContent='';app.innerHTML='<div class="wrap">'+rSummary()+'</div>';}
+  const app=document.getElementById('app'),btn=document.getElementById('hdrBtn'),bk=document.getElementById('bookBtn');
+  const sched=S.showScheduler?rScheduler():'';const agEd=S.showAgendaEditor?rAgendaEd():'';
+  if(S.screen==='login'){btn.style.display='none';bk.style.display='none';app.innerHTML='<div class="wrap">'+rLogin()+'</div>';}
+  else if(S.screen==='dash'){btn.style.display='';btn.textContent='Sign out';btn.className='hdr-btn';btn.onclick=logout;bk.style.display='';app.innerHTML='<div class="wrap">'+rDash()+'</div>'+sched;}
+  else if(S.screen==='runner'){btn.style.display='';btn.textContent='End meeting';btn.className='hdr-btn red';btn.onclick=hdrAction;bk.style.display='none';app.innerHTML=rSidebarLayout('runner')+agEd+sched;const n=document.getElementById('sN');if(n)n.value=curSec()[S.curSec].notes||'';timerUI();}
+  else if(S.screen==='prep'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;bk.style.display='none';document.getElementById('clockEl').textContent='';app.innerHTML=rSidebarLayout('prep')+agEd+sched;const n=document.getElementById('sN');if(n)n.value=curSec()[S.curSec].notes||'';}
+  else if(S.screen==='summary'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;bk.style.display='none';document.getElementById('clockEl').textContent='';app.innerHTML='<div class="wrap">'+rSummary()+'</div>';}
 }
 
-function rLogin(){
-  return `<div class="login"><div class="login-card">
-    <h2>MEETING <span>RUNNER</span></h2>
-    <p>Run structured meetings with your team. Sign in with Microsoft to sync your calendar.</p>
-    <button class="login-btn" onclick="login()">
-      <svg viewBox="0 0 21 21" width="20" height="20" fill="none"><rect x="1" y="1" width="9" height="9" fill="#F25022"/><rect x="11" y="1" width="9" height="9" fill="#7FBA00"/><rect x="1" y="11" width="9" height="9" fill="#00A4EF"/><rect x="11" y="11" width="9" height="9" fill="#FFB900"/></svg>
-      Sign in with Microsoft
-    </button>
-    <div class="tagline">Proven Excellence</div>
-  </div></div>`;
-}
+function rLogin(){return `<div class="login"><div class="login-card"><h2>MEETING <span>RUNNER</span></h2><p>Sign in with Microsoft to sync your calendar.</p><button class="login-btn" onclick="login()"><svg viewBox="0 0 21 21" width="20" height="20" fill="none"><rect x="1" y="1" width="9" height="9" fill="#F25022"/><rect x="11" y="1" width="9" height="9" fill="#7FBA00"/><rect x="1" y="11" width="9" height="9" fill="#00A4EF"/><rect x="11" y="11" width="9" height="9" fill="#FFB900"/></svg>Sign in with Microsoft</button><div class="tagline">Proven Excellence</div></div></div>`;}
 
 function rDash(){
-  if(S.loadingCal)return `<div class="loading"><div class="spinner"></div>Loading your calendar...</div>`;
-  const vd=S.viewDate;
-  const ds=vd.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  const isToday=new Date().toDateString()===vd.toDateString();
-
-  // Day nav
-  let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+  if(S.loadingCal)return `<div class="loading"><div class="spinner"></div>Loading calendar...</div>`;
+  const vd=S.viewDate,ds=vd.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}),isToday=new Date().toDateString()===vd.toDateString();
+  let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
     <button class="hdr-btn" style="background:var(--dark);color:var(--white)" onclick="navDay(-1)">\u2190</button>
-    <div style="text-align:center">
-      <div style="font-size:14px;font-weight:700">${ds}</div>
-      ${!isToday?'<button style="background:none;color:var(--red);font-size:11px;font-weight:700;padding:2px 0;font-family:Arvo,serif" onclick="goToday()">Back to today</button>':'<div style="font-size:11px;color:var(--mid)">Today</div>'}
-    </div>
-    <button class="hdr-btn" style="background:var(--dark);color:var(--white)" onclick="navDay(1)">\u2192</button>
-  </div>`;
-
-  if(!S.meetings.length){
-    html+=`<div class="empty">No meetings on this day.</div>`;
-    html+=`<button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
-    return html;
-  }
-
-  const groups=[
-    {key:'today',label:'One-off',meetings:[]},
-    {key:'daily',label:'Daily',meetings:[]},
-    {key:'weekly',label:'Weekly',meetings:[]},
-    {key:'fortnightly',label:'Fortnightly',meetings:[]},
-    {key:'monthly',label:'Monthly',meetings:[]}
-  ];
-  S.meetings.forEach((m,i)=>{const g=groups.find(g=>g.key===m.freq)||groups[0];g.meetings.push({...m,idx:i});});
-
-  groups.forEach(g=>{
-    if(!g.meetings.length)return;
-    html+=`<div class="grp-label">${g.label}<span class="cnt">(${g.meetings.length})</span></div>`;
-    g.meetings.forEach(m=>{
-      const time=m.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
-      const n=m.attendees.length;
-      const hasAgenda=m.isRec && m.seriesId && S.enabledSeries.has(m.seriesId);
-      html+=`<div class="card click">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between">
-          <div><div style="font-size:14px;font-weight:700">${e(m.subject)}</div>
-          <div style="font-size:12px;color:var(--mid);margin-top:2px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div></div>
-          <span class="badge ${m.isRec?'rec':'one'}">${m.isRec?g.label:'One-off'}</span>
-        </div>
-        ${m.isRec&&m.seriesId?`
-          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bg)">
-            <div onclick="toggleAgenda('${e(m.seriesId)}')" style="cursor:pointer;width:40px;height:22px;border-radius:11px;background:${hasAgenda?'var(--green)':'var(--bdr)'};position:relative;transition:background .2s;flex-shrink:0">
-              <div style="width:18px;height:18px;border-radius:50%;background:var(--white);position:absolute;top:2px;${hasAgenda?'right:2px':'left:2px'};transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-            </div>
-            <span style="font-size:12px;color:${hasAgenda?'var(--green)':'var(--mid)'}">${hasAgenda?'Agenda enabled':'Enable agenda for this meeting'}</span>
-          </div>
-        `:''}
-        ${hasAgenda?`
-          ${isToday?'<button class="start-btn" onclick="startMtg('+m.idx+')">Start meeting</button>':''}
-          <button class="start-btn" onclick="prepMtg(${m.idx})" style="background:var(--dark);margin-top:6px">Prepare / View agenda</button>
-        `:''}
-      </div>`;
-    });
-  });
-  html+=`<button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
-  return html;
+    <div style="text-align:center"><div style="font-size:14px;font-weight:700">${ds}</div>${!isToday?'<button style="background:none;color:var(--red);font-size:11px;font-weight:700;padding:2px 0;font-family:Arvo,serif" onclick="goToday()">Back to today</button>':'<div style="font-size:11px;color:var(--mid)">Today</div>'}</div>
+    <button class="hdr-btn" style="background:var(--dark);color:var(--white)" onclick="navDay(1)">\u2192</button></div>`;
+  if(!S.meetings.length)return h+`<div class="empty">No meetings on this day.</div><button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
+  const groups=[{key:'today',label:'One-off',m:[]},{key:'daily',label:'Daily',m:[]},{key:'weekly',label:'Weekly',m:[]},{key:'fortnightly',label:'Fortnightly',m:[]},{key:'monthly',label:'Monthly',m:[]}];
+  S.meetings.forEach((m,i)=>{(groups.find(g=>g.key===m.freq)||groups[0]).m.push({...m,idx:i});});
+  groups.forEach(g=>{if(!g.m.length)return;h+=`<div class="grp-label">${g.label}<span class="cnt">(${g.m.length})</span></div>`;
+    g.m.forEach(m=>{const time=m.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});const n=m.attendees.length;const has=m.isRec&&m.seriesId&&S.enabledSeries.has(m.seriesId);
+      h+=`<div class="card click"><div style="display:flex;align-items:flex-start;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">${esc(m.subject)}</div><div style="font-size:12px;color:var(--mid);margin-top:2px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div></div><span class="badge ${m.isRec?'rec':'one'}">${m.isRec?g.label:'One-off'}</span></div>`;
+      if(m.isRec&&m.seriesId){h+=`<div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bg)"><div onclick="toggleEnabled('${esc(m.seriesId)}')" style="cursor:pointer;width:40px;height:22px;border-radius:11px;background:${has?'var(--green)':'var(--bdr)'};position:relative;transition:background .2s;flex-shrink:0"><div style="width:18px;height:18px;border-radius:50%;background:var(--white);position:absolute;top:2px;${has?'right:2px':'left:2px'};transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div></div><span style="font-size:12px;color:${has?'var(--green)':'var(--mid)'}">${has?'Agenda enabled':'Enable agenda'}</span></div>`;}
+      if(has){if(isToday)h+=`<button class="start-btn" onclick="startMtg(${m.idx})">Start meeting</button>`;h+=`<button class="start-btn" onclick="prepMtg(${m.idx})" style="background:var(--dark);margin-top:6px">Prepare / View agenda</button>`;}
+      h+=`</div>`;});});
+  h+=`<button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;return h;
 }
 
-/* ══ HELPERS for shared runner/prep logic ══ */
-function curSections(){return S.screen==='prep'?S.prepAgenda:S.sections;}
-function curSecName(){return curSections()[S.curSec].name;}
-function curAttendees(){
-  return S.attendees;
-}
+/* ═══ SIDEBAR LAYOUT (shared by runner & prep) ═══ */
+function rSidebarLayout(mode){
+  const secs=curSec(),sec=secs[S.curSec],att=S.attendees;
+  const mt=mode==='prep'?(S.prepMeeting?S.prepMeeting.subject:'Prepare'):(S.activeMeeting?S.activeMeeting.subject:'Ad-hoc meeting');
+  let sb=`<div class="sidebar"><div class="sb-meeting">${esc(mt)}<small>${mode==='prep'?'Prepare mode':S.activeMeeting&&S.activeMeeting.isRec?'Recurring':'One-off'}</small></div>`;
+  secs.forEach((s,i)=>{const isA=i===S.curSec,isDone=s.done;let timeLabel=s.duration+'m';
+    if(mode==='runner'&&(isA||isDone)){const rem=s.duration*60-s.elapsed,ov=rem<0,ab=Math.abs(rem);timeLabel=isDone?'Done':(ov?'-':'')+Math.floor(ab/60)+':'+String(ab%60).padStart(2,'0');}
+    sb+=`<div class="sb-item ${isA?'active':''} ${isDone?'done':''}" onclick="goSec(${i})"><div class="sn ${isA?'act':isDone?'done':''}">${i+1}</div><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.name)}</span><span class="sb-time${mode==='runner'&&!isDone&&s.duration*60-s.elapsed<0?' over':''}" id="sbT${i}">${timeLabel}</span></div>`;});
+  sb+=`<div class="sb-section"><div class="sb-section-label">Attendees</div>${att.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--mid);padding:2px 0"><span>${esc(a.name)}</span><button class="a-rm" style="font-size:12px" onclick="rmAttendee('${esc(a.name)}')">&times;</button></div>`).join('')}
+    <div style="display:flex;gap:4px;margin-top:6px"><input type="text" id="addAttName" placeholder="Add name..." style="flex:1;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px;font-size:10px" onkeydown="if(event.key==='Enter')addAttendee()"><button class="add-btn" style="padding:4px 8px;font-size:10px" onclick="addAttendee()">+</button></div>
+    <button class="sb-edit-btn" onclick="openAgendaEd()">Edit agenda</button></div></div>`;
 
-/* ══ PREPARE (Full pre-meeting editor) ══ */
-function rPrep(){
-  const m=S.prepMeeting;
-  if(!m) return '<div class="empty">No meeting selected.</div>';
-  const secs=S.prepAgenda;
-  const att=m.attendees||[];
-  const sec=secs[S.curSec];
-  if(!sec) return '<div class="empty">No agenda loaded.</div>';
-
-  // Sidebar
-  let sb=`<div class="sidebar">
-    <div class="sb-meeting">${e(m.subject)}<small>Prepare mode</small></div>`;
-
-  secs.forEach((s,i)=>{
-    const isAct=i===S.curSec;
-    sb+=`<div class="sb-item ${isAct?'active':''}" onclick="goSec(${i})">
-      <div class="sn ${isAct?'act':''}">${i+1}</div>
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e(s.name)}</span>
-      <span class="sb-time">${s.duration}m</span>
-    </div>`;
-  });
-
-  sb+=`<div class="sb-section">
-    <div class="sb-section-label">Attendees</div>
-    ${S.attendees.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--mid);padding:2px 0">
-      <span>${e(a.name)}</span>
-      <button class="a-rm" style="font-size:12px" onclick="removeAttendee('${e(a.name)}')">&times;</button>
-    </div>`).join('')}
-    <div style="display:flex;gap:4px;margin-top:6px">
-      <input type="text" id="addAttName" placeholder="Add name..." style="flex:1;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px;font-size:10px" onkeydown="if(event.key==='Enter')addAttendee()">
-      <button class="add-btn" style="padding:4px 8px;font-size:10px" onclick="addAttendee()">+</button>
-    </div>
-    <button class="sb-edit-btn" onclick="openAgendaEditor()">Edit agenda sections</button>
-  </div></div>`;
-
-  // Main content
   let main=`<div class="main">`;
-  main+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-    <div class="main-title">${e(sec.name)}</div>
-    <div style="font-size:11px;color:var(--mid)">${sec.duration} min</div>
-  </div>`;
+  if(mode==='runner'){main+=`<div class="t-row"><div style="font-size:11px;color:var(--mid)">${sec.duration} min</div><div class="t-disp" id="tD">--:--</div><button class="t-btn" onclick="${S.timerOn?'timerStop()':'timerStart()'}">${S.timerOn?'\u23F8':'\u25B6'}</button><div class="t-bar"><div class="t-fill" id="tF" style="width:0"></div></div></div>`;}
+  else{main+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:11px;color:var(--mid)">${sec.duration} min</div></div>`;}
+  main+=`<div class="main-title">${esc(sec.name)}</div>`;
 
-  // Section content (reuse same functions as runner)
-  if(sec.type==='checkin') main+=rCheckinSection(att);
-  else if(sec.type==='headlines') main+=rHeadlinesSection(att);
-  else if(sec.type==='issues') main+=rIssuesSection(att);
-  else if(sec.type==='wrapup') main+=rWrapupSection();
-  else main+=rNotesSection(att);
+  const oo=att.map(a=>`<option value="${esc(a.name)}">${esc(a.name)}</option>`).join('');
+  if(sec.type==='checkin')main+=rCheckin();
+  else if(sec.type==='headlines')main+=rHeadlines(oo);
+  else if(sec.type==='issues')main+=rIssues(oo);
+  else if(sec.type==='wrapup')main+=rWrapup(oo);
+  else main+=rNotes(oo);
 
   // Nav
-  const last=S.curSec===secs.length-1;
-  main+=`<div class="main-nav">
-    ${S.curSec>0?'<button class="hdr-btn" onclick="goSec('+(S.curSec-1)+')">\u2190 '+secs[S.curSec-1].name+'</button>':''}
-    ${!last?'<button class="hdr-btn" style="background:var(--mid);color:var(--white)" onclick="goSec('+(S.curSec+1)+')">'+secs[S.curSec+1].name+' \u2192</button>':''}
-    <button class="hdr-btn red" onclick="startFromPrep()">Start meeting</button>
-  </div>`;
-
+  if(mode==='runner'){const last=S.curSec===secs.length-1;main+=`<div class="main-nav">${S.curSec>0?'<button class="hdr-btn" onclick="prevSec()">\u2190 Back</button>':''}<button class="hdr-btn red" onclick="nextSec()">${last?'Finish':'Next: '+secs[Math.min(S.curSec+1,secs.length-1)].name+' \u2192'}</button></div>`;}
+  else{main+=`<div class="main-nav">${S.curSec>0?'<button class="hdr-btn" onclick="goSec('+(S.curSec-1)+')">\u2190 '+secs[S.curSec-1].name+'</button>':''}${S.curSec<secs.length-1?'<button class="hdr-btn" style="background:var(--mid);color:var(--white)" onclick="goSec('+(S.curSec+1)+')">'+secs[S.curSec+1].name+' \u2192</button>':''}<button class="hdr-btn red" onclick="startFromPrep()">Start meeting</button></div>`;}
   main+=`</div>`;
   return `<div class="runner">${sb}${main}</div>`;
 }
 
-/* ══ RUNNER (Sidebar Layout) ══ */
-function rRunner(){
-  const sec=S.sections[S.curSec];
-  const mt=S.activeMeeting?S.activeMeeting.subject:'Ad-hoc meeting';
-  const att=S.activeMeeting?S.activeMeeting.attendees:[];
+/* ═══ SECTION RENDERERS ═══ */
+function bookBtn(){return `<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;}
 
-  // Sidebar
-  let sb=`<div class="sidebar">
-    <div class="sb-meeting">${e(mt)}<small>${S.activeMeeting&&S.activeMeeting.isRec?'Recurring':'One-off'}</small></div>`;
-
-  S.sections.forEach((s,i)=>{
-    const isAct=i===S.curSec;
-    const isDone=s.done;
-    const rem=s.duration*60-s.elapsed;
-    const ov=rem<0;
-    const ab=Math.abs(rem);
-    const timeStr=isDone?'Done':(ov?'-':'')+Math.floor(ab/60)+':'+String(ab%60).padStart(2,'0');
-    sb+=`<div class="sb-item ${isAct?'active':''} ${isDone?'done':''}" onclick="goSec(${i})">
-      <div class="sn ${isAct?'act':isDone?'done':''}">${i+1}</div>
-      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e(s.name)}</span>
-      <span class="sb-time ${ov&&!isDone?'over':''}" id="sbTime${i}">${isDone?'Done':s.duration+'m'}</span>
-    </div>`;
-  });
-
-  sb+=`<div class="sb-section">
-    <div class="sb-section-label">Attendees</div>
-    ${S.attendees.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--mid);padding:2px 0">
-      <span>${e(a.name)}</span>
-      <button class="a-rm" style="font-size:12px" onclick="removeAttendee('${e(a.name)}')">&times;</button>
-    </div>`).join('')}
-    <div style="display:flex;gap:4px;margin-top:6px">
-      <input type="text" id="addAttName" placeholder="Add name..." style="flex:1;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px;font-size:10px" onkeydown="if(event.key==='Enter')addAttendee()">
-      <button class="add-btn" style="padding:4px 8px;font-size:10px" onclick="addAttendee()">+</button>
-    </div>
-    ${S.seriesId?'<button class="sb-edit-btn" onclick="openAgendaEditor()">Edit agenda</button>':''}
-  </div></div>`;
-
-  // Main content
-  let main=`<div class="main">`;
-  main+=`<div class="t-row">
-    <div class="t-lbl">${sec.duration} min</div>
-    <div class="t-disp" id="tD">--:--</div>
-    <button class="t-btn" onclick="${S.timerOn?'timerStop()':'timerStart()'}">${S.timerOn?'\u23F8':'\u25B6'}</button>
-    <div class="t-bar"><div class="t-fill" id="tF" style="width:0"></div></div>
-  </div>`;
-  main+=`<div class="main-title">${e(sec.name)}</div>`;
-
-  // Section content based on type
-  if(sec.type==='checkin') main+=rCheckinSection(att);
-  else if(sec.type==='headlines') main+=rHeadlinesSection(att);
-  else if(sec.type==='issues') main+=rIssuesSection(att);
-  else if(sec.type==='wrapup') main+=rWrapupSection();
-  else main+=rNotesSection(att);
-
-  // Nav
-  const last=S.curSec===S.sections.length-1;
-  main+=`<div class="main-nav">
-    ${S.curSec>0?'<button class="hdr-btn" onclick="prevSec()">\u2190 Back</button>':''}
-    <button class="hdr-btn red" onclick="nextSec()">${last?'Finish':'Next: '+S.sections[Math.min(S.curSec+1,S.sections.length-1)].name+' \u2192'}</button>
-  </div>`;
-
-  main+=`</div>`;
-  return `<div class="runner">${sb}${main}</div>`;
+function rCheckin(){
+  const present=presentAtt();
+  let h=bookBtn()+`<div class="main-sub">Mark who is present. ${present.length} of ${S.attendees.length} checked in.</div>`;
+  S.attendees.forEach(a=>{const c=S.attendance[a.name];h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg);cursor:pointer" onclick="togAtt('${esc(a.name)}')"><div class="a-chk ${c?'done':''}" style="width:22px;height:22px">${c?'&#10003;':''}</div><div style="font-size:14px;${c?'':'opacity:.5'}">${esc(a.name)}</div>${c?'<span style="font-size:10px;color:var(--green);margin-left:auto">Present</span>':'<span style="font-size:10px;color:var(--mid);margin-left:auto">Absent</span>'}</div>`;});
+  h+=`<div class="sub-l">Notes</div><textarea class="notes" id="sN" placeholder="Check-in notes..." oninput="updNotes(this.value)"></textarea>`;
+  return h;
 }
 
-function rCheckinSection(att){
-  const present=getPresentAttendees();
-  let html=`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;
-  html+=`<div class="main-sub">Mark who is present. ${present.length} of ${S.attendees.length} checked in.</div>`;
-  html+=`<div style="margin-bottom:16px">`;
-  S.attendees.forEach(a=>{
-    const checked=S.attendance[a.name];
-    html+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg);cursor:pointer" onclick="toggleAttendance('${e(a.name)}')">
-      <div class="a-chk ${checked?'done':''}" style="width:22px;height:22px">${checked?'&#10003;':''}</div>
-      <div style="font-size:14px;${checked?'':'opacity:.5'}">${e(a.name)}</div>
-      ${checked?'<span style="font-size:10px;color:var(--green);margin-left:auto">Present</span>':'<span style="font-size:10px;color:var(--mid);margin-left:auto">Absent</span>'}
-    </div>`;
-  });
-  html+=`</div>`;
-  html+=`<div class="sub-l">Notes</div>`;
-  html+=`<textarea class="notes" id="sN" placeholder="Check-in notes..." oninput="updNotes(this.value)"></textarea>`;
-  return html;
+function rNotes(oo){
+  const acts=S.actions.filter(a=>a.section===curSecName());
+  return bookBtn()+`<div class="sub-l" style="margin-top:0">Notes</div><textarea class="notes" id="sN" placeholder="Notes..." oninput="updNotes(this.value)"></textarea><div class="sub-l">Actions</div>${rActList(acts)}${rAddAct(oo)}`;
 }
 
-function rNotesSection(att){
-  const oo=att.map(a=>`<option value="${e(a.name)}">${e(a.name)}</option>`).join('');
-  const secActions=S.actions.filter(a=>a.section===curSecName());
-  return `
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>
-    <div class="sub-l" style="margin-top:0">Notes</div>
-    <textarea class="notes" id="sN" placeholder="Notes..." oninput="updNotes(this.value)"></textarea>
-    <div class="sub-l">Actions</div>
-    ${rActionsList(secActions)}
-    ${rAddAction(oo, curSecName())}`;
+function rHeadlines(oo){
+  const open=S.headlines.filter(h=>h.status==='open'),disc=S.headlines.filter(h=>h.status==='discussed');
+  const acts=S.actions.filter(a=>a.section===curSecName());
+  let h=bookBtn()+`<div class="main-sub">Discussion points. Anyone can add a headline.</div>`;
+  h+=`<div class="add-row" style="margin-bottom:16px"><input type="text" id="hlT" placeholder="Add a headline..." onkeydown="if(event.key==='Enter'){addHL(this.value);this.value='';}"><button class="add-btn" onclick="const i=document.getElementById('hlT');addHL(i.value);i.value='';">+ Headline</button></div>`;
+  if(open.length){h+=`<div class="sub-l">Open (${open.length})</div>`;open.forEach(x=>{h+=rHLItem(x,oo);});}
+  if(disc.length){h+=`<div class="sub-l">Discussed (${disc.length})</div>`;disc.forEach(x=>{h+=rHLItem(x,oo);});}
+  if(!S.headlines.length)h+=`<div style="font-size:13px;color:var(--mid);padding:8px 0">No headlines yet.</div>`;
+  h+=`<div class="sub-l" style="margin-top:20px">Actions</div>${rActList(acts)}${rAddAct(oo)}`;
+  return h;
+}
+function rHLItem(hl,oo){return `<div class="hl-item"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px"><div style="flex:1"><div class="hl-text">${esc(hl.text)}</div><div class="hl-meta">Added by ${esc(hl.by)}</div></div><span class="hl-status ${hl.status}" onclick="updHL('${hl.id}',{status:'${hl.status==='open'?'discussed':'open'}'});render();">${hl.status}</span><button class="a-rm" onclick="delHL('${hl.id}')">&times;</button></div><div style="margin-top:6px"><textarea placeholder="Discussion notes..." oninput="updHL('${hl.id}',{notes:this.value})" style="width:100%;min-height:36px;border:1px solid var(--bdr);border-radius:4px;padding:6px 8px;font-size:12px;resize:vertical;font-family:'Arvo',serif">${esc(hl.notes)}</textarea></div><button class="hl-action-btn" onclick="toggleHLAction('${hl.id}')">+ Create action</button><div class="add-row" id="hlA_${hl.id}" style="display:none;margin-top:6px"><input type="text" id="hlAT_${hl.id}" placeholder="Action..." onkeydown="if(event.key==='Enter')submitHLAction('${hl.id}')"><select id="hlAO_${hl.id}"><option value="">Owner</option>${oo}</select><input type="date" id="hlAD_${hl.id}" style="max-width:140px"><button class="add-btn" onclick="submitHLAction('${hl.id}')">Add</button></div></div>`;}
+
+function rIssues(oo){
+  let h=bookBtn()+`<div class="main-sub">Identify, Discuss, Solve.</div><div class="sub-l">Issues</div>`;
+  if(S.issues.length)S.issues.forEach(i=>{h+=`<div style="padding:10px 0;border-bottom:1px solid var(--bg)"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="font-size:13px;font-weight:700;flex:1">${esc(i.title)}</div><span class="ib ${i.status}" onclick="cycleIss('${i.id}')">${i.status}</span><button class="a-rm" onclick="delIss('${i.id}')">&times;</button></div><input type="text" placeholder="Resolution notes..." value="${esc(i.notes)}" oninput="issNotes('${i.id}',this.value)" style="width:100%;border:none;border-bottom:1px solid var(--bg);padding:5px 0;font-size:12px;font-family:'Arvo',serif;margin-top:3px"></div>`;});
+  else h+=`<div style="font-size:12px;color:var(--mid);padding:4px 0">No issues yet.</div>`;
+  h+=`<div class="add-row"><input type="text" id="iT" placeholder="Raise an issue..." onkeydown="if(event.key==='Enter')addIss()"><button class="add-btn" onclick="addIss()">+ Issue</button></div>`;
+  h+=`<div class="sub-l" style="margin-top:20px">Actions</div>${rActList(S.actions)}${rAddAct(oo)}`;
+  return h;
 }
 
-function rHeadlinesSection(att){
-  const oo=att.map(a=>`<option value="${e(a.name)}">${e(a.name)}</option>`).join('');
-  const open=S.headlines.filter(h=>h.status==='open');
-  const discussed=S.headlines.filter(h=>h.status==='discussed');
-  const secActions=S.actions.filter(a=>a.section===curSecName());
-
-  let html=`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;
-  html+=`<div class="main-sub">Discussion points. Anyone can add a headline before or during the meeting.</div>`;
-
-  // Add headline
-  html+=`<div class="add-row" style="margin-bottom:16px">
-    <input type="text" id="hlT" placeholder="Add a headline..." onkeydown="if(event.key==='Enter'){addHeadline(this.value);this.value='';}">
-    <button class="add-btn" onclick="const i=document.getElementById('hlT');addHeadline(i.value);i.value='';">+ Headline</button>
-  </div>`;
-
-  if(open.length){
-    html+=`<div class="sub-l">Open (${open.length})</div>`;
-    open.forEach(h=>{html+=rHeadlineItem(h,oo);});
-  }
-  if(discussed.length){
-    html+=`<div class="sub-l">Discussed (${discussed.length})</div>`;
-    discussed.forEach(h=>{html+=rHeadlineItem(h,oo);});
-  }
-  if(!S.headlines.length) html+=`<div style="font-size:13px;color:var(--mid);padding:8px 0">No headlines yet. Add one above.</div>`;
-
-  html+=`<div class="sub-l" style="margin-top:20px">Actions from this section</div>`;
-  html+=rActionsList(secActions);
-  html+=rAddAction(oo, curSecName());
-
-  return html;
+function rWrapup(oo){
+  const openA=S.actions.filter(a=>!a.done),doneA=S.actions.filter(a=>a.done);
+  let h=`<div class="main-sub">Review actions, headlines, and rate this meeting.</div>`;
+  h+=`<div class="sub-l">Open actions (${openA.length})</div>`;
+  if(openA.length)openA.forEach(a=>{h+=`<div class="a-item"><div class="a-chk" onclick="togAct('${a.id}')"></div><div style="flex:1"><div class="a-txt">${esc(a.text)}</div><div class="a-meta">${a.owner?'<span>'+esc(a.owner)+'</span>':''}${a.due?'<span>Due '+a.due+'</span>':''}${a.section?'<span>From: '+esc(a.section)+'</span>':''}</div></div></div>`;});
+  else h+=`<div style="font-size:12px;color:var(--mid)">No open actions.</div>`;
+  if(doneA.length){h+=`<div class="sub-l">Completed (${doneA.length})</div>`;doneA.forEach(a=>{h+=`<div class="a-item"><div class="a-chk done" onclick="togAct('${a.id}')">&#10003;</div><div style="flex:1"><div class="a-txt dn">${esc(a.text)}</div></div></div>`;});}
+  if(S.headlines.length){h+=`<div class="sub-l" style="margin-top:20px">Headlines</div>`;S.headlines.forEach(x=>{h+=`<div style="font-size:12px;margin-bottom:6px"><span class="ib ${x.status}" style="font-size:9px;margin-right:6px">${x.status}</span>${esc(x.text)}${x.notes?' — <span style="color:var(--mid)">'+esc(x.notes)+'</span>':''}</div>`;});}
+  // Rating
+  const avg=avgRat();
+  h+=`<div class="sub-l" style="margin-top:20px">Rate this meeting</div>`;
+  if(S.ratings.length)h+=`<div style="background:var(--bg);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:13px;font-weight:700">Average</div><div style="font-size:24px;font-weight:700;color:${avg>=7?'var(--green)':avg>=5?'var(--amber)':'var(--red)'}">${avg}<span style="font-size:12px;font-weight:400;color:var(--mid)">/10</span></div></div>`;
+  S.attendees.forEach(a=>{const r=S.ratings.find(x=>x.by===a.name),rv=r?r.rating:0,pres=S.attendance[a.name];
+    h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg)"><div style="min-width:90px;font-size:13px;${pres?'':'opacity:.4'}">${esc(a.name)}</div><div style="display:flex;gap:3px;flex:1">`;
+    for(let i=1;i<=10;i++){const sel=i<=rv;h+=`<div onclick="submitRat(${i},'${esc(a.name)}')" style="width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;background:${sel?'var(--red)':'var(--bg)'};color:${sel?'var(--white)':'var(--mid)'}">${i}</div>`;}
+    h+=`</div></div>`;});
+  return h;
 }
 
-function rHeadlineItem(h,oo){
-  return `<div class="hl-item">
-    <div class="hl-top">
-      <div style="flex:1">
-        <div class="hl-text">${e(h.text)}</div>
-        <div class="hl-meta">Added by ${e(h.by)}</div>
-      </div>
-      <span class="hl-status ${h.status}" onclick="updateHeadline('${h.id}',{status:'${h.status==='open'?'discussed':'open'}'});render();">${h.status}</span>
-      <button class="a-rm" onclick="deleteHeadline('${h.id}')">&times;</button>
-    </div>
-    <div class="hl-notes">
-      <textarea placeholder="Discussion notes..." oninput="updateHeadline('${h.id}',{notes:this.value})">${e(h.notes)}</textarea>
-    </div>
-    <button class="hl-action-btn" onclick="promptActionFromHL('${h.id}')">+ Create action from this</button>
-    <div class="add-row" id="hlAction_${h.id}" style="display:none;margin-top:6px">
-      <input type="text" id="hlAT_${h.id}" placeholder="Action..." onkeydown="if(event.key==='Enter')submitActionFromHL('${h.id}')">
-      <select id="hlAO_${h.id}"><option value="">Owner</option>${oo}</select>
-      <input type="date" id="hlAD_${h.id}" style="max-width:140px">
-      <button class="add-btn" onclick="submitActionFromHL('${h.id}')">Add</button>
-    </div>
-  </div>`;
-}
+function rActList(acts){if(!acts.length)return '<div style="font-size:12px;color:var(--mid);padding:4px 0">No actions yet.</div>';return acts.map(a=>`<div class="a-item"><div class="a-chk ${a.done?'done':''}" onclick="togAct('${a.id}')">${a.done?'&#10003;':''}</div><div style="flex:1"><div class="a-txt ${a.done?'dn':''}">${esc(a.text)}</div><div class="a-meta">${a.owner?'<span>'+esc(a.owner)+'</span>':''}${a.due?'<span>Due '+a.due+'</span>':''}</div></div><button class="a-rm" onclick="delAct('${a.id}')">&times;</button></div>`).join('');}
+function rAddAct(oo){const sec=curSecName();return `<div class="add-row"><input type="text" id="aT" placeholder="New action..." onkeydown="if(event.key==='Enter'){const o=document.getElementById('aO'),d=document.getElementById('aD');addAct(this.value,o?o.value:'',d?d.value:'','${esc(sec)}');this.value='';}"><select id="aO"><option value="">Owner</option>${oo}</select><input type="date" id="aD" style="max-width:140px"><button class="add-btn" onclick="const t=document.getElementById('aT'),o=document.getElementById('aO'),d=document.getElementById('aD');if(t.value.trim()){addAct(t.value.trim(),o?o.value:'',d?d.value:'','${esc(sec)}');t.value='';}">+ Action</button></div>`;}
 
-function rIssuesSection(att){
-  const oo=att.map(a=>`<option value="${e(a.name)}">${e(a.name)}</option>`).join('');
-  let html=`<div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="add-btn sec" onclick="openScheduler()" style="font-size:11px;padding:5px 12px">Book a meeting</button></div>`;
-  html+=`<div class="main-sub">Identify, Discuss, Solve. Tap the status badge to cycle.</div>`;
-
-  // Issues
-  html+=`<div class="sub-l">Issues</div>`;
-  if(S.issues.length){
-    S.issues.forEach(i=>{
-      html+=`<div class="issue-item"><div class="issue-top">
-        <div class="issue-title">${e(i.title)}</div>
-        <span class="ib ${i.status}" onclick="cycleI(${i.id})">${i.status}</span>
-        <button class="a-rm" onclick="rmIssue(${i.id})">&times;</button>
-      </div>
-      <input type="text" placeholder="Resolution notes..." value="${e(i.notes)}" oninput="iNotes(${i.id},this.value)"
-        style="width:100%;border:none;border-bottom:1px solid var(--bg);padding:5px 0;font-size:12px;font-family:'Arvo',serif;margin-top:3px">
-      </div>`;
-    });
-  } else html+=`<div style="font-size:12px;color:var(--mid);padding:4px 0">No issues raised yet.</div>`;
-
-  html+=`<div class="add-row"><input type="text" id="iT" placeholder="Raise an issue..." onkeydown="if(event.key==='Enter')addIssue()"><button class="add-btn" onclick="addIssue()">+ Issue</button></div>`;
-
-  // Actions
-  html+=`<div class="sub-l" style="margin-top:20px">Actions</div>`;
-  html+=rActionsList(S.actions);
-  html+=rAddAction(oo, curSecName());
-
-  return html;
-}
-
-function rWrapupSection(){
-  let html=`<div class="main-sub">Review all actions and headlines from this meeting.</div>`;
-
-  // All actions summary
-  const openActions=S.actions.filter(a=>!a.done);
-  const doneActions=S.actions.filter(a=>a.done);
-
-  html+=`<div class="sub-l">Open actions (${openActions.length})</div>`;
-  if(openActions.length){
-    openActions.forEach(a=>{
-      html+=`<div class="a-item">
-        <div class="a-chk" onclick="toggleAction('${a.id}')""></div>
-        <div style="flex:1"><div class="a-txt">${e(a.text)}</div>
-        <div class="a-meta">${a.owner?'<span>'+e(a.owner)+'</span>':''}${a.due?'<span>Due '+a.due+'</span>':''}${a.section?'<span>From: '+e(a.section)+'</span>':''}</div></div>
-      </div>`;
-    });
-  } else html+=`<div style="font-size:12px;color:var(--mid)">No open actions.</div>`;
-
-  if(doneActions.length){
-    html+=`<div class="sub-l">Completed (${doneActions.length})</div>`;
-    doneActions.forEach(a=>{
-      html+=`<div class="a-item">
-        <div class="a-chk done" onclick="toggleAction('${a.id}')">&#10003;</div>
-        <div style="flex:1"><div class="a-txt dn">${e(a.text)}</div>
-        <div class="a-meta">${a.owner?'<span>'+e(a.owner)+'</span>':''}</div></div>
-      </div>`;
-    });
-  }
-
-  // Section notes
-  const notedSections=curSections().filter(s=>s.notes);
-  if(notedSections.length){
-    html+=`<div class="sub-l" style="margin-top:20px">Section notes</div>`;
-    notedSections.forEach(s=>{
-      html+=`<div style="margin-bottom:10px"><div style="font-size:12px;font-weight:700;margin-bottom:3px">${e(s.name)}</div><div style="font-size:12px;color:var(--mid);white-space:pre-wrap">${e(s.notes)}</div></div>`;
-    });
-  }
-
-  // Headlines
-  if(S.headlines.length){
-    html+=`<div class="sub-l" style="margin-top:20px">Headlines</div>`;
-    S.headlines.forEach(h=>{
-      html+=`<div style="font-size:12px;margin-bottom:6px"><span class="ib ${h.status}" style="font-size:9px;margin-right:6px">${h.status}</span>${e(h.text)}${h.notes?' \u2014 <span style="color:var(--mid)">'+e(h.notes)+'</span>':''}</div>`;
-    });
-  }
-
-  // Meeting rating
-  const avg=getAverageRating();
-
-  html+=`<div class="sub-l" style="margin-top:20px">Rate this meeting</div>`;
-
-  // Average display
-  if(S.ratings.length){
-    html+=`<div style="background:var(--bg);border-radius:6px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:13px;font-weight:700">Average</div>
-      <div style="font-size:24px;font-weight:700;color:${avg>=7?'var(--green)':avg>=5?'var(--amber)':'var(--red)'}">${avg}<span style="font-size:12px;font-weight:400;color:var(--mid)">/10</span></div>
-    </div>`;
-  }
-
-  // Per-attendee rating rows
-  S.attendees.forEach(a=>{
-    const theirRating=S.ratings.find(r=>r.by===a.name);
-    const present=S.attendance[a.name];
-    const rVal=theirRating?theirRating.rating:0;
-
-    html+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg)">
-      <div style="min-width:100px;font-size:13px;${present?'':'opacity:.4'}">
-        ${e(a.name)}
-        ${!present?'<span style="font-size:10px;color:var(--mid)">(absent)</span>':''}
-      </div>
-      <div style="display:flex;gap:3px;flex:1">`;
-    for(let i=1;i<=10;i++){
-      const sel=i<=rVal;
-      html+=`<div onclick="submitRating(${i},'${e(a.name)}')" style="width:26px;height:26px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;
-        background:${sel?'var(--red)':'var(--bg)'};color:${sel?'var(--white)':'var(--mid)'}">${i}</div>`;
-    }
-    html+=`</div></div>`;
-  });
-
-  return html;
-}
-
-function rActionsList(actions){
-  if(!actions.length) return '<div style="font-size:12px;color:var(--mid);padding:4px 0">No actions yet.</div>';
-  return actions.map(a=>`
-    <div class="a-item">
-      <div class="a-chk ${a.done?'done':''}" onclick="toggleAction('${a.id}')">${a.done?'&#10003;':''}</div>
-      <div style="flex:1">
-        <div class="a-txt ${a.done?'dn':''}">${e(a.text)}</div>
-        <div class="a-meta">${a.owner?'<span>'+e(a.owner)+'</span>':''}${a.due?'<span>Due '+a.due+'</span>':''}</div>
-      </div>
-      <button class="a-rm" onclick="deleteAction('${a.id}')">&times;</button>
-    </div>`).join('');
-}
-
-function rAddAction(oo, section){
-  return `<div class="add-row">
-    <input type="text" id="aT" placeholder="New action..." onkeydown="if(event.key==='Enter'){const o=document.getElementById('aO'),d=document.getElementById('aD');addAction(this.value,o?o.value:'',d?d.value:'','${e(section)}');this.value='';}">
-    <select id="aO"><option value="">Owner</option>${oo}</select>
-    <input type="date" id="aD" style="max-width:140px">
-    <button class="add-btn" onclick="const t=document.getElementById('aT'),o=document.getElementById('aO'),d=document.getElementById('aD');if(t.value.trim()){addAction(t.value.trim(),o?o.value:'',d?d.value:'','${e(section)}');t.value='';}">+ Action</button>
-  </div>`;
-}
-
-function promptActionFromHL(hlId){
-  // Toggle inline form visibility
-  const el=document.getElementById('hlAction_'+hlId);
-  if(el) el.style.display=el.style.display==='none'?'flex':'none';
-}
-function submitActionFromHL(hlId){
-  const t=document.getElementById('hlAT_'+hlId);
-  const o=document.getElementById('hlAO_'+hlId);
-  const d=document.getElementById('hlAD_'+hlId);
-  if(!t||!t.value.trim()) return;
-  addAction(t.value.trim(), o?o.value:'', d?d.value:'', curSecName());
-  t.value='';if(d)d.value='';
-  const el=document.getElementById('hlAction_'+hlId);
-  if(el) el.style.display='none';
-}
-
-/* ══ AGENDA EDITOR MODAL ══ */
-function rAgendaEditor(){
+/* ═══ AGENDA EDITOR ═══ */
+function rAgendaEd(){
   const types=[{v:'checkin',l:'Check-in'},{v:'notes',l:'Notes'},{v:'headlines',l:'Headlines'},{v:'issues',l:'Issues & Actions'},{v:'wrapup',l:'Wrap-up'}];
-  let rows=S.editAgenda.map((s,i)=>{
-    const typeOpts=types.map(t=>`<option value="${t.v}" ${s.type===t.v?'selected':''}>${t.l}</option>`).join('');
-    return `<div class="modal-sec">
-      <div style="display:flex;flex-direction:column;gap:2px;margin-right:4px">
-        <button style="background:none;color:${i===0?'var(--bdr)':'var(--mid)'};font-size:10px;padding:0;line-height:1" onclick="edMove(${i},-1)">\u25B2</button>
-        <button style="background:none;color:${i===S.editAgenda.length-1?'var(--bdr)':'var(--mid)'};font-size:10px;padding:0;line-height:1" onclick="edMove(${i},1)">\u25BC</button>
-      </div>
-      <input type="text" value="${e(s.name)}" oninput="edSetName(${i},this.value)">
-      <input type="number" class="dur-input" value="${s.duration}" min="1" max="120" oninput="edSetDur(${i},this.value)"> min
-      <select onchange="edSetType(${i},this.value)" style="font-size:11px;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px">${typeOpts}</select>
-      <button class="rm-sec" onclick="edRmSec(${i})">&times;</button>
-    </div>`;
-  }).join('');
-
-  return `<div class="modal-bg" onclick="if(event.target===this)closeAgendaEditor()">
-    <div class="modal">
-      <h3>Edit agenda</h3>
-      <p style="font-size:12px;color:var(--mid);margin-bottom:12px">Changes are saved for this recurring meeting series. All future meetings will use this agenda.</p>
-      ${rows}
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="add-btn sec" onclick="edAddSec()">+ Add section</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
-        <button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeAgendaEditor()">Cancel</button>
-        <button class="add-btn" onclick="edSave()">Save agenda</button>
-      </div>
-    </div>
-  </div>`;
+  let rows=S.editAgenda.map((s,i)=>{const to=types.map(t=>`<option value="${t.v}" ${s.type===t.v?'selected':''}>${t.l}</option>`).join('');
+    return `<div class="modal-sec"><div style="display:flex;flex-direction:column;gap:2px;margin-right:4px"><button style="background:none;color:${i===0?'var(--bdr)':'var(--mid)'};font-size:10px;padding:0;line-height:1" onclick="edMove(${i},-1)">\u25B2</button><button style="background:none;color:${i===S.editAgenda.length-1?'var(--bdr)':'var(--mid)'};font-size:10px;padding:0;line-height:1" onclick="edMove(${i},1)">\u25BC</button></div><input type="text" value="${esc(s.name)}" oninput="edName(${i},this.value)"><input type="number" class="dur-input" value="${s.duration}" min="1" max="120" oninput="edDur(${i},this.value)"> min <select onchange="edType(${i},this.value)" style="font-size:11px;padding:4px 6px;border:1px solid var(--bdr);border-radius:4px">${to}</select><button style="color:var(--bdr);background:none;font-size:16px;padding:2px 4px" onclick="edRm(${i})">&times;</button></div>`;}).join('');
+  return `<div class="modal-bg" onclick="if(event.target===this)closeAgendaEd()"><div class="modal"><h3>Edit agenda</h3><p style="font-size:12px;color:var(--mid);margin-bottom:12px">Saved for all future meetings in this series.</p>${rows}<div style="display:flex;gap:8px;margin-top:12px"><button class="add-btn sec" onclick="edAdd()">+ Add section</button></div><div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end"><button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeAgendaEd()">Cancel</button><button class="add-btn" onclick="edSave()">Save agenda</button></div></div></div>`;
 }
 
-/* ══ SUMMARY ══ */
+/* ═══ SCHEDULER ═══ */
+function rScheduler(){
+  const totalMin=(S.schedEndHr-S.schedStartHr)*60;const slotW=Math.max(Math.floor(560/((S.schedEndHr-S.schedStartHr)*4)),8);
+  // Meeting time from selection
+  let meetStart=S.schedSelTime||'',meetEnd='';
+  if(meetStart){const sh=parseInt(meetStart.split(':')[0]),sm=parseInt(meetStart.split(':')[1]),em=(sm+S.schedDuration)%60,eh=sh+Math.floor((sm+S.schedDuration)/60);meetEnd=String(eh).padStart(2,'0')+':'+String(em).padStart(2,'0');}
+  // Time header
+  let hdr='<div style="display:flex;padding-left:100px">';
+  for(let h=S.schedStartHr;h<S.schedEndHr;h++)hdr+=`<div style="width:${slotW*4}px;font-size:9px;color:var(--mid);border-left:1px solid var(--bdr);padding:2px 3px">${String(h).padStart(2,'0')}:00</div>`;
+  hdr+='</div>';
+  // Rows using availabilityView
+  let rows='';
+  const selStartSlot=meetStart?((parseInt(meetStart.split(':')[0])-S.schedStartHr)*4+Math.floor(parseInt(meetStart.split(':')[1])/15)):null;
+  const selSlots=Math.ceil(S.schedDuration/15);
+  S.schedAvail.forEach(p=>{
+    rows+=`<div class="tl-row"><div class="tl-name">${esc(p.name)}</div><div class="tl-blocks" style="position:relative" onclick="schedClickTime(Math.floor((event.offsetX)/${slotW})*15)">`;
+    for(let i=0;i<p.view.length&&i<(S.schedEndHr-S.schedStartHr)*4;i++){
+      const c=p.view[i];let cls='';if(c==='2'||c==='3')cls='busy';else if(c==='1')cls='tentative';else if(c==='4')cls='elsewhere';
+      rows+=`<div class="tl-slot ${cls}" style="width:${slotW}px;display:inline-block"></div>`;
+    }
+    if(selStartSlot!==null)rows+=`<div class="tl-sel" style="left:${selStartSlot*slotW}px;width:${selSlots*slotW}px"></div>`;
+    rows+=`</div></div>`;
+  });
+
+  return `<div class="sched-overlay" onclick="if(event.target===this)closeScheduler()"><div class="sched-panel">
+    <div class="sched-hdr"><h3>Book a meeting</h3><button class="a-rm" style="font-size:20px" onclick="closeScheduler()">&times;</button></div>
+    <div class="sched-body">
+      <div class="sched-field"><label>Subject</label><input type="text" value="${esc(S.schedSubject)}" oninput="S.schedSubject=this.value"></div>
+      <div class="sched-field" style="position:relative"><label>Add people</label><input type="text" id="schedSearchInp" placeholder="Search by name or email..." oninput="schedSearch(this.value)" autocomplete="off"><div id="scDD"></div></div>
+      <div style="margin-bottom:12px">${S.schedPeople.map(p=>`<span class="sched-chip">${esc(p.name)}<button onclick="schedRmP('${esc(p.email)}')">&times;</button></span>`).join('')}</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div class="sched-field" style="flex:1;margin:0"><label>Date</label><input type="date" value="${S.schedDate}" onchange="schedSetDate(this.value)"></div>
+        <div class="sched-field" style="width:90px;margin:0"><label>From</label><input type="time" value="${meetStart}" onchange="S.schedSelTime=this.value;render();" style="font-size:13px"></div>
+        <div class="sched-field" style="width:90px;margin:0"><label>To</label><input type="time" value="${meetEnd}" readonly style="font-size:13px;background:var(--bg);color:var(--mid)"></div>
+        <div class="sched-field" style="width:90px;margin:0"><label>Duration</label><select onchange="S.schedDuration=parseInt(this.value);render()">${[15,30,45,60,90,120].map(d=>`<option value="${d}" ${d===S.schedDuration?'selected':''}>${d} min</option>`).join('')}</select></div>
+      </div>
+      <label style="font-size:12px;display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:12px"><input type="checkbox" ${S.schedTeams?'checked':''} onchange="S.schedTeams=this.checked"> Include Teams link</label>
+      ${S.schedLoading?'<div class="loading" style="padding:20px"><div class="spinner"></div>Loading availability...</div>':`
+        ${S.schedPeople.length?`<div class="sub-l">Availability</div><div class="tl-wrap">${hdr}${rows}</div>
+          <div style="display:flex;gap:12px;font-size:11px;color:var(--mid);margin-top:4px">
+            <span><span style="display:inline-block;width:12px;height:10px;background:#e57373;border-radius:2px;vertical-align:middle"></span> Busy</span>
+            <span><span style="display:inline-block;width:12px;height:10px;background:#ffb74d;border-radius:2px;vertical-align:middle"></span> Tentative</span>
+            <span><span style="display:inline-block;width:12px;height:10px;background:var(--bg);border-radius:2px;vertical-align:middle;border:1px solid var(--bdr)"></span> Free</span>
+          </div>`:'<div style="font-size:13px;color:var(--mid);padding:16px 0">Add people to see availability.</div>'}
+      `}
+    </div>
+    <div class="sched-foot"><button class="hdr-btn" style="background:var(--bg);color:var(--dark)" onclick="closeScheduler()">Cancel</button><button class="add-btn" style="flex:1" onclick="schedBook()">Send invite</button></div>
+  </div></div>`;
+}
+
+/* ═══ SUMMARY ═══ */
 function rSummary(){
-  const mt=S.activeMeeting?S.activeMeeting.subject:'Ad-hoc meeting';
-  const tm=Math.floor(S.elapsed/60);
+  const mt=S.activeMeeting?S.activeMeeting.subject:'Meeting',tm=Math.floor(S.elapsed/60);
   const ts=S.startTime?S.startTime.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true}):'';
   const ds=S.startTime?S.startTime.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}):'';
-  const att=S.activeMeeting?S.activeMeeting.attendees.map(a=>a.name).join(', '):'';
+  const att=S.attendees.map(a=>a.name).join(', ');
+  const sH=(S.sections||[]).filter(s=>s.notes).map(s=>`<div class="sum-sec"><h3>${esc(s.name)}</h3><div style="font-size:13px;color:var(--mid);white-space:pre-wrap">${esc(s.notes)}</div></div>`).join('');
+  const openA=S.actions.filter(a=>!a.done),doneA=S.actions.filter(a=>a.done);
+  const aH=openA.length?openA.map(a=>`<div style="padding:4px 0;font-size:12px;display:flex;gap:8px"><div style="width:6px;height:6px;border-radius:50%;background:var(--red);margin-top:5px;flex-shrink:0"></div><div>${esc(a.text)}${a.owner?' — '+esc(a.owner):''}${a.due?' (due '+a.due+')':''}</div></div>`).join(''):'<div style="font-size:12px;color:var(--mid)">No open actions.</div>';
+  const hlH=S.headlines.length?S.headlines.map(h=>`<div style="padding:4px 0;font-size:12px;display:flex;gap:8px"><div style="width:6px;height:6px;border-radius:50%;background:${h.status==='discussed'?'var(--green)':'var(--blue)'};margin-top:5px;flex-shrink:0"></div><div>${esc(h.text)} <span class="ib ${h.status}" style="font-size:9px">${h.status}</span></div></div>`).join(''):'';
+  const plain=`${mt}\n${ds} at ${ts}\n${att?'Attendees: '+att+'\n':''}Duration: ${tm} minutes\n\n${(S.sections||[]).filter(s=>s.notes).map(s=>s.name+':\n'+s.notes).join('\n\n')}\n\nOpen actions:\n${openA.map(a=>'• '+a.text+(a.owner?' — '+a.owner:'')+(a.due?' (due '+a.due+')':'')).join('\n')||'None'}${S.ratings.length?'\n\nRating: '+avgRat()+'/10':''}`;
 
-  const sH=S.sections.filter(s=>s.notes).map(s=>`<div class="sum-sec"><h3>${e(s.name)}</h3><div class="sum-notes">${e(s.notes)}</div></div>`).join('');
-  const openA=S.actions.filter(a=>!a.done);
-  const doneA=S.actions.filter(a=>a.done);
-  const aH=openA.length?openA.map(a=>`<div class="sum-act"><div class="sum-dot"></div><div>${e(a.text)}${a.owner?' \u2014 '+e(a.owner):''}${a.due?' (due '+a.due+')':''}</div></div>`).join(''):'<div style="font-size:12px;color:var(--mid)">No open actions.</div>';
-  const hlH=S.headlines.length?S.headlines.map(h=>`<div class="sum-act"><div class="sum-dot" style="background:${h.status==='discussed'?'var(--green)':'var(--blue)'}"></div><div>${e(h.text)} <span class="ib ${h.status}" style="font-size:9px">${h.status}</span></div></div>`).join(''):'';
-
-  const plain=`${mt}\n${ds} at ${ts}\n${att?'Attendees: '+att+'\n':''}Duration: ${tm} minutes\n\n${S.sections.filter(s=>s.notes).map(s=>s.name+':\n'+s.notes).join('\n\n')}\n\nOpen actions:\n${openA.map(a=>'\u2022 '+a.text+(a.owner?' \u2014 '+a.owner:'')+(a.due?' (due '+a.due+')':'')).join('\n')||'None'}\n${S.headlines.length?'\nHeadlines:\n'+S.headlines.map(h=>'\u2022 ['+h.status+'] '+h.text+(h.notes?': '+h.notes:'')).join('\n'):''}`;
-
-  return `<div class="card" style="margin-bottom:12px">
-    <div style="display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:16px;font-weight:700;color:var(--red)">Meeting Summary</div>
-      <div style="font-size:12px;color:var(--mid)">${tm} min</div>
-    </div>
-    <div style="font-size:12px;color:var(--mid);margin-top:4px">${ds}${ts?' at '+ts:''}${att?'<br>Attendees: '+att:''}</div>
-  </div>
+  return `<div class="card" style="margin-bottom:12px"><div style="display:flex;align-items:center;justify-content:space-between"><div style="font-size:16px;font-weight:700;color:var(--red)">Meeting Summary</div><div style="font-size:12px;color:var(--mid)">${tm} min</div></div><div style="font-size:12px;color:var(--mid);margin-top:4px">${ds}${ts?' at '+ts:''}${att?'<br>Attendees: '+att:''}</div></div>
   ${sH?'<div class="card">'+sH+'</div>':''}
-  <div class="card"><div class="sum-sec"><h3>Open actions</h3>${aH}</div>${doneA.length?'<div class="sum-sec"><h3>Completed</h3>'+doneA.map(a=>'<div class="sum-act"><div class="sum-dot" style="background:var(--green)"></div><div style="text-decoration:line-through;opacity:.5">'+e(a.text)+'</div></div>').join('')+'</div>':''}</div>
+  <div class="card"><div class="sum-sec"><h3>Open actions</h3>${aH}</div>${doneA.length?'<div class="sum-sec"><h3>Completed</h3>'+doneA.map(a=>'<div style="padding:4px 0;font-size:12px;display:flex;gap:8px"><div style="width:6px;height:6px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0"></div><div style="text-decoration:line-through;opacity:.5">'+esc(a.text)+'</div></div>').join('')+'</div>':''}</div>
   ${hlH?'<div class="card"><div class="sum-sec"><h3>Headlines</h3>'+hlH+'</div></div>':''}
-  ${S.ratings.length?'<div class="card"><div class="sum-sec"><h3>Meeting rating</h3><div style="font-size:20px;font-weight:700;color:'+(getAverageRating()>=7?'var(--green)':getAverageRating()>=5?'var(--amber)':'var(--red)')+'">'+getAverageRating()+'/10</div><div style="font-size:12px;color:var(--mid);margin-top:4px">'+S.ratings.map(r=>e(r.by)+': '+r.rating).join(' \u00B7 ')+'</div></div></div>':''}
-  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap" id="sT" data-plain="${e(plain)}">
+  ${S.ratings.length?'<div class="card"><div class="sum-sec"><h3>Meeting rating: '+avgRat()+'/10</h3><div style="font-size:12px;color:var(--mid)">'+S.ratings.map(r=>esc(r.by)+': '+r.rating).join(' · ')+'</div></div></div>':''}
+  <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap" id="sT" data-plain="${esc(plain)}">
     <button class="add-btn" id="cBtn" onclick="copySummary()" style="flex:1">Copy summary</button>
     <button class="add-btn" id="emailBtn" onclick="emailSummary()" style="flex:1;background:var(--blue)">Email to attendees</button>
     <button class="add-btn" onclick="window.print()" style="flex:1;background:var(--dark)">Print</button>
     <button class="add-btn" onclick="backToDash()" style="flex:1;background:var(--mid)">\u2190 Dashboard</button>
   </div>`;
 }
+function copySummary(){const el=document.getElementById('sT');navigator.clipboard.writeText(el?el.getAttribute('data-plain'):'').then(()=>{const b=document.getElementById('cBtn');if(b){b.textContent='Copied!';setTimeout(()=>{b.textContent='Copy summary'},1500);}});}
 
-async function emailSummary(){
-  const att=S.activeMeeting?S.activeMeeting.attendees:S.attendees;
-  if(!att||!att.length){toast('No attendees to email');return;}
-  const mt=S.activeMeeting?S.activeMeeting.subject:'Meeting';
-  const ds=S.startTime?S.startTime.toLocaleDateString('en-NZ',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}):'';
-  const tm=Math.floor(S.elapsed/60);
-
-  // Build HTML email
-  let body='<div style="font-family:Arial,sans-serif;max-width:600px">';
-  body+=`<h2 style="color:#EF3E42;margin-bottom:4px">${e(mt)}</h2>`;
-  body+=`<p style="color:#666;font-size:14px">${ds} \u00B7 ${tm} minutes</p>`;
-
-  // Section notes
-  const secs=S.sections||curSections();
-  const noted=secs.filter(s=>s.notes);
-  if(noted.length){
-    noted.forEach(s=>{
-      body+=`<h3 style="color:#231F20;margin-top:16px;margin-bottom:4px">${e(s.name)}</h3>`;
-      body+=`<p style="color:#666;font-size:14px;white-space:pre-wrap">${e(s.notes)}</p>`;
-    });
-  }
-
-  // Actions
-  const openA=S.actions.filter(a=>!a.done);
-  if(openA.length){
-    body+=`<h3 style="color:#EF3E42;margin-top:16px;margin-bottom:8px">Open Actions</h3><ul style="color:#333;font-size:14px">`;
-    openA.forEach(a=>{body+=`<li style="margin-bottom:4px">${e(a.text)}${a.owner?' \u2014 <strong>'+e(a.owner)+'</strong>':''}${a.due?' (due '+a.due+')':''}</li>`;});
-    body+=`</ul>`;
-  }
-
-  // Headlines
-  if(S.headlines.length){
-    body+=`<h3 style="color:#231F20;margin-top:16px;margin-bottom:8px">Headlines</h3><ul style="color:#333;font-size:14px">`;
-    S.headlines.forEach(h=>{body+=`<li style="margin-bottom:4px">[${h.status}] ${e(h.text)}${h.notes?' \u2014 '+e(h.notes):''}</li>`;});
-    body+=`</ul>`;
-  }
-
-  // Rating
-  if(S.ratings.length){
-    body+=`<h3 style="color:#231F20;margin-top:16px;margin-bottom:4px">Meeting Rating: ${getAverageRating()}/10</h3>`;
-    body+=`<p style="color:#666;font-size:13px">${S.ratings.map(r=>e(r.by)+': '+r.rating).join(' \u00B7 ')}</p>`;
-  }
-
-  body+=`<hr style="border:none;border-top:1px solid #ddd;margin-top:20px"><p style="color:#999;font-size:12px">Sent from Meeting Runner \u00B7 Unicrest Group</p></div>`;
-
-  // Send via Graph API
-  const recipients=att.map(a=>({emailAddress:{address:a.email,name:a.name}}));
-  const mail={
-    message:{
-      subject:'Meeting Summary: '+mt+' \u2014 '+ds,
-      body:{contentType:'HTML',content:body},
-      toRecipients:recipients
-    }
-  };
-
-  const btn=document.getElementById('emailBtn');
-  if(btn){btn.textContent='Sending...';btn.disabled=true;}
-
-  const t=await getToken();
-  if(!t){toast('Auth error');return;}
-  const r=await fetch(GRAPH+'/me/sendMail',{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(mail)});
-
-  if(r.ok||r.status===202){
-    toast('Summary emailed to '+recipients.length+' attendees');
-    if(btn){btn.textContent='Sent!';setTimeout(()=>{btn.textContent='Email to attendees';btn.disabled=false;},2000);}
-  } else {
-    const err=await r.text();
-    console.error('Send mail error',r.status,err);
-    toast('Failed to send email');
-    if(btn){btn.textContent='Email to attendees';btn.disabled=false;}
-  }
-}
-
-function copySummary(){
-  const el=document.getElementById('sT');
-  navigator.clipboard.writeText(el?el.getAttribute('data-plain'):'').then(()=>{
-    const b=document.getElementById('cBtn');if(b){b.textContent='Copied!';setTimeout(()=>{b.textContent='Copy summary'},1500);}
-  });
-}
-
-function e(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 /* ═══ INIT ═══ */
 initAuth();
