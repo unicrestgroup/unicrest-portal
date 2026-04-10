@@ -721,8 +721,9 @@ function rCalendar(){
     const dayStr=day.toDateString();
     const isToday=dayStr===today;
     const dayEvents=S.calEvents.filter(ev=>{
-      const evDay=ev.start.toDateString();
-      return evDay===dayStr;
+      const dayStart=new Date(day);dayStart.setHours(0,0,0,0);
+      const dayEnd=new Date(day);dayEnd.setHours(23,59,59,999);
+      return ev.start<=dayEnd && ev.end>=dayStart;
     });
     const dayLabel=day.toLocaleDateString('en-NZ',{weekday:'short',day:'2-digit',month:'short'});
 
