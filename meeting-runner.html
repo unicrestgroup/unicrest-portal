@@ -228,7 +228,7 @@ let S = {
   // runner
   activeMeeting:null, seriesId:null, curSec:0,
   sections:[], // agenda for this meeting
-  headlines:[], actions:[], issues:[],
+  headlines:[], actions:[], issues:[], ratings:[],
   timerOn:false, elapsed:0, startTime:null,
   // modal
   showAgendaEditor:false, editAgenda:[]
@@ -281,7 +281,8 @@ const LISTS = {
   config: {name:'MR_Config', id:null},
   headlines: {name:'MR_Headlines', id:null},
   actions: {name:'MR_Actions', id:null},
-  issues: {name:'MR_Issues', id:null}
+  issues: {name:'MR_Issues', id:null},
+  ratings: {name:'MR_Ratings', id:null}
 };
 
 async function initSharePoint(){
@@ -331,6 +332,12 @@ async function createList(name, key){
       {name:'Status',text:{}},
       {name:'Notes',text:{allowMultipleLines:true}},
       {name:'CreatedByName',text:{}}
+    ],
+    ratings: [
+      {name:'SeriesId',text:{}},
+      {name:'MeetingDate',text:{}},
+      {name:'RatedBy',text:{}},
+      {name:'Rating',text:{}}
     ]
   };
   const body = {
@@ -660,6 +667,52 @@ async function rmIssue(id){
 }
 
 /* ═══════════════════════════════
+   RATINGS (SharePoint)
+   ═══════════════════════════════ */
+async function loadRatings(seriesId){
+  if(!seriesId || !LISTS.ratings.id){S.ratings=[];return;}
+  const today=new Date().toISOString().slice(0,10);
+  const items = await spGetItems('ratings','SeriesId',seriesId);
+  // Only show ratings for today's meeting
+  S.ratings = items.filter(it=>it.fields.MeetingDate===today).map(it=>({
+    id:it.id, seriesId:it.fields.SeriesId,
+    date:it.fields.MeetingDate||'', by:it.fields.RatedBy||'',
+    rating:parseFloat(it.fields.Rating)||0
+  }));
+}
+
+function getCurrentUserRating(){
+  const userName=currentUser.name||currentUser.username;
+  return S.ratings.find(r=>r.by===userName);
+}
+
+async function submitRating(value){
+  const v=parseFloat(value);
+  if(isNaN(v)||v<1||v>10) return;
+  const sid=S.seriesId||S.prepSeriesId;
+  if(!sid||!LISTS.ratings.id){toast('Cannot save rating');return;}
+  const userName=currentUser.name||currentUser.username;
+  const today=new Date().toISOString().slice(0,10);
+  const existing=getCurrentUserRating();
+  if(existing){
+    existing.rating=v;
+    await spUpdateItem('ratings',existing.id,{Rating:String(v)});
+    toast('Rating updated');
+  } else {
+    const item=await spAddItem('ratings',{Title:userName+' '+today,SeriesId:sid,MeetingDate:today,RatedBy:userName,Rating:String(v)});
+    if(item) S.ratings.push({id:item.id,seriesId:sid,date:today,by:userName,rating:v});
+    toast('Rating saved');
+  }
+  render();
+}
+
+function getAverageRating(){
+  if(!S.ratings.length) return 0;
+  const sum=S.ratings.reduce((a,r)=>a+r.rating,0);
+  return (sum/S.ratings.length).toFixed(1);
+}
+
+/* ═══════════════════════════════
    TIMER
    ═══════════════════════════════ */
 function timerStart(){if(tInt)return;S.timerOn=true;tInt=setInterval(()=>{S.sections[S.curSec].elapsed++;S.elapsed++;timerUI();},1000);render();}
@@ -694,6 +747,7 @@ async function prepMtg(idx){
   await loadHeadlines(m.seriesId);
   await loadActions(m.seriesId);
   await loadIssues(m.seriesId);
+  await loadRatings(m.seriesId);
   S.screen='prep'; render();
 }
 
@@ -723,6 +777,7 @@ async function startMtg(idx){
   await loadHeadlines(S.seriesId);
   await loadActions(S.seriesId);
   await loadIssues(S.seriesId);
+  await loadRatings(S.seriesId);
 
   S.screen='runner';render();
 }
@@ -1123,6 +1178,35 @@ function rWrapupSection(){
     });
   }
 
+  // Meeting rating
+  const avg=getAverageRating();
+  const myRating=getCurrentUserRating();
+  const userName=currentUser?currentUser.name||currentUser.username:'';
+
+  html+=`<div class="sub-l" style="margin-top:20px">Rate this meeting</div>`;
+  html+=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+    <div style="display:flex;gap:4px">`;
+  for(let i=1;i<=10;i++){
+    const isSelected=myRating&&myRating.rating===i;
+    html+=`<div onclick="submitRating(${i})" style="width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;
+      background:${isSelected?'var(--red)':i<=(myRating?myRating.rating:0)?'var(--red)':'var(--bg)'};
+      color:${isSelected||i<=(myRating?myRating.rating:0)?'var(--white)':'var(--mid)'}">${i}</div>`;
+  }
+  html+=`</div></div>`;
+
+  if(S.ratings.length){
+    html+=`<div style="background:var(--bg);border-radius:6px;padding:12px 14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700">Average rating</div>
+        <div style="font-size:22px;font-weight:700;color:${avg>=7?'var(--green)':avg>=5?'var(--amber)':'var(--red)'}">${avg}<span style="font-size:12px;font-weight:400;color:var(--mid)">/10</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--mid)">`;
+    S.ratings.forEach(r=>{
+      html+=`<div style="display:flex;justify-content:space-between;padding:2px 0"><span>${e(r.by)}</span><span style="font-weight:700">${r.rating}</span></div>`;
+    });
+    html+=`</div></div>`;
+  }
+
   return html;
 }
 
@@ -1219,6 +1303,7 @@ function rSummary(){
   ${sH?'<div class="card">'+sH+'</div>':''}
   <div class="card"><div class="sum-sec"><h3>Open actions</h3>${aH}</div>${doneA.length?'<div class="sum-sec"><h3>Completed</h3>'+doneA.map(a=>'<div class="sum-act"><div class="sum-dot" style="background:var(--green)"></div><div style="text-decoration:line-through;opacity:.5">'+e(a.text)+'</div></div>').join('')+'</div>':''}</div>
   ${hlH?'<div class="card"><div class="sum-sec"><h3>Headlines</h3>'+hlH+'</div></div>':''}
+  ${S.ratings.length?'<div class="card"><div class="sum-sec"><h3>Meeting rating</h3><div style="font-size:20px;font-weight:700;color:'+(getAverageRating()>=7?'var(--green)':getAverageRating()>=5?'var(--amber)':'var(--red)')+'">'+getAverageRating()+'/10</div><div style="font-size:12px;color:var(--mid);margin-top:4px">'+S.ratings.map(r=>e(r.by)+': '+r.rating).join(' \u00B7 ')+'</div></div></div>':''}
   <div style="display:flex;gap:8px;margin-top:12px" id="sT" data-plain="${e(plain)}">
     <button class="add-btn" id="cBtn" onclick="copySummary()" style="flex:1">Copy summary</button>
     <button class="add-btn" onclick="window.print()" style="flex:1;background:var(--dark)">Print</button>
