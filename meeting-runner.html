@@ -222,6 +222,8 @@ let msalApp, accessToken, currentUser, siteId;
 let S = {
   screen:'login',
   meetings:[], loadingCal:false,
+  // prep (pre-meeting view)
+  prepMeeting:null, prepSeriesId:null, prepAgenda:[],
   // runner
   activeMeeting:null, seriesId:null, curSec:0,
   sections:[], // agenda for this meeting
@@ -267,7 +269,7 @@ async function getToken(){
 }
 
 async function gGet(url){const t=await getToken();if(!t)return null;const r=await fetch(GRAPH+url,{headers:{Authorization:'Bearer '+t}});if(!r.ok){console.error('Graph GET',r.status,url);return null;}return r.json();}
-async function gPost(url,body){const t=await getToken();if(!t)return null;const r=await fetch(GRAPH+url,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){console.error('Graph POST',r.status,url);return null;}return r.json();}
+async function gPost(url,body){const t=await getToken();if(!t)return null;const r=await fetch(GRAPH+url,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){const err=await r.text();console.error('Graph POST',r.status,url,err);return null;}return r.json();}
 async function gPatch(url,body){const t=await getToken();if(!t)return null;const r=await fetch(GRAPH+url,{method:'PATCH',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){console.error('Graph PATCH',r.status,url);return null;}return r.json();}
 async function gDel(url){const t=await getToken();if(!t)return;await fetch(GRAPH+url,{method:'DELETE',headers:{Authorization:'Bearer '+t}});}
 
@@ -393,14 +395,21 @@ async function loadHeadlines(seriesId){
 }
 
 async function addHeadline(text){
-  if(!S.seriesId || !LISTS.headlines.id) return;
+  if(!text || !text.trim()) return;
+  text = text.trim();
+  const sid = S.seriesId || S.prepSeriesId;
+  if(!sid){toast('Cannot add headlines to ad-hoc meetings');return;}
+  if(!LISTS.headlines.id){toast('SharePoint list not ready');return;}
   const today = new Date().toISOString().slice(0,10);
   const userName = currentUser.name || currentUser.username;
-  const item = await spAddItem('headlines', {
-    Title:text, SeriesId:S.seriesId, MeetingDate:today,
-    CreatedByName:userName, Status:'open', Notes:''
-  });
-  if(item) S.headlines.push({id:item.id, text, seriesId:S.seriesId, date:today, by:userName, status:'open', notes:''});
+  try {
+    const item = await spAddItem('headlines', {
+      Title:text, SeriesId:sid, MeetingDate:today,
+      CreatedByName:userName, Status:'open', Notes:''
+    });
+    if(item) S.headlines.push({id:item.id, text, seriesId:sid, date:today, by:userName, status:'open', notes:''});
+    else toast('Failed to save headline');
+  } catch(err){console.error('addHeadline error',err);toast('Error saving headline');}
   render();
 }
 
@@ -546,6 +555,20 @@ function goSec(i){if(i<0||i>=S.sections.length)return;timerStop();S.curSec=i;ren
 function nextSec(){S.sections[S.curSec].done=true;timerStop();if(S.curSec<S.sections.length-1){S.curSec++;render();}else endMeeting();}
 function prevSec(){if(S.curSec>0){timerStop();S.curSec--;render();}}
 
+async function prepMtg(idx){
+  const m=S.meetings[idx];
+  S.prepMeeting=m; S.prepSeriesId=m.seriesId;
+  S.prepAgenda = await getAgenda(m.seriesId);
+  await loadHeadlines(m.seriesId);
+  await loadActions(m.seriesId);
+  S.screen='prep'; render();
+}
+
+function startFromPrep(){
+  const idx=S.meetings.findIndex(m=>m.id===S.prepMeeting.id);
+  startMtg(idx>=0?idx:undefined);
+}
+
 async function startMtg(idx){
   const m=idx!==undefined?S.meetings[idx]:null;
   S.activeMeeting=m;S.seriesId=m?m.seriesId:null;
@@ -567,7 +590,7 @@ function endMeeting(){
   timerStop();S.sections[S.curSec].done=true;
   S.screen='summary';render();
 }
-function backToDash(){timerStop();S.screen='dash';document.getElementById('clockEl').textContent='';loadCal();}
+function backToDash(){timerStop();S.screen='dash';S.prepMeeting=null;S.prepSeriesId=null;S.prepAgenda=[];document.getElementById('clockEl').textContent='';loadCal();}
 function hdrAction(){if(S.screen==='runner'){if(confirm('End this meeting?'))endMeeting();}else if(S.screen==='summary')backToDash();}
 function updNotes(v){S.sections[S.curSec].notes=v;}
 
@@ -575,7 +598,8 @@ function updNotes(v){S.sections[S.curSec].notes=v;}
    AGENDA EDITOR
    ═══════════════════════════════ */
 function openAgendaEditor(){
-  S.editAgenda=S.sections.map(s=>({name:s.name,duration:s.duration,type:s.type}));
+  const source = S.screen==='prep' ? S.prepAgenda : S.sections;
+  S.editAgenda=source.map(s=>({name:s.name,duration:s.duration,type:s.type}));
   S.showAgendaEditor=true;render();
 }
 function closeAgendaEditor(){S.showAgendaEditor=false;render();}
@@ -585,10 +609,16 @@ function edSetType(i,v){S.editAgenda[i].type=v;}
 function edAddSec(){S.editAgenda.push({name:'New section',duration:5,type:'notes'});render();}
 function edRmSec(i){if(S.editAgenda.length<=1)return;S.editAgenda.splice(i,1);render();}
 async function edSave(){
-  if(!S.seriesId){toast('Cannot save agenda for ad-hoc meetings');return;}
-  await saveAgenda(S.seriesId, S.editAgenda);
-  S.sections=S.editAgenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
-  S.curSec=0;S.showAgendaEditor=false;render();
+  const sid = S.seriesId || S.prepSeriesId;
+  if(!sid){toast('Cannot save agenda for ad-hoc meetings');return;}
+  await saveAgenda(sid, S.editAgenda);
+  if(S.screen==='prep'){
+    S.prepAgenda=S.editAgenda.map(a=>({...a}));
+  } else {
+    S.sections=S.editAgenda.map(a=>({...a,notes:'',elapsed:0,done:false}));
+    S.curSec=0;
+  }
+  S.showAgendaEditor=false;render();
 }
 
 /* ═══════════════════════════════
@@ -608,6 +638,11 @@ function render(){
     app.innerHTML=rRunner()+(S.showAgendaEditor?rAgendaEditor():'');
     const na=document.getElementById('sN');if(na)na.value=S.sections[S.curSec].notes;
     timerUI();
+  }
+  else if(S.screen==='prep'){
+    btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;
+    document.getElementById('clockEl').textContent='';
+    app.innerHTML='<div class="wrap">'+rPrep()+'</div>'+(S.showAgendaEditor?rAgendaEditor():'');
   }
   else if(S.screen==='summary'){btn.style.display='';btn.textContent='\u2190 Dashboard';btn.className='hdr-btn';btn.onclick=backToDash;document.getElementById('clockEl').textContent='';app.innerHTML='<div class="wrap">'+rSummary()+'</div>';}
 }
@@ -652,10 +687,95 @@ function rDash(){
           <span class="badge ${m.isRec?'rec':'one'}">${m.isRec?'Recurring':'One-off'}</span>
         </div>
         <button class="start-btn" onclick="startMtg(${m.idx})">Start meeting</button>
+        ${m.isRec?'<button class="start-btn" onclick="prepMtg('+m.idx+')" style="background:var(--dark);margin-top:6px">Prepare / View agenda</button>':''}
       </div>`;
     });
   });
   html+=`<button class="adhoc-btn" onclick="startAdhoc()">+ Start an ad-hoc meeting</button>`;
+  return html;
+}
+
+/* ══ PREPARE (Pre-meeting view) ══ */
+function rPrep(){
+  const m=S.prepMeeting;
+  if(!m) return '<div class="empty">No meeting selected.</div>';
+
+  const time=m.start.toLocaleTimeString('en-NZ',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const n=m.attendees.length;
+  const openHL=S.headlines.filter(h=>h.status==='open');
+  const openActions=S.actions.filter(a=>!a.done);
+
+  let html=`
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div style="font-size:17px;font-weight:700">${e(m.subject)}</div>
+          <div style="font-size:12px;color:var(--mid);margin-top:3px">${time} \u00B7 ${m.durMin} min \u00B7 ${n} attendee${n!==1?'s':''}</div>
+        </div>
+        <span class="badge rec">Recurring</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="start-btn" onclick="startFromPrep()" style="flex:1">Start meeting now</button>
+        <button class="start-btn" onclick="openAgendaEditor()" style="flex:1;background:var(--dark)">Edit agenda</button>
+      </div>
+    </div>`;
+
+  // Agenda overview
+  html+=`<div class="card" style="margin-bottom:16px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:10px">Agenda</div>`;
+  S.prepAgenda.forEach((s,i)=>{
+    html+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg)">
+      <div class="sn" style="width:20px;height:20px;font-size:9px">${i+1}</div>
+      <span style="font-size:13px;flex:1">${e(s.name)}</span>
+      <span style="font-size:11px;color:var(--mid)">${s.duration} min</span>
+      <span style="font-size:10px;color:var(--mid);opacity:.6">${s.type}</span>
+    </div>`;
+  });
+  html+=`</div>`;
+
+  // Headlines
+  html+=`<div class="card" style="margin-bottom:16px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:6px">Headlines</div>
+    <div style="font-size:12px;color:var(--mid);margin-bottom:10px">Add discussion points for the meeting. All attendees can add headlines.</div>
+    <div class="add-row" style="margin-bottom:12px">
+      <input type="text" id="hlT" placeholder="Add a headline..." onkeydown="if(event.key==='Enter'){addHeadline(this.value);this.value='';}">
+      <button class="add-btn" onclick="const i=document.getElementById('hlT');addHeadline(i.value);i.value='';">+ Headline</button>
+    </div>`;
+
+  if(S.headlines.length){
+    S.headlines.forEach(h=>{
+      html+=`<div class="hl-item">
+        <div class="hl-top">
+          <div style="flex:1">
+            <div class="hl-text">${e(h.text)}</div>
+            <div class="hl-meta">Added by ${e(h.by)}</div>
+          </div>
+          <span class="hl-status ${h.status}" onclick="updateHeadline('${h.id}',{status:'${h.status==='open'?'discussed':'open'}'});render();">${h.status}</span>
+          <button class="a-rm" onclick="deleteHeadline('${h.id}')">&times;</button>
+        </div>
+      </div>`;
+    });
+  } else {
+    html+=`<div style="font-size:12px;color:var(--mid)">No headlines yet. Add one above.</div>`;
+  }
+  html+=`</div>`;
+
+  // Open actions
+  if(openActions.length){
+    html+=`<div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:8px">Open actions (${openActions.length})</div>`;
+    openActions.forEach(a=>{
+      html+=`<div class="a-item">
+        <div class="a-chk" onclick="toggleAction('${a.id}')"></div>
+        <div style="flex:1">
+          <div class="a-txt">${e(a.text)}</div>
+          <div class="a-meta">${a.owner?'<span>'+e(a.owner)+'</span>':''}${a.due?'<span>Due '+a.due+'</span>':''}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
   return html;
 }
 
