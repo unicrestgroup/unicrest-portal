@@ -18,7 +18,7 @@
   --font:'Arvo',serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;min-width:1100px;overflow-x:auto;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
 /* LOGIN */
 #login-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;background:var(--dark);overflow-y:auto;}
 .login-mark{width:52px;height:52px;background:var(--red);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;}
@@ -28,6 +28,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .login-card h2{font-size:17px;color:#fff;margin-bottom:8px;}.login-card p{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:24px;}
 .btn-ms{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px 20px;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;}
 .btn-ms:hover{background:#d43336;}
+/* PAGES */.pages-wrap{flex:1;min-height:0;position:relative;overflow:hidden;}
+.page{position:absolute;inset:0;overflow-y:auto;display:none;}
 /* SIDEBAR */
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:52px;background:var(--dark);z-index:100;display:flex;flex-direction:column;align-items:flex-start;overflow:hidden;transition:width .2s ease;border-right:1px solid rgba(255,255,255,.08);}
 .sidebar:hover{width:200px;}
@@ -405,8 +407,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         </div>
       </div>
     </div>
+    <div class="pages-wrap">
     <!-- HOME PAGE -->
-    <div id="home-page" style="display:none;flex:1;min-height:0;flex-direction:column;overflow:hidden;">
+    <div id="home-page" class="page" style="display:none;">
     <div class="timer-bar">
       <div class="timer-lbl">Working on:</div>
       <input class="timer-input" id="timer-task" placeholder="What are you working on right now?" onkeydown="if(event.key==='Enter')timerToggle()"/>
@@ -1480,4 +1483,62 @@ function renderDashResults(results){
 init();
 </script>
 </body>
-</html>
+</html>    <!-- DASHBOARD PAGE -->
+    <div id="dashboard-page" class="page" style="display:none;">
+      <!-- Sticky header -->
+      <div style="background:var(--dark);padding:20px 32px 16px;border-bottom:3px solid var(--red);position:sticky;top:0;z-index:10;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:20px;font-weight:700;color:#fff;">Email Response Times</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:3px;">Working hours only. Last 90 days.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <span id="dash-last-scan" style="font-size:11px;color:rgba(255,255,255,.3);"></span>
+            <button onclick="scanResponseTimes()" id="dash-scan-btn" style="background:var(--red);border:none;color:#fff;border-radius:8px;padding:10px 22px;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;">&#9654; Scan</button>
+          </div>
+        </div>
+      </div>
+      <!-- Body -->
+      <div style="padding:28px 32px;max-width:1100px;">
+        <!-- Settings row -->
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 24px;margin-bottom:24px;display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:10px;">Working Days</div>
+            <div style="display:flex;gap:5px;" id="wday-btns">
+              <button onclick="toggleWDay(0)" id="wd-0" class="wday-btn">Sun</button>
+              <button onclick="toggleWDay(1)" id="wd-1" class="wday-btn on">Mon</button>
+              <button onclick="toggleWDay(2)" id="wd-2" class="wday-btn on">Tue</button>
+              <button onclick="toggleWDay(3)" id="wd-3" class="wday-btn on">Wed</button>
+              <button onclick="toggleWDay(4)" id="wd-4" class="wday-btn on">Thu</button>
+              <button onclick="toggleWDay(5)" id="wd-5" class="wday-btn on">Fri</button>
+              <button onclick="toggleWDay(6)" id="wd-6" class="wday-btn">Sat</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:10px;">Working Hours</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <select id="wh-start" onchange="saveWorkSettings()" style="background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;font-family:var(--font);color:var(--text);outline:none;"></select>
+              <span style="font-size:13px;color:var(--mid);">to</span>
+              <select id="wh-end" onchange="saveWorkSettings()" style="background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;font-family:var(--font);color:var(--text);outline:none;"></select>
+            </div>
+          </div>
+        </div>
+        <!-- Stats cards -->
+        <div id="dash-stats" style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;"></div>
+        <!-- Progress -->
+        <div id="dash-progress" style="display:none;background:#fff;border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin-bottom:24px;text-align:center;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;color:var(--mid);">
+            <div class="spinner"></div>
+            <span id="dash-progress-text">Starting scan...</span>
+          </div>
+          <div style="font-size:11px;color:var(--mid);margin-top:8px;font-style:italic;">May take 30-60 seconds for large mailboxes.</div>
+        </div>
+        <!-- Distribution chart -->
+        <div id="dash-chart-wrap" style="display:none;background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:24px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mid);margin-bottom:16px;">Response Time Distribution</div>
+          <div id="dash-chart"></div>
+        </div>
+        <!-- Results -->
+        <div id="dash-results"></div>
+      </div>
+    </div>
