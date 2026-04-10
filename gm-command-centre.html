@@ -20,7 +20,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;min-width:1100px;overflow-x:auto;}
 /* LOGIN */
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;background:var(--dark);}
+#login-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;background:var(--dark);overflow-y:auto;}
 .login-mark{width:52px;height:52px;background:var(--red);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;}
 .login-wm{font-size:22px;font-weight:700;color:#fff;}.login-wm span{color:var(--red);}
 .login-tag{font-size:11px;color:rgba(255,255,255,0.35);font-style:italic;letter-spacing:.12em;}
@@ -46,9 +46,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sb-item.active .sb-lbl{color:rgba(255,255,255,.85);}
 /* APP BODY */
 #app{width:100%;flex-direction:column;}
-.app-body{margin-left:52px;display:flex;flex-direction:column;min-height:100vh;width:calc(100vw - 52px);}
+.app-body{margin-left:52px;display:flex;flex-direction:column;height:100vh;overflow:hidden;width:calc(100vw - 52px);}
 /* TOPBAR */
-.topbar{height:52px;background:var(--dark);border-bottom:3px solid var(--red);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:50;}
+.topbar{height:52px;flex-shrink:0;background:var(--dark);border-bottom:3px solid var(--red);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:50;}
 .tb-left{display:flex;align-items:center;gap:14px;}
 .tb-wm{font-size:15px;font-weight:700;color:#fff;letter-spacing:.02em;}.tb-wm span{color:var(--red);}
 .tb-div{width:1px;height:18px;background:rgba(255,255,255,.12);}
@@ -59,7 +59,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .tb-btn:hover{border-color:rgba(255,255,255,.4);color:#fff;}
 .tb-av{width:28px;height:28px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;}
 /* SETTINGS */
-#settings-panel{display:none;background:var(--dark);border-bottom:1px solid rgba(255,255,255,.08);padding:18px 28px;}
+#settings-panel{display:none;flex-shrink:0;background:var(--dark);border-bottom:1px solid rgba(255,255,255,.08);padding:18px 28px;}
 .sp-inner{max-width:440px;display:flex;flex-direction:column;gap:12px;}
 .sp-group{display:flex;flex-direction:column;gap:6px;}
 .sp-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35);}
@@ -88,14 +88,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .h-val.g{color:#3DBE7A;}.h-val.a{color:#F5A623;}.h-val.r{color:var(--red);}
 .h-lbl{font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.1em;margin-top:4px;}
 /* MAIN GRID */
-.main-grid{display:grid;grid-template-columns:360px 1fr 320px;flex:1;width:100%;}
-.col{border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.main-grid{display:grid;grid-template-columns:360px 1fr 320px;flex:1;min-height:0;width:100%;}
+.col{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden;}
 .col:last-child{border-right:none;}
-.col-hdr{padding:14px 22px 12px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:52px;z-index:10;display:flex;align-items:center;justify-content:space-between;}
+.col-hdr{padding:14px 22px 12px;flex-shrink:0;background:var(--white);border-bottom:1px solid var(--border);z-index:10;display:flex;align-items:center;justify-content:space-between;}
 .col-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);}
 .col-act{font-size:11px;color:var(--red);cursor:pointer;font-weight:700;}
 /* CALENDAR */
-.cal-body{flex:1;overflow-y:auto;background:var(--white);}
+.cal-body{flex:1;min-height:0;overflow-y:auto;background:var(--white);}
 .cal-item{padding:13px 22px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;}
 .cal-item:hover{background:var(--soft);}
 .cal-item.now{background:#FEF5F5;border-left:3px solid var(--red);padding-left:19px;}
@@ -108,12 +108,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .now-chip{display:inline-block;font-size:9px;background:var(--red);color:#fff;padding:2px 6px;border-radius:10px;font-weight:700;margin-left:6px;vertical-align:middle;}
 .cal-empty{padding:28px 22px;font-size:13px;color:var(--mid);font-style:italic;}
 /* EMAIL */
-.email-filters{padding:8px 22px;background:var(--white);border-bottom:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.email-filters{padding:8px 22px;flex-shrink:0;background:var(--white);border-bottom:1px solid var(--border);display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
 .f-chip{font-size:11px;padding:4px 11px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--mid);background:transparent;font-family:var(--font);}
 .f-chip:hover{border-color:var(--red);color:var(--red);}
 .f-chip.on{background:rgba(239,62,66,.08);border-color:rgba(239,62,66,.3);color:var(--red);font-weight:700;}
 .f-sep{width:1px;height:14px;background:var(--border);margin:0 3px;}
-.email-feed{flex:1;overflow-y:auto;background:var(--white);}
+.email-feed{flex:1;min-height:0;overflow-y:auto;background:var(--white);}
 .email-item{padding:14px 22px;border-bottom:1px solid var(--border);}
 .email-item:hover{background:var(--soft);}
 .er1{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:4px;}
@@ -133,7 +133,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .ai-sum{font-size:13px;color:var(--text);line-height:1.6;}
 .ai-act{font-size:11px;color:var(--amber);font-weight:700;margin-top:4px;}
 /* RIGHT COL */
-.right-col{background:var(--bg);}
+.right-col{background:var(--bg);overflow-y:auto;min-height:0;}
 .sec-hdr{padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;}
 .sec-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mid);}
 .section{background:var(--white);border-bottom:1px solid var(--border);}
@@ -235,7 +235,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .sm-tl::-webkit-scrollbar{width:4px;}
 .sm-tl::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 /* DASHBOARD LAYOUT */
-.page-fill{display:none;flex-direction:column;flex:1;overflow:hidden;background:var(--bg);}
+.page-fill{display:none;flex-direction:column;flex:1;min-height:0;background:var(--bg);}
 .page-fill.visible{display:flex;}
 .dash-topbar{background:var(--dark);padding:18px 28px;border-bottom:3px solid var(--red);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0;}
 .dash-topbar-left{}
@@ -245,7 +245,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .dash-last-scan{font-size:11px;color:rgba(255,255,255,.3);font-style:italic;}
 .dash-scan-btn{background:var(--red);border:none;color:#fff;border-radius:8px;padding:9px 20px;font-size:13px;font-family:var(--font);font-weight:700;cursor:pointer;white-space:nowrap;}
 .dash-scan-btn:hover{background:#d43336;}
-.dash-layout{display:flex;flex:1;overflow:hidden;gap:0;}
+.dash-layout{display:flex;flex:1;min-height:0;overflow:hidden;gap:0;}
 .dash-sidebar{width:220px;flex-shrink:0;padding:20px;border-right:1px solid var(--border);overflow-y:auto;background:var(--white);}
 .dash-main{flex:1;padding:20px 24px;overflow-y:auto;}
 .dash-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
@@ -313,7 +313,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .cp-body-wrap{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 
 /* TIMELOG PAGE */
-#timelog-page{display:none;flex:1;overflow-y:auto;}
+#timelog-page{display:none;flex:1;min-height:0;overflow-y:auto;}
 .tl-hdr{background:var(--dark);padding:22px 32px 18px;border-bottom:3px solid var(--red);}
 .tl-hdr-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;}
 .tl-hdr-sub{font-size:12px;color:rgba(255,255,255,.35);}
@@ -345,7 +345,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 </head>
 <body>
 <!-- LOGIN -->
-<div id="login-screen">
+<div id="login-screen" style="display:none;">
   <div style="display:flex;flex-direction:column;align-items:center;gap:7px;">
     <div class="login-mark">UC</div>
     <div class="login-wm"><span>UNI</span>CREST GROUP</div>
@@ -361,7 +361,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 <!-- APP -->
-<div id="app">
+<div id="app" style="display:none;">
   <div class="sidebar">
     <div class="sb-top"><div class="sb-mark">UC</div><div class="sb-brand"><span style="color:var(--red)">UNI</span>CREST</div></div>
     <div class="sb-items">
@@ -406,7 +406,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
     <!-- HOME PAGE -->
-    <div id="home-page" style="display:none;flex:1;flex-direction:column;overflow-y:auto;">
+    <div id="home-page" style="display:none;flex:1;min-height:0;flex-direction:column;overflow:hidden;">
     <div class="timer-bar">
       <div class="timer-lbl">Working on:</div>
       <input class="timer-input" id="timer-task" placeholder="What are you working on right now?" onkeydown="if(event.key==='Enter')timerToggle()"/>
@@ -670,7 +670,7 @@ function clearApiKey(){localStorage.removeItem('gm_api_key');document.getElement
 function saveGhToken(){var v=document.getElementById('gh-token-input').value.trim();if(!v||v==='****************'){document.getElementById('gh-token-status').textContent='No changes.';return;}localStorage.setItem('gm_gh_token',v);document.getElementById('gh-token-status').textContent='Saved.';document.getElementById('gh-token-input').value='****************';}
 function clearGhToken(){localStorage.removeItem('gm_gh_token');document.getElementById('gh-token-input').value='';document.getElementById('gh-token-status').textContent='Cleared.';}
 
-async function init(){msalInst=new msal.PublicClientApplication(msalCfg);await msalInst.initialize();var r=await msalInst.handleRedirectPromise();if(r)curAcct=r.account;var a=msalInst.getAllAccounts();if(a.length>0){curAcct=a[0];showApp();}else{document.getElementById('login-screen').style.display='flex';}}
+async function init(){msalInst=new msal.PublicClientApplication(msalCfg);await msalInst.initialize();var r=await msalInst.handleRedirectPromise();if(r)curAcct=r.account;var a=msalInst.getAllAccounts();if(a.length>0){curAcct=a[0];showApp();}else{document.getElementById('login-screen').style.display='flex';document.body.style.overflow='hidden';}}
 async function signIn(){try{Object.keys(sessionStorage).filter(function(k){return k.startsWith('msal.');}).forEach(function(k){sessionStorage.removeItem(k);});Object.keys(localStorage).filter(function(k){return k.startsWith('msal.');}).forEach(function(k){localStorage.removeItem(k);});if(!msalInst){msalInst=new msal.PublicClientApplication(msalCfg);await msalInst.initialize();}await msalInst.loginRedirect({scopes:SCOPES});}catch(e){console.error(e);alert('Sign in error: '+e.message);}}
 function signOut(){msalInst.logoutRedirect({account:curAcct});}
 async function getToken(){try{var r=await msalInst.acquireTokenSilent({scopes:SCOPES,account:curAcct});return r.accessToken;}catch(e){await msalInst.acquireTokenRedirect({scopes:SCOPES});return null;}}
@@ -680,6 +680,7 @@ async function calGet(url){var t=await getToken();var r=await fetch(url,{headers
 function showApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
+  document.body.style.overflow='';
   var name=curAcct.name||curAcct.username;
   var first=name.split(' ')[0];
   document.getElementById('user-name').textContent=name;
@@ -1357,42 +1358,48 @@ async function scanResponseTimes(){
       btn.disabled=false;btn.textContent='&#9654; Scan emails';return;
     }
 
+    // Get sent items folder ID so we can reliably detect my own messages by folder
+    var sfData=await gGet('https://graph.microsoft.com/v1.0/me/mailFolders/sentitems?$select=id');
+    var sentFolderId=(sfData.id||'').toLowerCase();
+
     // Step 2: for each conversation, find the received message before the reply
-    // Batch in groups of 10 parallel requests
     var results=[];
-    var noInbound=0,calcZero=0,errors=0;
-    // Process sequentially to avoid rate limits (50ms gap between calls)
+    var noInbound=0,errors=0;
     for(var i=0;i<convIds.length;i++){
-      setProgress('Checking conversation '+(i+1)+' of '+convIds.length+' ('+results.length+' matched so far)...');
+      setProgress('Checking '+(i+1)+' of '+convIds.length+' ... ('+results.length+' matched)');
       try{
         var cid=convIds[i];
         var reply=convMap[cid];
         var replySent=new Date(reply.sentDateTime).getTime();
-        var url='https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,from&$top=25';
+        // Fetch all messages in conversation
+        var url='https://graph.microsoft.com/v1.0/me/messages?$filter=conversationId eq %27'+cid+'%27 and isDraft eq false&$select=subject,receivedDateTime,from,parentFolderId&$top=25';
         var msgs=await gGet(url);
-        var items=(msgs.value||[]).filter(function(m){
-          var a=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
-          return a!==myEmail && new Date(m.receivedDateTime).getTime()<replySent;
+        var allMsgs=msgs.value||[];
+        // A message is inbound if: not from me AND not in sent items folder AND received before reply
+        var inbounds=allMsgs.filter(function(m){
+          var fromAddr=(m.from&&m.from.emailAddress&&m.from.emailAddress.address||'').toLowerCase();
+          var inSent=(m.parentFolderId||'').toLowerCase()===sentFolderId;
+          var isMe=fromAddr===myEmail||inSent;
+          var beforeReply=new Date(m.receivedDateTime).getTime()<replySent;
+          return !isMe&&beforeReply;
         });
-        // Sort by receivedDateTime asc, take the last one = most recent before reply
-        items.sort(function(a,b){return new Date(a.receivedDateTime)-new Date(b.receivedDateTime);});
-        var inbound=items.length?items[items.length-1]:null;
+        inbounds.sort(function(a,b){return new Date(a.receivedDateTime)-new Date(b.receivedDateTime);});
+        var inbound=inbounds.length?inbounds[inbounds.length-1]:null;
         if(!inbound){noInbound++;continue;}
         var receivedMs=new Date(inbound.receivedDateTime).getTime();
         var wMins=workMinsBetween(receivedMs,replySent);
-        if(wMins>43200){continue;} // skip >30 working days (likely bad data)
+        if(wMins>43200)continue;
         var subj=(reply.subject||'').replace(/^\s*(re|fwd|fw)\s*:\s*/i,'').replace(/^\s*(re|fwd|fw)\s*:\s*/i,'').trim();
         results.push({
           subject:subj||'(no subject)',
           from:(inbound.from&&inbound.from.emailAddress)?(inbound.from.emailAddress.name||inbound.from.emailAddress.address):'Unknown',
           received:receivedMs,replied:replySent,wMins:wMins
         });
-      }catch(e){errors++;console.warn('Conversation lookup error:',e.message);}
-      // Small delay to respect rate limits
-      if(i%5===4)await new Promise(function(r){setTimeout(r,200);});
+      }catch(e){errors++;console.warn('Conv error',cid,e.message);}
+      if(i%5===4)await new Promise(function(resolve){setTimeout(resolve,150);});
     }
-    console.log('Scan complete. Matched:'+results.length+' NoInbound:'+noInbound+' Errors:'+errors);
-    setProgress('Complete. '+results.length+' of '+convIds.length+' conversations matched.');
+    console.log('Scan: replies='+convIds.length+' matched='+results.length+' noInbound='+noInbound+' errors='+errors);
+    setProgress('Complete. '+results.length+' matched from '+convIds.length+' reply conversations.');
 
     if(!results.length){
       document.getElementById('dash-progress').style.display='none';
